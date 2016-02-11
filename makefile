@@ -1,12 +1,12 @@
 
 
-bin/c_lexer : src/c_lexer.yy.c
-	g++ src/c_lexer.yy.c -o bin/c_lexer
+bin/c_lexer : src/c_lexer.yy.cpp
+	g++ src/c_lexer.yy.cpp -o bin/c_lexer
 
-src/c_lexer.yy.c : src/c_lexer.lex
-	flex -o src/c_lexer.yy.c src/c_lexer.lex
+src/c_lexer.yy.cpp : src/c_lexer.lex
+	flex -o src/c_lexer.yy.cpp src/c_lexer.lex
 
 clean :
-	rm src/c_lexer.yy.c
+	rm src/c_lexer.yy.cpp
 	rm bin/c_lexer
 

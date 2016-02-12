@@ -1,0 +1,16 @@
+string Identifier TokenIdentifier 1  0
+a Identifier TokenIdentifier 1  0
+= Operator TokenOperator 1  0
+" Invalid TokenInvalid 1  0
+bla Identifier TokenIdentifier 1  0
+bla Identifier TokenIdentifier 2  1
+/ Operator TokenOperator 2  1
+r Identifier TokenIdentifier 2  1
+bla Identifier TokenIdentifier 2  1
+/ Operator TokenOperator 2  1
+t Identifier TokenIdentifier 2  1
+bla Identifier TokenIdentifier 2  1
+/ Operator TokenOperator 2  1
+/ Operator TokenOperator 2  1
+r Identifier TokenIdentifier 2  1
+" Invalid TokenInvalid 2  1

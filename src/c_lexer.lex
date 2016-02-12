@@ -111,7 +111,7 @@ ostream& operator << (std::ostream& out, const Token& Tin){
 
 /* -------------------------------------------------------- KEYWORDS -------------------------------------------------------- */
 
-Keyword 				auto|double|int|struct|break|else|long|switch|case|enum|register|typedef|char|extern|return|union|const|float|short|unsigned|continue|for|signed|void|default|goto|sizeof|volatile|do|if|static|while
+Keyword 				auto|double|int|struct|break|else|long|switch|case|enum|register|typedef|char|extern|return|union|const|float|short|unsigned|continue|for|signed|void|default|goto|volatile|do|if|static|while
 
 
 /*
@@ -185,7 +185,7 @@ Operator 	((\[)|(\])|\(|\)|\{|\}|(\.\.\.)|(\.)|->|(\+\+)|--|sizeof|<<|>>|<=|>=|=
 
 /* -------------------------------------------------------- INVALID -------------------------------------------------------- */
 
-Invalid 				[(\S)]+
+Invalid 				.
 
 /* -------------------------------------------------------- PREPROCESSOR -------------------------------------------------------- */
 

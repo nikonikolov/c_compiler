@@ -108,15 +108,10 @@ ostream& operator << (std::ostream& out, const Token& Tin){
 */
 
 
-/* -------------------------------------------------------- IDENTIFIERS -------------------------------------------------------- */
-
-Identifier 				([a-zA-Z_]+[a-zA-Z0-9_]*)		
-/* Pointers are in the operators scope */
-
 
 /* -------------------------------------------------------- KEYWORDS -------------------------------------------------------- */
 
-Keyword 				('auto'|'double'|'int'|'struct'|'break'|'else'|'long'|'switch'|'case'|'enum'|'register'|'typedef'|'char'|'extern'|'return'|'union'|'const'|'float'|'short'|'unsigned'|'continue'|'for'|'signed'|'void'|'default'|'goto'|'sizeof'|'volatile'|'do'|'if'|'static'|'while')
+Keyword 				auto|double|int|struct|break|else|long|switch|case|enum|register|typedef|char|extern|return|union|const|float|short|unsigned|continue|for|signed|void|default|goto|sizeof|volatile|do|if|static|while
 
 
 /*
@@ -124,9 +119,15 @@ Keyword 				((auto)|(double)|(int)|(struct)|(break)|(else)|(long)|(switch)|(case
 
 Keyword 				('auto'|'double'|'int'|'struct'|'break'|'else'|'long'|'switch'|'case'|'enum'|'register'|'typedef'|'char'|'extern'|'return'|'union'|'const'|'float'|'short'|'unsigned'|'continue'|'for'|'signed'|'void'|'default'|'goto'|'sizeof'|'volatile'|'do'|'if'|'static'|'while')
 
+Keyword 				('auto'|'double'|'int'|'struct'|'break'|'else'|'long'|'switch'|'case'|'enum'|'register'|'typedef'|'char'|'extern'|'return'|'union'|'const'|'float'|'short'|'unsigned'|'continue'|'for'|'signed'|'void'|'default'|'goto'|'sizeof'|'volatile'|'do'|'if'|'static'|'while')
 
 Keyword 				auto|double|int|struct|break|else|long|switch|case|enum|register|typedef|char|extern|return|union|const|float|short|unsigned|continue|for|signed|void|default|goto|sizeof|volatile|do|if|static|while
 */
+
+/* -------------------------------------------------------- IDENTIFIERS -------------------------------------------------------- */
+
+Identifier 				([a-zA-Z_]+[a-zA-Z0-9_]*)		
+/* Pointers are in the operators scope */
 
 
 /* -------------------------------------------------------- CONSTANTS -------------------------------------------------------- */
@@ -201,8 +202,8 @@ Preprocessor 			^#[ ].+$
 %%
 [\n]				{ 	input_file_line++; source_file_line++; }
 [ ]|[\t]			{ }
-{Identifier}		{ cout<<Token(yytext, "Identifier", "TokenIdentifier", input_file_line, source_file, source_file_line)<<endl; }
 {Keyword}			{ cout<<Token(yytext, "Keyword", "TokenKeyword", input_file_line, source_file, source_file_line)<<endl; }
+{Identifier}		{ cout<<Token(yytext, "Identifier", "TokenIdentifier", input_file_line, source_file, source_file_line)<<endl; }
 {Constant}			{ cout<<Token(yytext, "Constant", "TokenConstant", input_file_line, source_file, source_file_line)<<endl; }
 {Operator}			{ cout<<Token(yytext, "Operator", "TokenOperator", input_file_line, source_file, source_file_line)<<endl; }
 {StringLiteral}		{ cout<<Token(yytext, "StringLiteral", "TokenStringLiteral", input_file_line, source_file, source_file_line)<<endl; }

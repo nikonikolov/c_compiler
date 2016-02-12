@@ -11,5 +11,7 @@ INFILE=${FILEPATH}.prep
 EXECUTABLE=./bin/c_lexer
 OUTFILE=${FILEPATH}.output
 
+rm -f ${OUTFILE}
+
 cat ${INFILE} | ${EXECUTABLE} > ${OUTFILE}
 

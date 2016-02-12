@@ -16,39 +16,25 @@
 #include <iostream>
 #include <string>
 #include <sstream>
-//#include <boost/regex.hpp>
-//#include "help_methods.h"
 
 using namespace std;
 
 int input_file_line=1;
-int source_file_line;
-string source_file;
+int source_file_line=1;
+string source_file="";
 
 /* -------------------------------------------------------- HELP METHODS -------------------------------------------------------- */
 
-/*const boost::regex source_file_regex("\\A\"(.+)\"\\z");
-const boost::regex source_line_regex("\\A# (\\d+)\\z");
-
-const std::string str_format("\\1");
-
-std::string get_source_file(const std::string& s){
-   return boost::regex_replace(s, source_file_regex, str_format, boost::match_default | boost::format_sed);
-}	
-
-std::string get_source_line(const std::string& s){
-   return boost::regex_replace(s, source_line_regex, str_format, boost::match_default | boost::format_sed);
-}
+enum token_type{
+	Identifier_token, 
+	Keyword_token,
+	Constant_token,
+	Operator_token,
+	StringLiteral_token,
+	Invalid_token
+};
 
 
-void process_prep(const string& content){
-	int line = atoi(get_source_line(content).c_str());
-	string source = get_source_file(content);
-	
-	source_file_line = line-1;
-	source_file = source;
-}
-*/
 void process_prep(const string& content){
 	stringstream ss;
 	ss<<content;
@@ -60,38 +46,32 @@ void process_prep(const string& content){
 	source_file = source_file.substr(1, source_file.size()-2);
 }
 
-/*
-struct Token{
-	string text;
-	string class_t;
-	string type;
-	int input_line;
-	string source;	
-	int source_line;
-};
-
-ostream& operator << (std::ostream& out, const Token& Tin){
-	out<<Tin.text<<" "<<Tin.class_t<<" "<<Tin.type<<" "<<Tin.input_line<<" "<<Tin.source<<" "<<Tin.source_line;
-	return out;
-}
-*/
-
 class Token{
 public:
-	Token (string textin, string class_tin, string typein, int input_linein, string sourcein, int source_linein) :
-	text(textin), class_t(class_tin), type(typein), input_line(input_linein), source(sourcein), source_line(source_linein) {}
+	Token (string textin, string class_tin, token_type token_type_in, int input_linein, string sourcein, int source_linein) :
+	text(textin), class_t(class_tin), input_line(input_linein), source(sourcein), source_line(source_linein) {
+		if(token_type_in==Identifier_token)			ttype = "TIdentifier";
+		else if(token_type_in==Keyword_token)		ttype = "T"+text;
+		else if(token_type_in==Constant_token)		ttype = "TConstant";
+		else if(token_type_in==StringLiteral_token)	ttype = "TStringLiteral";
+		else if(token_type_in==Operator_token)		ttype = "T"+text;
+		else if(token_type_in==Invalid_token)		ttype = "TInvalid";
+
+
+	}
+
 	friend ostream& operator << (std::ostream& out, const Token& Tin);
 private:
 	string text;
 	string class_t;
-	string type;
+	string ttype;
 	int input_line;
 	string source;	
 	int source_line;
 };
 
 ostream& operator << (std::ostream& out, const Token& Tin){
-	out<<Tin.text<<" "<<Tin.class_t<<" "<<Tin.type<<" "<<Tin.input_line<<" "<<Tin.source<<" "<<Tin.source_line;
+	out<<Tin.text<<" "<<Tin.class_t<<" "<<Tin.ttype<<" "<<Tin.input_line<<" "<<Tin.source<<" "<<Tin.source_line;
 	return out;
 }
 
@@ -202,13 +182,13 @@ Preprocessor 			^#[ ].+$
 %%
 [\n]				{ 	input_file_line++; source_file_line++; }
 [ ]|[\t]			{ }
-{Keyword}			{ cout<<Token(yytext, "Keyword", "TokenKeyword", input_file_line, source_file, source_file_line)<<endl; }
-{Identifier}		{ cout<<Token(yytext, "Identifier", "TokenIdentifier", input_file_line, source_file, source_file_line)<<endl; }
-{Constant}			{ cout<<Token(yytext, "Constant", "TokenConstant", input_file_line, source_file, source_file_line)<<endl; }
-{Operator}			{ cout<<Token(yytext, "Operator", "TokenOperator", input_file_line, source_file, source_file_line)<<endl; }
-{StringLiteral}		{ cout<<Token(yytext, "StringLiteral", "TokenStringLiteral", input_file_line, source_file, source_file_line)<<endl; }
+{Keyword}			{ cout<<Token(yytext, "Keyword", Keyword_token, input_file_line, source_file, source_file_line)<<endl; }
+{Identifier}		{ cout<<Token(yytext, "Identifier", Identifier_token, input_file_line, source_file, source_file_line)<<endl; }
+{Constant}			{ cout<<Token(yytext, "Constant", Constant_token, input_file_line, source_file, source_file_line)<<endl; }
+{Operator}			{ cout<<Token(yytext, "Operator", Operator_token, input_file_line, source_file, source_file_line)<<endl; }
+{StringLiteral}		{ cout<<Token(yytext, "StringLiteral", StringLiteral_token, input_file_line, source_file, source_file_line)<<endl; }
 {Preprocessor}		{	process_prep(yytext);	}
-{Invalid}			{ cout<<Token(yytext, "Invalid", "TokenInvalid", input_file_line, source_file, source_file_line)<<endl; }
+{Invalid}			{ cout<<Token(yytext, "Invalid", Invalid_token, input_file_line, source_file, source_file_line)<<endl; }
 %%
 /* ==================== User function section - optional. Define the functions called on regex matches here ==================== */
 

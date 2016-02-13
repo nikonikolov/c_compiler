@@ -1,7 +1,7 @@
 
 
 bin/c_lexer : src/c_lexer.yy.cpp
-	g++ src/c_lexer.yy.cpp -o bin/c_lexer
+	g++ -std=gnu++11 src/c_lexer.yy.cpp -o bin/c_lexer
 
 src/c_lexer.yy.cpp : src/c_lexer.lex
 	flex -o src/c_lexer.yy.cpp src/c_lexer.lex

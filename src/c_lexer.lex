@@ -31,7 +31,12 @@ enum token_type{
 	Constant_token,
 	Operator_token,
 	StringLiteral_token,
-	Invalid_token
+	Invalid_token,
+	Enum_const_token,
+	Char_const_token,
+	Int_const_token,
+	Float_const_token,
+	Empty_token
 };
 
 
@@ -48,16 +53,18 @@ void process_prep(const string& content){
 
 class Token{
 public:
+	
+
 	Token (string textin, string class_tin, token_type token_type_in, int input_linein, string sourcein, int source_linein) :
 	text(textin), class_t(class_tin), input_line(input_linein), source(sourcein), source_line(source_linein) {
 		if(token_type_in==Identifier_token)			ttype = "TIdentifier";
 		else if(token_type_in==Keyword_token)		ttype = "T"+text;
-		else if(token_type_in==Constant_token)		ttype = "TConstant";
+		else if(token_type_in==Int_const_token) 	ttype = "TIntConstant";
+		else if(token_type_in==Float_const_token) 	ttype = "TFloatConstant";
+		else if(token_type_in==Char_const_token) 	ttype = "TCharConstant";
 		else if(token_type_in==StringLiteral_token)	ttype = "TStringLiteral";
 		else if(token_type_in==Operator_token)		ttype = "T"+text;
 		else if(token_type_in==Invalid_token)		ttype = "TInvalid";
-
-
 	}
 
 	friend ostream& operator << (std::ostream& out, const Token& Tin);
@@ -68,7 +75,9 @@ private:
 	int input_line;
 	string source;	
 	int source_line;
+
 };
+
 
 ostream& operator << (std::ostream& out, const Token& Tin){
 	out<<Tin.text<<" "<<Tin.class_t<<" "<<Tin.ttype<<" "<<Tin.input_line<<" "<<Tin.source<<" "<<Tin.source_line;
@@ -149,7 +158,7 @@ Constant 				({FLOATING_CONST}|{INTEGER_CONST}|{ENUM_CONST}|{CHAR_CONST})
 
 /* -------------------------------------------------------- STRING LITERALS ------------------------------------------------------- */
 
-S_CHAR					[^(\")(\\)(\n)]|{ESC_SEQUENCE}								
+S_CHAR					[^\"\\\n]|{ESC_SEQUENCE}								
 S_CHAR_SEQUENCE			{S_CHAR}+												
 StringLiteral			((\"{S_CHAR_SEQUENCE}?\")|(L\"{S_CHAR_SEQUENCE}?\"))
 
@@ -184,7 +193,9 @@ Preprocessor 			^#[ ].+$
 [ ]|[\t]			{ }
 {Keyword}			{ cout<<Token(yytext, "Keyword", Keyword_token, input_file_line, source_file, source_file_line)<<endl; }
 {Identifier}		{ cout<<Token(yytext, "Identifier", Identifier_token, input_file_line, source_file, source_file_line)<<endl; }
-{Constant}			{ cout<<Token(yytext, "Constant", Constant_token, input_file_line, source_file, source_file_line)<<endl; }
+{FLOATING_CONST}	{ cout<<Token(yytext, "Constant", Float_const_token, input_file_line, source_file, source_file_line)<<endl; }
+{INTEGER_CONST}		{ cout<<Token(yytext, "Constant", Int_const_token, input_file_line, source_file, source_file_line)<<endl; }
+{CHAR_CONST}		{ cout<<Token(yytext, "Constant", Char_const_token, input_file_line, source_file, source_file_line)<<endl; }
 {Operator}			{ cout<<Token(yytext, "Operator", Operator_token, input_file_line, source_file, source_file_line)<<endl; }
 {StringLiteral}		{ cout<<Token(yytext, "StringLiteral", StringLiteral_token, input_file_line, source_file, source_file_line)<<endl; }
 {Preprocessor}		{	process_prep(yytext);	}
@@ -192,6 +203,7 @@ Preprocessor 			^#[ ].+$
 %%
 /* ==================== User function section - optional. Define the functions called on regex matches here ==================== */
 
+//{Constant}			{ cout<<Token(yytext, "Constant", Constant_token, input_file_line, source_file, source_file_line)<<endl; }
 
 int main(){
 

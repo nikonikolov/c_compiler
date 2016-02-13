@@ -23,8 +23,6 @@
 # 11 "/usr/include/gnu/stubs.h" 2 3 4
 # 390 "/usr/include/features.h" 2 3 4
 # 28 "/usr/include/stdio.h" 2 3 4
-string a="bla 
-bla /r bla /t bla //r"
 
 
 

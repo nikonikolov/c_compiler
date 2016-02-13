@@ -379,8 +379,8 @@ static void yy_fatal_error (yyconst char msg[]  );
 	*yy_cp = '\0'; \
 	(yy_c_buf_p) = yy_cp;
 
-#define YY_NUM_RULES 10
-#define YY_END_OF_BUFFER 11
+#define YY_NUM_RULES 12
+#define YY_END_OF_BUFFER 13
 /* This struct is not used in this scanner,
    but its presence is necessary. */
 struct yy_trans_info
@@ -390,26 +390,26 @@ struct yy_trans_info
 	};
 static yyconst flex_int16_t yy_accept[218] =
     {   0,
-        0,    0,   11,    9,    2,    1,    6,    9,    6,    6,
-        6,    9,    6,    6,    6,    6,    6,    6,    9,    5,
-        6,    6,    6,    4,    4,    6,    4,    4,    4,    4,
+        0,    0,   13,   11,    2,    1,    8,   11,    8,    8,
+        8,   11,    8,    8,    8,    8,    8,    8,   11,    6,
+        8,    8,    8,    4,    4,    8,    4,    4,    4,    4,
         4,    4,    4,    4,    4,    4,    4,    4,    4,    4,
-        4,    6,    6,    6,    0,    7,    0,    0,    0,    0,
-        5,    5,    5,    0,    0,    0,    5,    5,    5,    6,
-        6,    4,    4,    0,    0,    4,    4,    4,    4,    4,
+        4,    8,    8,    8,    0,    9,    0,    0,    0,    0,
+        5,    5,    6,    0,    0,    0,    6,    6,    6,    8,
+        8,    4,    4,    0,    0,    4,    4,    4,    4,    4,
         4,    3,    4,    4,    4,    4,    4,    4,    3,    4,
         4,    4,    4,    4,    4,    4,    4,    4,    4,    4,
-        0,    0,    0,    0,    5,    0,    0,    0,    0,    5,
+        0,    0,    0,    0,    7,    0,    0,    0,    0,    5,
 
-        5,    5,    0,    5,    5,    5,    5,    0,    0,    0,
+        6,    6,    0,    5,    6,    6,    6,    0,    0,    0,
         0,    4,    4,    4,    4,    4,    4,    4,    4,    4,
         4,    4,    4,    4,    4,    4,    4,    4,    4,    4,
         4,    4,    4,    4,    4,    4,    4,    4,    0,    0,
-        0,    0,    0,    0,    5,    5,    5,    5,    5,    5,
+        0,    0,    0,    0,    5,    6,    6,    5,    6,    6,
         0,    0,    0,    0,    0,    0,    4,    4,    4,    4,
         4,    4,    4,    4,    4,    4,    4,    4,    4,    4,
-        4,    4,    4,    4,    4,    4,    8,    0,    0,    0,
-        0,    5,    5,    0,    0,    0,    0,    4,    4,    4,
+        4,    4,    4,    4,    4,    4,   10,    0,    0,    0,
+        0,    6,    6,    0,    0,    0,    0,    4,    4,    4,
         4,    4,    4,    4,    4,    4,    4,    4,    4,    4,
 
         4,    0,    0,    0,    0,    4,    4,    4,    4,    4,
@@ -451,41 +451,41 @@ static yyconst YY_CHAR yy_ec[256] =
 static yyconst YY_CHAR yy_meta[67] =
     {   0,
         1,    1,    2,    1,    1,    1,    1,    1,    1,    3,
-        4,    4,    1,    1,    1,    1,    1,    1,    5,    5,
-        5,    1,    1,    1,    1,    1,    1,    5,    5,    5,
-        6,    6,    6,    6,    1,    1,    1,    1,    5,    5,
-        5,    5,    5,    5,    6,    6,    6,    6,    6,    6,
-        6,    6,    6,    6,    6,    6,    6,    6,    6,    6,
-        6,    6,    1,    1,    1,    1
+        3,    3,    1,    1,    1,    1,    1,    1,    4,    4,
+        4,    1,    1,    1,    1,    1,    1,    4,    4,    4,
+        5,    5,    5,    5,    1,    1,    1,    1,    4,    4,
+        4,    4,    4,    4,    5,    5,    5,    5,    5,    5,
+        5,    5,    5,    5,    5,    5,    5,    5,    5,    5,
+        5,    5,    1,    1,    1,    1
     } ;
 
 static yyconst flex_uint16_t yy_base[230] =
     {   0,
-        0,  279,  282, 1017, 1017, 1017,  251,   61,  258,  238,
-       59,  211, 1017,  218,   55,   56,   54,  215,   66,  110,
+        0,  279,  282, 1012, 1012, 1012,  251,   61,  258,  238,
+       59,  211, 1012,  218,   55,   56,   54,  215,   66,  110,
        52,  181,   53,   69,   86,  175,   83,   91,   95,  103,
       100,  116,  137,  142,  150,  153,  157,  160,  163,  171,
-      178,   68,   87, 1017,   92, 1017,  206,   89,  248,  177,
+      178,   68,   87, 1012,   92, 1012,  206,   89,  248,  177,
       188,  209,  292,  252,  235,    0,    0,  131,   69,  162,
       141,    0,  191,  102,  118,  258,  277,  215,  297,  307,
       310,  313,  318,  323,  326,  270,  331,  336,  340,  343,
       346,  355,  358,  367,  370,  374,  382,  385,  394,  397,
-        0,  274,  169,    0, 1017,  417,  191,    0,  431, 1017,
+        0,  274,  169,    0, 1012,  417,  191,    0,  431, 1012,
 
-      162,  101,  435,  438,  416, 1017, 1017,  179,  469,  212,
+      162,  101,  435,  438,  416, 1012, 1012,  179,  469,  212,
       511,  441,  455,  458,  464,  478,  471,  495,  483,  520,
       523,  533,  537,  540,  554,  557,  561,  567,  573,  576,
       579,  583,  586,  589,  600,  592,  603,  606,  149,  624,
-      655,  618,  690,  629,  637, 1017, 1017, 1017,  226,  212,
+      655,  618,  690,  629,  637, 1012, 1012, 1012,  226,  212,
       646,  279,    0,  643,  264,    0,  668,  651,  693,  682,
       702,  716,  685,  723,  726,  729,  733,  736,  739,  742,
-      746,  752,  770,  777,  780,  783, 1017,  317,    0,  362,
-        0, 1017, 1017,  773,  831,  795,  866,  787,  791,  798,
+      746,  752,  770,  777,  780,  783, 1012,  317,    0,  362,
+        0, 1012, 1012,  773,  831,  795,  866,  787,  791,  798,
       804,  808,  814,  824,  837,  827,  858,  869,  878,  872,
 
       892,  390,    0,  371,    0,  863,  897,  905,  908,  911,
-      914,  917,  921,  924,  930,  939, 1017,  982,  988,  990,
-      143,  992,  998, 1004, 1010,  139,  112,  108,   65
+      914,  917,  921,  924,  930,  939, 1012,  982,  987,  989,
+      144,  991,  996, 1001, 1006,  140,  113,  109,   66
     } ;
 
 static yyconst flex_int16_t yy_def[230] =
@@ -517,7 +517,7 @@ static yyconst flex_int16_t yy_def[230] =
       217,  217,  217,  217,  217,  217,  217,  217,  217
     } ;
 
-static yyconst flex_uint16_t yy_nxt[1084] =
+static yyconst flex_uint16_t yy_nxt[1079] =
     {   0,
         4,    5,    6,    5,    7,    8,    9,   10,   11,   12,
        13,   13,   14,   15,   13,   16,   17,   18,   19,   20,
@@ -626,21 +626,20 @@ static yyconst flex_uint16_t yy_nxt[1084] =
        62,  217,   79,  217,   79,  217,  215,   62,   62,   62,
       217,  217,  217,   79,  217,  216,  217,  217,  217,  217,
       217,   79,  217,  217,  217,  217,  217,   79,  217,  217,
-      217,   79,   45,  217,   45,  217,   45,   45,   48,  217,
-      217,  217,   48,   48,   63,   63,   62,   62,  108,  217,
+      217,   79,   45,  217,   45,   45,   45,   48,  217,  217,
+       48,   48,   63,   63,   62,   62,  108,  217,  108,  108,
 
-      108,  217,  108,  108,  110,  217,  217,  217,  110,  110,
-      139,  217,  139,  139,  139,  139,    3,  217,  217,  217,
+      108,  110,  217,  217,  110,  110,  139,  217,  139,  139,
+      139,    3,  217,  217,  217,  217,  217,  217,  217,  217,
       217,  217,  217,  217,  217,  217,  217,  217,  217,  217,
       217,  217,  217,  217,  217,  217,  217,  217,  217,  217,
       217,  217,  217,  217,  217,  217,  217,  217,  217,  217,
       217,  217,  217,  217,  217,  217,  217,  217,  217,  217,
       217,  217,  217,  217,  217,  217,  217,  217,  217,  217,
-      217,  217,  217,  217,  217,  217,  217,  217,  217,  217,
-      217,  217,  217
+      217,  217,  217,  217,  217,  217,  217,  217
     } ;
 
-static yyconst flex_int16_t yy_chk[1084] =
+static yyconst flex_int16_t yy_chk[1079] =
     {   0,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
@@ -749,18 +748,17 @@ static yyconst flex_int16_t yy_chk[1084] =
       215,    0,  207,    0,  210,    0,  211,  216,  216,  216,
         0,    0,    0,  213,    0,  212,    0,    0,    0,    0,
         0,  215,    0,    0,    0,    0,    0,  214,    0,    0,
-        0,  216,  218,    0,  218,    0,  218,  218,  219,    0,
-        0,    0,  219,  219,  220,  220,  222,  222,  223,    0,
+        0,  216,  218,    0,  218,  218,  218,  219,    0,    0,
+      219,  219,  220,  220,  222,  222,  223,    0,  223,  223,
 
-      223,    0,  223,  223,  224,    0,    0,    0,  224,  224,
-      225,    0,  225,  225,  225,  225,  217,  217,  217,  217,
+      223,  224,    0,    0,  224,  224,  225,    0,  225,  225,
+      225,  217,  217,  217,  217,  217,  217,  217,  217,  217,
       217,  217,  217,  217,  217,  217,  217,  217,  217,  217,
       217,  217,  217,  217,  217,  217,  217,  217,  217,  217,
       217,  217,  217,  217,  217,  217,  217,  217,  217,  217,
       217,  217,  217,  217,  217,  217,  217,  217,  217,  217,
       217,  217,  217,  217,  217,  217,  217,  217,  217,  217,
-      217,  217,  217,  217,  217,  217,  217,  217,  217,  217,
-      217,  217,  217
+      217,  217,  217,  217,  217,  217,  217,  217
     } ;
 
 static yy_state_type yy_last_accepting_state;
@@ -803,7 +801,12 @@ enum token_type{
 	Constant_token,
 	Operator_token,
 	StringLiteral_token,
-	Invalid_token
+	Invalid_token,
+	Enum_const_token,
+	Char_const_token,
+	Int_const_token,
+	Float_const_token,
+	Empty_token
 };
 
 
@@ -820,16 +823,18 @@ void process_prep(const string& content){
 
 class Token{
 public:
+	
+
 	Token (string textin, string class_tin, token_type token_type_in, int input_linein, string sourcein, int source_linein) :
 	text(textin), class_t(class_tin), input_line(input_linein), source(sourcein), source_line(source_linein) {
 		if(token_type_in==Identifier_token)			ttype = "TIdentifier";
 		else if(token_type_in==Keyword_token)		ttype = "T"+text;
-		else if(token_type_in==Constant_token)		ttype = "TConstant";
+		else if(token_type_in==Int_const_token) 	ttype = "TIntConstant";
+		else if(token_type_in==Float_const_token) 	ttype = "TFloatConstant";
+		else if(token_type_in==Char_const_token) 	ttype = "TCharConstant";
 		else if(token_type_in==StringLiteral_token)	ttype = "TStringLiteral";
 		else if(token_type_in==Operator_token)		ttype = "T"+text;
 		else if(token_type_in==Invalid_token)		ttype = "TInvalid";
-
-
 	}
 
 	friend ostream& operator << (std::ostream& out, const Token& Tin);
@@ -840,7 +845,9 @@ private:
 	int input_line;
 	string source;	
 	int source_line;
+
 };
+
 
 ostream& operator << (std::ostream& out, const Token& Tin){
 	out<<Tin.text<<" "<<Tin.class_t<<" "<<Tin.ttype<<" "<<Tin.input_line<<" "<<Tin.source<<" "<<Tin.source_line;
@@ -884,7 +891,7 @@ SIMPLE_ESC_SEQUENCE		(((\\)(\?))|((\\){2})|(\a)|(\b)|(\f)|(\n)|(\r)|(\t)|(\v))
 */
 /* ============================================== Pattern matching rule section ============================================== */
 /* What happens when no more input */
-#line 888 "src/c_lexer.yy.cpp"
+#line 895 "src/c_lexer.yy.cpp"
 
 #define INITIAL 0
 
@@ -1105,9 +1112,9 @@ YY_DECL
 		}
 
 	{
-#line 182 "src/c_lexer.lex"
+#line 191 "src/c_lexer.lex"
 
-#line 1111 "src/c_lexer.yy.cpp"
+#line 1118 "src/c_lexer.yy.cpp"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -1141,7 +1148,7 @@ yy_match:
 			yy_current_state = yy_nxt[yy_base[yy_current_state] + (unsigned int) yy_c];
 			++yy_cp;
 			}
-		while ( yy_base[yy_current_state] != 1017 );
+		while ( yy_base[yy_current_state] != 1012 );
 
 yy_find_action:
 		yy_act = yy_accept[yy_current_state];
@@ -1168,58 +1175,68 @@ do_action:	/* This label is used only to access EOF actions. */
 case 1:
 /* rule 1 can match eol */
 YY_RULE_SETUP
-#line 183 "src/c_lexer.lex"
+#line 192 "src/c_lexer.lex"
 { 	input_file_line++; source_file_line++; }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 184 "src/c_lexer.lex"
+#line 193 "src/c_lexer.lex"
 { }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 185 "src/c_lexer.lex"
+#line 194 "src/c_lexer.lex"
 { cout<<Token(yytext, "Keyword", Keyword_token, input_file_line, source_file, source_file_line)<<endl; }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 186 "src/c_lexer.lex"
+#line 195 "src/c_lexer.lex"
 { cout<<Token(yytext, "Identifier", Identifier_token, input_file_line, source_file, source_file_line)<<endl; }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 187 "src/c_lexer.lex"
-{ cout<<Token(yytext, "Constant", Constant_token, input_file_line, source_file, source_file_line)<<endl; }
+#line 196 "src/c_lexer.lex"
+{ cout<<Token(yytext, "Constant", Float_const_token, input_file_line, source_file, source_file_line)<<endl; }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 188 "src/c_lexer.lex"
-{ cout<<Token(yytext, "Operator", Operator_token, input_file_line, source_file, source_file_line)<<endl; }
+#line 197 "src/c_lexer.lex"
+{ cout<<Token(yytext, "Constant", Int_const_token, input_file_line, source_file, source_file_line)<<endl; }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 189 "src/c_lexer.lex"
-{ cout<<Token(yytext, "StringLiteral", StringLiteral_token, input_file_line, source_file, source_file_line)<<endl; }
+#line 198 "src/c_lexer.lex"
+{ cout<<Token(yytext, "Constant", Char_const_token, input_file_line, source_file, source_file_line)<<endl; }
 	YY_BREAK
 case 8:
+YY_RULE_SETUP
+#line 199 "src/c_lexer.lex"
+{ cout<<Token(yytext, "Operator", Operator_token, input_file_line, source_file, source_file_line)<<endl; }
+	YY_BREAK
+case 9:
+YY_RULE_SETUP
+#line 200 "src/c_lexer.lex"
+{ cout<<Token(yytext, "StringLiteral", StringLiteral_token, input_file_line, source_file, source_file_line)<<endl; }
+	YY_BREAK
+case 10:
 *yy_cp = (yy_hold_char); /* undo effects of setting up yytext */
 (yy_c_buf_p) = yy_cp -= 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
-#line 190 "src/c_lexer.lex"
+#line 201 "src/c_lexer.lex"
 {	process_prep(yytext);	}
 	YY_BREAK
-case 9:
+case 11:
 YY_RULE_SETUP
-#line 191 "src/c_lexer.lex"
+#line 202 "src/c_lexer.lex"
 { cout<<Token(yytext, "Invalid", Invalid_token, input_file_line, source_file, source_file_line)<<endl; }
 	YY_BREAK
-case 10:
+case 12:
 YY_RULE_SETUP
-#line 192 "src/c_lexer.lex"
+#line 203 "src/c_lexer.lex"
 ECHO;
 	YY_BREAK
-#line 1223 "src/c_lexer.yy.cpp"
+#line 1240 "src/c_lexer.yy.cpp"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -2223,11 +2240,12 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 192 "src/c_lexer.lex"
+#line 203 "src/c_lexer.lex"
 
 
 /* ==================== User function section - optional. Define the functions called on regex matches here ==================== */
 
+//{Constant}			{ cout<<Token(yytext, "Constant", Constant_token, input_file_line, source_file, source_file_line)<<endl; }
 
 int main(){
 

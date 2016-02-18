@@ -16,6 +16,8 @@
 #include <iostream>
 #include <string>
 #include <sstream>
+#include <cstdlib>
+#include "c_parser.tab.hpp"
 
 using namespace std;
 
@@ -103,16 +105,6 @@ ostream& operator << (std::ostream& out, const Token& Tin){
 Keyword 				auto|double|int|struct|break|else|long|switch|case|enum|register|typedef|char|extern|return|union|const|float|short|unsigned|continue|for|signed|void|default|goto|volatile|do|if|static|while
 
 
-/*
-Keyword 				((auto)|(double)|(int)|(struct)|(break)|(else)|(long)|(switch)|(case)|(enum)|(register)|(typedef)|(char)|(extern)|(return)|(union)|(const)|(float)|(short)|(unsigned)|(continue)|(for)|(signed)|(void)|(default)|(goto)|(sizeof)|(volatile)|(do)|(if)|(static)|(while))
-
-Keyword 				('auto'|'double'|'int'|'struct'|'break'|'else'|'long'|'switch'|'case'|'enum'|'register'|'typedef'|'char'|'extern'|'return'|'union'|'const'|'float'|'short'|'unsigned'|'continue'|'for'|'signed'|'void'|'default'|'goto'|'sizeof'|'volatile'|'do'|'if'|'static'|'while')
-
-Keyword 				('auto'|'double'|'int'|'struct'|'break'|'else'|'long'|'switch'|'case'|'enum'|'register'|'typedef'|'char'|'extern'|'return'|'union'|'const'|'float'|'short'|'unsigned'|'continue'|'for'|'signed'|'void'|'default'|'goto'|'sizeof'|'volatile'|'do'|'if'|'static'|'while')
-
-Keyword 				auto|double|int|struct|break|else|long|switch|case|enum|register|typedef|char|extern|return|union|const|float|short|unsigned|continue|for|signed|void|default|goto|sizeof|volatile|do|if|static|while
-*/
-
 /* -------------------------------------------------------- IDENTIFIERS -------------------------------------------------------- */
 
 Identifier 				([a-zA-Z_]+[a-zA-Z0-9_]*)		
@@ -124,7 +116,7 @@ Identifier 				([a-zA-Z_]+[a-zA-Z0-9_]*)
 EXPONENT				([eE]{1}[+-]?[0-9]+)
 FRACTIONAL_CONST		(([0-9]*\.[0-9]+)|([0-9]+\.))
 FLOATING_SUFFIX			([flFL])
-FLOATING_CONST			(({FRACTIONAL_CONST}{EXPONENT}?{FLOATING_SUFFIX}?)|([0-9]+{EXPONENT}{FLOATING_SUFFIX}?))
+Floating_const			(({FRACTIONAL_CONST}{EXPONENT}?{FLOATING_SUFFIX}?)|([0-9]+{EXPONENT}{FLOATING_SUFFIX}?))
 
 LONG_SUFFIX				([lL])
 UNSIGNED_SUFFIX			([uU])
@@ -135,7 +127,7 @@ HEX_CONST				(0[xX]{HEX_DIGIT}+)
 OCTAL_DIGIT				([0-7])
 OCTAL_CONST				(0{OCTAL_DIGIT}+)
 DECIMAL_CONST			({NONZERO_DIGIT}[0-9]*)
-INTEGER_CONST			(({DECIMAL_CONST}{INT_SUFFIX}?)|({HEX_CONST}{INT_SUFFIX}?)|({OCTAL_CONST}{INT_SUFFIX}?))
+Integer_const			(({DECIMAL_CONST}{INT_SUFFIX}?)|({HEX_CONST}{INT_SUFFIX}?)|({OCTAL_CONST}{INT_SUFFIX}?))
 
 ENUM_CONST				{Identifier}
 
@@ -151,10 +143,8 @@ ESC_SEQUENCE 			({HEX_ESC_SEQUENCE}|{OCTAL_ESC_SEQUENCE}|{SIMPLE_ESC_SEQUENCE})
 
 C_CHAR					[^(\')(\\)(\n)]|{ESC_SEQUENCE} 								
 C_CHAR_SEQUENCE			{C_CHAR}+												
-CHAR_CONST				(\'{C_CHAR_SEQUENCE}\'|L\'{C_CHAR_SEQUENCE}\')				
+Char_const				(\'{C_CHAR_SEQUENCE}\'|L\'{C_CHAR_SEQUENCE}\')				
 
-
-Constant 				({FLOATING_CONST}|{INTEGER_CONST}|{ENUM_CONST}|{CHAR_CONST})
 
 /* -------------------------------------------------------- STRING LITERALS ------------------------------------------------------- */
 
@@ -168,10 +158,6 @@ StringLiteral			((\"{S_CHAR_SEQUENCE}?\")|(L\"{S_CHAR_SEQUENCE}?\"))
 Operator 	((\[)|(\])|\(|\)|\{|\}|(\.\.\.)|(\.)|->|(\+\+)|--|sizeof|<<|>>|<=|>=|==|(!=)|(\|)|(&&)|(\|\|)|(\?)|(:)|(\*=)|(\/=)|(%=)|(\+=)|-=|<<=|>>=|&=|(\^=)|(\|=)|,|##|#|;|=|&|(\*)|(\+)|-|~|!|(\/)|%|<|>|(\^))		
 
 
-/* WHY IS sizeof BOTH A KEYWORD AND AN OPERATOR
- What about \n \t ... - you whould probably recognize them so that you know a new token comes in
-*/
-
 /* -------------------------------------------------------- INVALID -------------------------------------------------------- */
 
 Invalid 				.
@@ -181,33 +167,109 @@ Invalid 				.
 Preprocessor 			^#[ ].+$
 
 
-/* NB - REGEX NOT SURE ABOUT:
+/* NB: Regexes that might need fixing:
 	SIMPLE_ESC_SEQUENCE
 	SCHAR 	- should be fine
 */
 
 /* ============================================== Pattern matching rule section ============================================== */
-/* What happens when no more input */
 %%
-[\n]				{ 	input_file_line++; source_file_line++; }
+[\n]				{ input_file_line++; source_file_line++; }
 [ ]|[\t]			{ }
-{Keyword}			{ cout<<Token(yytext, "Keyword", Keyword_token, input_file_line, source_file, source_file_line)<<endl; }
-{Identifier}		{ cout<<Token(yytext, "Identifier", Identifier_token, input_file_line, source_file, source_file_line)<<endl; }
-{FLOATING_CONST}	{ cout<<Token(yytext, "Constant", Float_const_token, input_file_line, source_file, source_file_line)<<endl; }
-{INTEGER_CONST}		{ cout<<Token(yytext, "Constant", Int_const_token, input_file_line, source_file, source_file_line)<<endl; }
-{CHAR_CONST}		{ cout<<Token(yytext, "Constant", Char_const_token, input_file_line, source_file, source_file_line)<<endl; }
-{Operator}			{ cout<<Token(yytext, "Operator", Operator_token, input_file_line, source_file, source_file_line)<<endl; }
-{StringLiteral}		{ cout<<Token(yytext, "StringLiteral", StringLiteral_token, input_file_line, source_file, source_file_line)<<endl; }
-{Preprocessor}		{	process_prep(yytext);	}
-{Invalid}			{ cout<<Token(yytext, "Invalid", Invalid_token, input_file_line, source_file, source_file_line)<<endl; }
+auto				{ return AUTO; }
+double				{ return DOUBLE; }
+int					{ return INT; }
+struct				{ return STRUCT; }
+break				{ return BREAK; }
+else				{ return ELSE; }
+long				{ return LONG; }
+switch				{ return SWITCH; }
+case				{ return CASE; }
+enum				{ return ENUM; }
+register			{ return REGISTER; }
+typedef				{ return TYPEDEF; }
+char				{ return CHAR; }
+extern				{ return EXTERN; }
+return				{ return RETURN; }
+union				{ return UNION; }
+const				{ return CONST; }
+float				{ return FLOAT; }
+short				{ return SHORT; }
+unsigned			{ return UNSIGNED; }
+continue			{ return CONTINUE; }
+for					{ return FOR; }
+signed				{ return SIGNED; }
+void				{ return VOID; }
+default				{ return DEFAULT; }
+goto				{ return GOTO; }
+volatile			{ return VOLATILE; }
+do					{ return DO; }
+if					{ return IF; }
+static				{ return STATIC; }
+while				{ return WHILE; }
+sizeof				{ return SIZEOF; }
+{Identifier}		{ return IDENTIFIER; }
+{Floating_const}	{ return FLOATING_CONST; }
+{Integer_const}		{ return INTEGER_CONST; }
+{Char_const}		{ return CHAR_CONST; }
+\[					{ return LSQUARE; }
+\]					{ return RSQUARE; }
+\(					{ return LBRACKET; }
+\)					{ return RBRACKET; }
+\{					{ return LCURLY; }
+\}					{ return RCURLY; }
+\.\.\.				{ return THREE_DOTS; }
+\.					{ return DOT; }
+\-\>				{ return PTR_OP; }
+\+\+				{ return PLUS_PLUS; }
+\-\-				{ return MINUS_MINUS; }
+\<\<				{ return LSHIFT; }
+\>\>				{ return RSHIFT; }
+\<\=				{ return LESS_OR_EQUAL; }
+\>\=				{ return MORE_OR_EQUAL; }
+\=\=				{ return LOGICAL_EQUALITY; }
+\!\=				{ return LOGICAL_INEQUALITY; }
+\&\&				{ return LOGICAL_AND; }
+\|\|				{ return LOGICAL_OR; }
+\?					{ return Q_MARK; }
+\:					{ return COLON; }
+\*\=				{ return MULT_EQUALS; }
+\/\=				{ return DIV_EQUALS; }
+\%\=				{ return PERCENT_EQUALS; }
+\+\=				{ return PLUS_EQUALS; }
+\-\=				{ return MINUS_EQUALS; }
+\<\<\=				{ return LSHIFT_EQUALS; }
+\>\>\=				{ return RSHIFT_EQUALS; }
+\&\=				{ return AND_EQUALS; }
+\^\=				{ return XOR_EQUALS; }
+\|\=				{ return OR_EQUALS; }
+\,					{ return COMMA; }
+\#\#				{ return HASH; }
+\#					{ return HASH_HASH; }
+\;					{ return SEMI_COLON; }
+\=					{ return EQUALS; }
+\|					{ return BITWISE_OR; }
+\&					{ return BITWISE_AND; }
+\*					{ return MULT; }
+\+					{ return PLUS; }
+\-					{ return MINUS; }
+\~					{ return WAVE; }
+\!					{ return EXL_MARK; }
+\/					{ return DIV; }
+\%					{ return PERCENT; }
+\<					{ return LOGICAL_LESS; }
+\>					{ return LOGICAL_MORE; }
+\^					{ return OP_HAT; }
+{StringLiteral}		{ return STRING_LITERAL; }
+{Preprocessor}		{ process_prep(yytext); }
+{Invalid}			{ cout<<"In file "<<source_file<<": Invalid syntax at line "<<source_file_line<<endl; exit(EXIT_FAILURE); }
 %%
 /* ==================== User function section - optional. Define the functions called on regex matches here ==================== */
 
-//{Constant}			{ cout<<Token(yytext, "Constant", Constant_token, input_file_line, source_file, source_file_line)<<endl; }
 
-int main(){
+/*int main(){
 
 	yylex();
 
 	return 0;
-}
+}*/

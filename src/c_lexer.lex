@@ -59,7 +59,7 @@ enum token_type{
 /* -------------------------------------------------------- KEYWORDS -------------------------------------------------------- */
 
 Keyword 				auto|double|int|struct|break|else|long|switch|case|enum|register|typedef|char|extern|return|union|const|float|short|unsigned|continue|for|signed|void|default|goto|volatile|do|if|static|while
-
+// Make sure sizeof is now recognized as operator, check by running pointer4
 
 /* -------------------------------------------------------- IDENTIFIERS -------------------------------------------------------- */
 
@@ -73,6 +73,7 @@ EXPONENT				([eE]{1}[+-]?[0-9]+)
 FRACTIONAL_CONST		(([0-9]*\.[0-9]+)|([0-9]+\.))
 FLOATING_SUFFIX			([flFL])
 Floating_const			(({FRACTIONAL_CONST}{EXPONENT}?{FLOATING_SUFFIX}?)|([0-9]+{EXPONENT}{FLOATING_SUFFIX}?))
+// is 0.0 recognized
 
 LONG_SUFFIX				([lL])
 UNSIGNED_SUFFIX			([uU])
@@ -81,15 +82,16 @@ HEX_DIGIT				([a-fA-F0-9])
 NONZERO_DIGIT			([1-9])
 HEX_CONST				(0[xX]{HEX_DIGIT}+)
 OCTAL_DIGIT				([0-7])
-OCTAL_CONST				(0{OCTAL_DIGIT}+)
+OCTAL_CONST				(0{OCTAL_DIGIT}*)
 DECIMAL_CONST			({NONZERO_DIGIT}[0-9]*)
 Integer_const			(({DECIMAL_CONST}{INT_SUFFIX}?)|({HEX_CONST}{INT_SUFFIX}?)|({OCTAL_CONST}{INT_SUFFIX}?))
+// NOTE: 0 currently recognized in OCTAL
 
 ENUM_CONST				{Identifier}
 
 HEX_ESC_SEQUENCE		((\\)x{HEX_DIGIT}+)
 OCTAL_ESC_SEQUENCE		((\\){OCTAL_DIGIT}{1,3})										
-SIMPLE_ESC_SEQUENCE		(((\\)(\?))|((\\){2})|(\\a)|(\\b)|(\\f)|(\\n)|(\\r)|(\\t)|(\\v))
+SIMPLE_ESC_SEQUENCE		(((\\)(\'))|((\\)(\"))|((\\)(\?))|((\\){2})|(\\a)|(\\b)|(\\f)|(\\n)|(\\r)|(\\t)|(\\v))
 
 /*
 SIMPLE_ESC_SEQUENCE		(\'|\"|\\?|\\|\a|\b|\f|\\n|\\r|\\t|\v)					

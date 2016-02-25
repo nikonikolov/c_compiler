@@ -21,9 +21,6 @@
 
 using namespace std;
 
-int input_file_line=1;
-int source_file_line=1;
-string source_file="";
 
 /* -------------------------------------------------------- HELP METHODS -------------------------------------------------------- */
 
@@ -42,49 +39,8 @@ enum token_type{
 };
 
 
-void process_prep(const string& content){
-	stringstream ss;
-	ss<<content;
-	string out;
-	ss>>out;
-	ss>>out;
-	source_file_line = atoi(out.c_str())-1;
-	ss>>source_file;
-	source_file = source_file.substr(1, source_file.size()-2);
-}
-
-class Token{
-public:
-	
-
-	Token (string textin, string class_tin, token_type token_type_in, int input_linein, string sourcein, int source_linein) :
-	text(textin), class_t(class_tin), input_line(input_linein), source(sourcein), source_line(source_linein) {
-		if(token_type_in==Identifier_token)			ttype = "TIdentifier";
-		else if(token_type_in==Keyword_token)		ttype = "T"+text;
-		else if(token_type_in==Int_const_token) 	ttype = "TIntConstant";
-		else if(token_type_in==Float_const_token) 	ttype = "TFloatConstant";
-		else if(token_type_in==Char_const_token) 	ttype = "TCharConstant";
-		else if(token_type_in==StringLiteral_token)	ttype = "TStringLiteral";
-		else if(token_type_in==Operator_token)		ttype = "T"+text;
-		else if(token_type_in==Invalid_token)		ttype = "TInvalid";
-	}
-
-	friend ostream& operator << (std::ostream& out, const Token& Tin);
-private:
-	string text;
-	string class_t;
-	string ttype;
-	int input_line;
-	string source;	
-	int source_line;
-
-};
 
 
-ostream& operator << (std::ostream& out, const Token& Tin){
-	out<<Tin.text<<" "<<Tin.class_t<<" "<<Tin.ttype<<" "<<Tin.input_line<<" "<<Tin.source<<" "<<Tin.source_line;
-	return out;
-}
 
 /* ------------------------------------------------------ END HELP METHODS ------------------------------------------------------ */
 
@@ -174,7 +130,7 @@ Preprocessor 			^#[ ].+$
 
 /* ============================================== Pattern matching rule section ============================================== */
 %%
-[\n]				{ input_file_line++; source_file_line++; }
+[\n]				{ input_file_line++; source_file_line++; /*return EOLINE;*/ }
 [ ]|[\t]			{ }
 auto				{ return AUTO; }
 double				{ return DOUBLE; }
@@ -208,9 +164,9 @@ if					{ return IF; }
 static				{ return STATIC; }
 while				{ return WHILE; }
 sizeof				{ return SIZEOF; }
-{Identifier}		{ return IDENTIFIER; }
+{Identifier}		{ yylval.strval = strdup(yytext); return IDENTIFIER; }
 {Floating_const}	{ return FLOATING_CONST; }
-{Integer_const}		{ return INTEGER_CONST; }
+{Integer_const}		{ yylval.intval = atoi(yytext); return INTEGER_CONST; }
 {Char_const}		{ return CHAR_CONST; }
 \[					{ return LSQUARE; }
 \]					{ return RSQUARE; }
@@ -261,15 +217,19 @@ sizeof				{ return SIZEOF; }
 \>					{ return LOGICAL_MORE; }
 \^					{ return OP_HAT; }
 {StringLiteral}		{ return STRING_LITERAL; }
-{Preprocessor}		{ process_prep(yytext); }
+{Preprocessor}		{ process_prep_include(yytext); yylval.strval = strdup(yytext); return PREPROCESSOR_INCLUDE; }
 {Invalid}			{ cout<<"In file "<<source_file<<": Invalid syntax at line "<<source_file_line<<endl; exit(EXIT_FAILURE); }
 %%
 /* ==================== User function section - optional. Define the functions called on regex matches here ==================== */
 
-
-/*int main(){
+/*
+int main(){
+  	cout<<"Lexing starts"<<endl;
 
 	yylex();
 
+  	cout<<"Lexing starts"<<endl;
+
 	return 0;
-}*/
+}
+*/

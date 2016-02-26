@@ -43,8 +43,37 @@
 %token <strval> LSQUARE RSQUARE LBRACKET RBRACKET LCURLY RCURLY THREE_DOTS DOT PTR_OP PLUS_PLUS MINUS_MINUS SIZEOF LSHIFT RSHIFT 
 %token <strval> LESS_OR_EQUAL MORE_OR_EQUAL LOGICAL_EQUALITY LOGICAL_INEQUALITY LOGICAL_AND LOGICAL_OR Q_MARK COLON MULT_EQUALS 
 %token <strval> DIV_EQUALS PERCENT_EQUALS PLUS_EQUALS MINUS_EQUALS LSHIFT_EQUALS RSHIFT_EQUALS AND_EQUALS XOR_EQUALS OR_EQUALS 
-%token <strval> COMMA HASH HASH_HASH SEMI_COLON EQUALS BITWISE_OR BITWISE_AND MULT PLUS MINUS WAVE EXL_MARK DIV PERCENT LOGICAL_LESS 
-%token <strval> LOGICAL_MORE BITWISE_XOR
+%token <strval> COMMA HASH HASH_HASH SEMI_COLON EQUALS BITWISE_OR BITWISE_AND BITWISE_XOR MULT PLUS MINUS WAVE EXL_MARK DIV PERCENT 
+%token <strval> LOGICAL_MORE LOGICAL_LESS
+/*
+useless_non_term  : ASSIGNMENT_OPERATOR
+                  | COMPARISON_OPERATOR
+                  | SIZEOF
+                  | LSHIFT
+                  | RSHIFT
+                  | Q_MARK
+                  | COLON
+                  | BITWISE_XOR
+                  | BITWISE_OR
+                  | BITWISE_AND
+                  | MULT
+                  | PLUS
+                  | MINUS
+                  | WAVE
+                  | EXL_MARK
+                  | DIV
+                  | PERCENT
+                  ;
+
+useless_expr  : useless_non_term bracketed_identifier
+              | useless_non_term CONSTANT
+              | useless_expr useless_non_term CONSTANT
+              | useless_expr useless_non_term bracketed_identifier
+              | useless_non_term
+              | useless_expr LBRACKET 
+              | useless_expr RBRACKET 
+              ;
+*/
 
 /* --------------------------------------------------- TOKENS CONSTANTS --------------------------------------------------- */
 
@@ -66,8 +95,6 @@
 %type <strval> assignment_expression
 
 %type <strval> bracketed_identifier
-
-//%type <fn_ptr> fn_declaration
 
 %type <statement_ptr> loop for_loop while_loop if_block_statement fn_declaration declaration statement 
 
@@ -123,6 +150,11 @@
 */
 
 
+
+
+/* ============================================== PROGRAM START ELEMENTS ============================================== */
+
+
 program : fn_declaration                                   { root = new vector<Statement*>; root->push_back($1);}
         | declaration                                      { root = new vector<Statement*>; root->push_back($1);}
         | PREPROCESSOR_INCLUDE                             { }
@@ -140,7 +172,7 @@ program : fn_declaration                                   { root = new vector<S
 // Final version should include ENUMERATION_CONSTANT
 //CONSTANT : FLOATING_CONST | INTEGER_CONST | ENUMERATION_CONSTANT | CHAR_CONST ;
 
-//CONSTANT : FLOATING_CONST | INTEGER_CONST | CHAR_CONST ;
+CONSTANT : FLOATING_CONST | INTEGER_CONST | CHAR_CONST ;
 
 
 
@@ -259,8 +291,8 @@ loop  : for_loop                                                  { $$=$1; }
       | while_loop                                                { $$=$1; }
       ;
 
-for_loop  : FOR LBRACKET for_loop_decl_statement RBRACKET compound_statement                { $$ = new Loop($5); }
-          | FOR LBRACKET for_loop_decl_statement RBRACKET statement SEMI_COLON              { $$ = new Loop($5); }
+for_loop  : FOR LBRACKET for_loop_decl_statement RBRACKET compound_statement     { $$ = new Loop($5); }
+          | FOR LBRACKET for_loop_decl_statement RBRACKET statement              { $$ = new Loop($5); }
           ;
 
 // NB: to prevent memory leaks, at this stage you need to delete the structures returned in the following conditions
@@ -282,7 +314,7 @@ for_loop_decl_statement : assignment_expression_list SEMI_COLON logical_conditio
                         ;
 
 while_loop  : WHILE LBRACKET logical_condition RBRACKET compound_statement                { $$ = new Loop($5); }
-            | WHILE LBRACKET logical_condition RBRACKET statement SEMI_COLON              { $$ = new Loop($5); }
+            | WHILE LBRACKET logical_condition RBRACKET statement                         { $$ = new Loop($5); }
             ;
 
 /* -------------------------------------------- CONDITIONAL STATEMENTS ------------------------------------------ */
@@ -304,7 +336,7 @@ else_statement_list : else_statement                          { $$ = $1; }
 // undefined: logical_condition
 if_statement  : IF LBRACKET logical_condition RBRACKET compound_statement               
                                               { $$ = new vector<ConditionalCase*>; $$->push_back(new ConditionalCase($5)); }
-              | IF LBRACKET logical_condition RBRACKET statement SEMI_COLON
+              | IF LBRACKET logical_condition RBRACKET statement
                                               { $$ = new vector<ConditionalCase*>; $$->push_back(new ConditionalCase($5)); }
               ;
 
@@ -340,12 +372,24 @@ statement_list  : statement                                         { $$ = new v
 // Add return statements as well
 statement : loop                                                    { $$=$1; }
           | if_block_statement                                      { $$=$1; }
-          | assignment_expression                                   { $$=NULL; }
-          | SEMI_COLON                                              { $$=NULL; }
+          //| assignment_expression                                   { $$=NULL; }
+          //| return_statement                                        { $$=NULL; }
+          //| SEMI_COLON                                              { $$=NULL; }
+          | semi_colon_statement                                    { $$=NULL; }
           ;
 
 
-/* ============================================== EXPRESSIONS ============================================== */
+/* ---------------------------------------------- RETURN STATEMENTS -------------------------------------------- */
+
+semi_colon_statement  : return_statement
+                      | assignment_expression SEMI_COLON
+                      | SEMI_COLON
+                      ;
+
+return_statement  : RETURN logical_condition SEMI_COLON
+                  ;
+
+/* ============================================== END RULES ============================================== */
 
 
 %%  

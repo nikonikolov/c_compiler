@@ -1,0 +1,9 @@
+int Keyword Tint 1  1
+main Identifier TIdentifier 1  1
+( Operator T( 1  1
+) Operator T) 1  1
+{ Operator T{ 2  2
+return Keyword Treturn 3  3
+0 Constant TIntConstant 3  3
+; Operator T; 3  3
+} Operator T} 4  4

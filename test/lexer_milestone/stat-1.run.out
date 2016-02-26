@@ -1,0 +1,12 @@
+int Keyword Tint 1  1
+main Identifier TIdentifier 1  1
+( Operator T( 1  1
+) Operator T) 1  1
+{ Operator T{ 2  2
+if Keyword Tif 3  3
+( Operator T( 3  3
+0.0 Constant TFloatConstant 3  3
+) Operator T) 3  3
+{ Operator T{ 3  3
+} Operator T} 3  3
+} Operator T} 4  4

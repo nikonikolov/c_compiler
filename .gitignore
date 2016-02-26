@@ -2,3 +2,7 @@
 *.obj
 bin/*
 .DS_Store
+Notes.txt
+ctest
+*.zip
+syntaxtest.c

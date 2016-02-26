@@ -34,7 +34,7 @@
 # define YY_YY_SRC_C_PARSER_TAB_HPP_INCLUDED
 /* Debug traces.  */
 #ifndef YYDEBUG
-# define YYDEBUG 0
+# define YYDEBUG 1
 #endif
 #if YYDEBUG
 extern int yydebug;
@@ -46,7 +46,10 @@ extern int yydebug;
   #include <string>  
   #include "helper.hpp"
   #include "DataStructures/Function.h"
+  #include "DataStructures/Loop.h"
   #include "DataStructures/Variable.h"
+  #include "DataStructures/Conditional.h"
+  #include "DataStructures/VarDeclaration.h"
   
   using namespace std;
 
@@ -57,7 +60,7 @@ extern int yydebug;
   //extern Function* root;
   
 
-#line 61 "src/c_parser.tab.hpp" /* yacc.c:1909  */
+#line 64 "src/c_parser.tab.hpp" /* yacc.c:1909  */
 
 /* Token type.  */
 #ifndef YYTOKENTYPE
@@ -143,7 +146,7 @@ extern int yydebug;
     PERCENT = 334,
     LOGICAL_LESS = 335,
     LOGICAL_MORE = 336,
-    OP_HAT = 337,
+    BITWISE_XOR = 337,
     FLOATING_CONST = 338,
     INTEGER_CONST = 339,
     CHAR_CONST = 340,
@@ -159,15 +162,22 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 18 "src/c_parser.y" /* yacc.c:1909  */
+#line 21 "src/c_parser.y" /* yacc.c:1909  */
 
   char* strval;
   int intval;
   Variable* varptr;
   list<Variable>* list_var_ptr=NULL;
-  Function* fnptr;
+  
+  vector<Variable>* vector_var_ptr;
+  vector<Statement*>* vector_statement_pointers_ptr;
+  
+  vector<ConditionalCase*>* vector_conditional_case_pointers_ptr;
+  
+  Function* fn_ptr;
+  Statement* statement_ptr;
 
-#line 171 "src/c_parser.tab.hpp" /* yacc.c:1909  */
+#line 181 "src/c_parser.tab.hpp" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;

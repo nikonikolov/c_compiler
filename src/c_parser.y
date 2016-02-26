@@ -3,7 +3,10 @@
   #include <string>  
   #include "helper.hpp"
   #include "DataStructures/Function.h"
+  #include "DataStructures/Loop.h"
   #include "DataStructures/Variable.h"
+  #include "DataStructures/Conditional.h"
+  #include "DataStructures/VarDeclaration.h"
   
   using namespace std;
 
@@ -20,7 +23,14 @@
   int intval;
   Variable* varptr;
   list<Variable>* list_var_ptr=NULL;
-  Function* fnptr;
+  
+  vector<Variable>* vector_var_ptr;
+  vector<Statement*>* vector_statement_pointers_ptr;
+  
+  vector<ConditionalCase*>* vector_conditional_case_pointers_ptr;
+  
+  Function* fn_ptr;
+  Statement* statement_ptr;
 }
 
 /* --------------------------------------------------- TOKENS KEYWORDS --------------------------------------------------- */
@@ -34,7 +44,7 @@
 %token <strval> LESS_OR_EQUAL MORE_OR_EQUAL LOGICAL_EQUALITY LOGICAL_INEQUALITY LOGICAL_AND LOGICAL_OR Q_MARK COLON MULT_EQUALS 
 %token <strval> DIV_EQUALS PERCENT_EQUALS PLUS_EQUALS MINUS_EQUALS LSHIFT_EQUALS RSHIFT_EQUALS AND_EQUALS XOR_EQUALS OR_EQUALS 
 %token <strval> COMMA HASH HASH_HASH SEMI_COLON EQUALS BITWISE_OR BITWISE_AND MULT PLUS MINUS WAVE EXL_MARK DIV PERCENT LOGICAL_LESS 
-%token <strval> LOGICAL_MORE OP_HAT
+%token <strval> LOGICAL_MORE BITWISE_XOR
 
 /* --------------------------------------------------- TOKENS CONSTANTS --------------------------------------------------- */
 
@@ -44,21 +54,53 @@
 
 %token <strval> IDENTIFIER STRING_LITERAL PREPROCESSOR_INCLUDE EOLINE
 
-%type <list_var_ptr> fn_params_list
+/* **** Only types that you use in the C++ code need to be defined **** */
+%type <vector_var_ptr> fn_params_list initialization_list
 
-%type <strval> fn_param_identifier
+// NOTE: assignment_expression_list and assignment_expression are defined like that only for the purposes of the MILESTONE. 
+// Need to think of a better solution for the final version. You will probably need some special class that can be both 
+// a variable and a statement. Probably variable can inherit Statement. Or you make a new class called expression. It can be
+// useful when dealing with arithmetic expressions. Variable can inherit from it, as a Variable is practically an expression 
+// Expressions and Statements need to be related somehow. You can make Expression inferit from Statement
+%type <vector_var_ptr> assignment_expression_list
+%type <strval> assignment_expression
 
-%type <fnptr> fn_declaration
+%type <strval> bracketed_identifier
 
-/* Only types that you use in the C++ code need to be defined */
-//%type <strval> IDENTIFIER 
-//%type <intval> INTEGER_CONST 
+//%type <fn_ptr> fn_declaration
 
-%start fn_declaration
+%type <statement_ptr> loop for_loop while_loop if_block_statement fn_declaration declaration statement 
+
+%type <vector_statement_pointers_ptr> compound_statement declaration_list statement_list
+
+%type <vector_statement_pointers_ptr> program
+
+%type <vector_conditional_case_pointers_ptr> if_statement else_statement else_statement_list
+
+
+/* ---------------------------------------------- FOR DEBUGGING PURPOSES -------------------------------------------- */
+
+/* Generate the parser description file.  */
+%verbose
+/* Enable run-time traces (yydebug).  */
+%define parse.trace
+
+/* Formatting semantic values.  */
+//%printer { fprintf (yyoutput, "%s", $$.strval); } <char*>;
+%printer { cerr<<$$.strval; } <char*>;
+//%printer { fprintf (yyoutput, "%s()", $$->strval); } FNCT;
+//%printer { fprintf (yyoutput, "%g", $$); } <double>;
+
+/* ---------------------------------------------- END FOR DEBUGGING PURPOSES -------------------------------------------- */
+
+
+
+%start program
 
 %{
-  Function* root=NULL;
   /* put additional C++ code here */
+  // Probably a better idea to make root pointer to Program in the end as function will not inherit from statement
+  vector<Statement*>* root=NULL;
 %}
 
 %%
@@ -80,133 +122,259 @@
 
 */
 
+
+program : fn_declaration                                   { root = new vector<Statement*>; root->push_back($1);}
+        | declaration                                      { root = new vector<Statement*>; root->push_back($1);}
+        | PREPROCESSOR_INCLUDE                             { }
+        | program fn_declaration                           { root->push_back($2); }
+        | program declaration                              { root->push_back($2); }
+        | program PREPROCESSOR_INCLUDE                     { }
+        ;
+        
+
 /* ============================================== 3.1 LEXICAL ELEMENTS ============================================== */
 
 /* ---------------------------------------------- 3.1.3 CONSTANTS -------------------------------------------- */
 
 // Ready
+// Final version should include ENUMERATION_CONSTANT
 //CONSTANT : FLOATING_CONST | INTEGER_CONST | ENUMERATION_CONSTANT | CHAR_CONST ;
 
+//CONSTANT : FLOATING_CONST | INTEGER_CONST | CHAR_CONST ;
 
 
-/* -------------------------------------------- ENUMERATION SPECIFIERS ------------------------------------------ */
-/* ---------------------------------------------c grammar: 3.5.2.2 enumeration specifiers ----------------------- */
 
+/* -------------------------------------------- 3.5.2.2. ENUMERATION SPECIFIERS ------------------------------------------ */
 
 //ENUMERATION_CONSTANT : IDENTIFIER ; 
 
-//START : fn_declaration { root = $1; }
 
-/* -------------------------------------------- FUNCTION DECLARATIONS ------------------------------------------ */
+/* -------------------------------------------- VARIABLE DECLARATIONS ------------------------------------------ */
+/* You need to define declaration here so that compound statement works. For the final version add other types as well 
+    e.g. double, float, char, arrays, pointers, function pointers. You should also try to make structs work. Remember that
+    arrays can be defined at initialization. You can try long and const as well. Question - can you cast variables on declaration? */
 
-// undefined fn_body. YOu have to add other return types as well
-fn_declaration  : INT IDENTIFIER LBRACKET fn_params_list RBRACKET LCURLY RCURLY          
-                    { root = new Function(int_type, $2, $4);
-                      root->pretty_print(0);}
-//                | INT IDENTIFIER LBRACKET fn_params_list RBRACKET LCURLY fn_body RCURLY  { cout<<"FUNCTION :"<<$2<<endl;}
-                ;
+// Currently only INTs covered
+declaration   : INT initialization_list SEMI_COLON                              { $$ = new VarDeclaration(int_type, $2);}
+              ;
 
-// need to add other types than int; add void and const
-//fn_params_list  : INT fn_param_identifier                           { cout<<"fn_param1 "<<$$<<endl; list_push_to_front($$, Variable(int_type, $2)); cout<<"fn_param1"<<endl;}
-//                | fn_params_list COMMA INT fn_param_identifier      { cout<<"fn_param2"<<endl; list_push_to_front($$, Variable(int_type, $4)); }
-fn_params_list  : INT fn_param_identifier                         { $$ = new list<Variable>; $$->push_back(Variable(int_type, $2));}
-                | fn_params_list COMMA INT fn_param_identifier    { $$->push_back(Variable(int_type, $4)); }
-                |                                                 { $$ = NULL; }
-                ;   
-
-fn_param_identifier : IDENTIFIER                                    { $$ = $1; }
-                    | LBRACKET fn_param_identifier RBRACKET
+// arrays and pointers not currently accounted for
+initialization_list : bracketed_identifier                              { $$ = new vector<Variable>; $$->push_back(Variable($1));}
+                    | assignment_expression                             { $$ = new vector<Variable>; $$->push_back(Variable($1));}
+                    | initialization_list COMMA assignment_expression   { $$->push_back(Variable($3));}
+                    | initialization_list COMMA bracketed_identifier    { $$->push_back(Variable($3));}
                     ;
 
 
-//fn_body : ;
+bracketed_identifier  : IDENTIFIER                                  { $$ = $1; }
+                      | LBRACKET bracketed_identifier RBRACKET      { $$ = $2; }
+                      ;
+
+
+/* 
+  NOTE this is different from assignment_expression as it combines the expressions in a list and therefore makes
+  sure they can only appear in a declaration statement. In terms of loops, you can simply ignore the list and destroy it
+*/
+// needs fixing
+assignment_expression_list  : assignment_expression              { $$ = new vector<Variable>; $$->push_back(Variable($1));}
+                            | assignment_expression_list COMMA assignment_expression        { $$->push_back(Variable($3));}
+                            ;
+
+
+/* ============================================== EXPRESSIONS ============================================== */
+
+/* ---------------------------------------------- 3.3.9 EQUALITY OPERATORS -------------------------------------------- */
+/* Essentially a comparison for an if condition*/
+
+/*
+equality_expression : relational_expression
+                    | equality_expression LOGICAL_EQUALITY relational_expression
+                    | equality_expression LOGICAL_INEQUALITY relational_expression                
+                    ;
+*/
+// needs fixing
+// This can also be a bracketed_identifier only
+logical_condition   : bracketed_identifier COMPARISON_OPERATOR bracketed_identifier
+                    ; 
+
+// Probably needs fixing
+COMPARISON_OPERATOR : LOGICAL_EQUALITY
+                    | LOGICAL_INEQUALITY
+                    | LOGICAL_AND
+                    | LOGICAL_OR
+                    | LOGICAL_MORE
+                    | LOGICAL_LESS
+                    | LESS_OR_EQUAL
+                    | MORE_OR_EQUAL
+                    ;
+/* -------------------------------------------- 3.3.16 ASSIGNMENT OPERATOR ------------------------------------------ */
+
+/* This is the version you are going for for the MILESTONE
+assignment_expression : conditional_expression  /* e.g. the if statement with question mark */
+/*                      | bracketed_identifier ASSIGNMENT_OPERATOR arithmetic_expression
+                      ;
+*/
+
+assignment_expression   : bracketed_identifier ASSIGNMENT_OPERATOR bracketed_identifier { $$=$1; }
+                        ;
+
+ASSIGNMENT_OPERATOR : EQUALS
+                    | MULT_EQUALS
+                    | DIV_EQUALS
+                    | PERCENT_EQUALS
+                    | PLUS_EQUALS
+                    | MINUS_EQUALS
+                    | LSHIFT_EQUALS
+                    | RSHIFT_EQUALS
+                    | AND_EQUALS
+                    | XOR_EQUALS
+                    | OR_EQUALS
+                    ;
+
+/* ============================================== BLOCK EXECUTION DECLARATIONS ============================================== */
+
+
+/* -------------------------------------------- FUNCTION DECLARATIONS ------------------------------------------ */
+
+// NB: ACCOUNT FOR RETURNS IN A FUNCTION !!!
+
+/* For both fn_params_list and fn_declaration: include other types than int: void, double, char, structs, pointers, etc.
+  Try to make function pointers work. Try const, long, etc.. Actually in the end you should have one rule that defines 
+  a variable and change only that one */
+
+fn_declaration  : INT IDENTIFIER LBRACKET fn_params_list RBRACKET compound_statement          
+                                                                { $$ = new Function(int_type, $2, $4, $6); }
+                ;
+
+fn_params_list  : INT bracketed_identifier                      { $$ = new vector<Variable>; $$->push_back(Variable(int_type, $2));}
+                | fn_params_list COMMA INT bracketed_identifier { $$->push_back(Variable(int_type, $4)); }
+                |                                               { $$ = NULL; }
+                ;   
+
 
 /* -------------------------------------------- LOOP DECLARATIONS ------------------------------------------ */
-/*
-// Add loop_body, single_line_loop_body
-for_loop  : FOR LBRACKET for_loop_decl_statement RBRACKET LCURLY RCURLY
-          | FOR LBRACKET for_loop_decl_statement RBRACKET single_line_loop_body SEMI_COLON 
-          //| FOR LBRACKET for_loop_decl_statement RBRACKET LCURLY loop_body RCURLY
+
+// Add do while for final version
+loop  : for_loop                                                  { $$=$1; }
+      | while_loop                                                { $$=$1; }
+      ;
+
+for_loop  : FOR LBRACKET for_loop_decl_statement RBRACKET compound_statement                { $$ = new Loop($5); }
+          | FOR LBRACKET for_loop_decl_statement RBRACKET statement SEMI_COLON              { $$ = new Loop($5); }
           ;
 
+// NB: to prevent memory leaks, at this stage you need to delete the structures returned in the following conditions
 // undefined: logical_condition, var_declaration, update_statement(this can be assignment expression)          
-for_loop_decl_statement : var_declaration SEMI_COLON logical_condition SEMI_COLON update_statement
-                        | var_declaration SEMI_COLON logical_condition SEMI_COLON
-                        | var_declaration SEMI_COLON SEMI_COLON update_statement
-                        | SEMI_COLON logical_condition SEMI_COLON update_statement
-                        | var_declaration SEMI_COLON SEMI_COLON
-                        | SEMI_COLON SEMI_COLON update_statement
+for_loop_decl_statement : assignment_expression_list SEMI_COLON logical_condition SEMI_COLON assignment_expression_list 
+                              { delete $1; delete $5; }
+                        | assignment_expression_list SEMI_COLON logical_condition SEMI_COLON
+                              { delete $1; }
+                        | assignment_expression_list SEMI_COLON SEMI_COLON assignment_expression_list
+                              { delete $1; delete $4; }
+                        | SEMI_COLON logical_condition SEMI_COLON assignment_expression_list
+                              { delete $4; }
+                        | assignment_expression_list SEMI_COLON SEMI_COLON
+                              { delete $1; }
+                        | SEMI_COLON SEMI_COLON assignment_expression_list
+                              { delete $3; }
                         | SEMI_COLON logical_condition SEMI_COLON
                         | SEMI_COLON SEMI_COLON
                         ;
 
-// Add loop_body, single_line_loop_body
-while_loop  : WHILE LBRACKET logical_condition RBRACKET LCURLY RCURLY  
-            | WHILE LBRACKET logical_condition RBRACKET single_line_loop_body SEMI_COLON  
-            //| WHILE LBRACKET logical_condition RBRACKET LCURLY loop_body RCURLY  
+while_loop  : WHILE LBRACKET logical_condition RBRACKET compound_statement                { $$ = new Loop($5); }
+            | WHILE LBRACKET logical_condition RBRACKET statement SEMI_COLON              { $$ = new Loop($5); }
             ;
 
 /* -------------------------------------------- CONDITIONAL STATEMENTS ------------------------------------------ */
+/* Similar to SELECTION STATEMENT 3.6.4 in the c grammar. You need to add switch statements later */
 
-// Be very careful - this can be function call, comparison, or even assignment
-//logical_condition
+/* Be very careful - this can be function call, comparison, number or even assignment - maybe you can put it as a statement
+logical_condition : LBRACKET logical_condition
+*/
 
-// NOTE: fn_body, loop_body, if_body can all be defined the same and recursively with loops, ifs, functions, var declarations
 // arithmetic expressions etc
-/*
-if_block_statement  : if_statement
-                    | if_statement else_statement
-                    | if_statement else_if_statement_list
-                    | if_statement else_if_statement_list else_statement
+if_block_statement  : if_statement                            { $$ = new Conditional($1); }
+                    | if_statement else_statement_list        { $$ = new Conditional(vec_append($1,$2)); }
                     ;
 
-if_statement  : scoped_if_statement
-              | single_line_if_statement
+else_statement_list : else_statement                          { $$ = $1; }
+                    | else_statement_list else_statement      { $$ = vec_append($1, $2); }
+                    ;
+
+// undefined: logical_condition
+if_statement  : IF LBRACKET logical_condition RBRACKET compound_statement               
+                                              { $$ = new vector<ConditionalCase*>; $$->push_back(new ConditionalCase($5)); }
+              | IF LBRACKET logical_condition RBRACKET statement SEMI_COLON
+                                              { $$ = new vector<ConditionalCase*>; $$->push_back(new ConditionalCase($5)); }
               ;
 
-else_if_statement_list  : single_line_else_if_statement
-                        | scoped_else_if_statement
-                        | else_if_statement_list scoped_else_if_statement
-                        | else_if_statement_list single_line_else_if_statement
-                        ;
-
-else_statement  : scoped_else_statement
-                | single_line_else_statement
+else_statement  : ELSE if_statement           { $$ = $2; }
+                | ELSE compound_statement     { $$ = new vector<ConditionalCase*>; $$->push_back(new ConditionalCase($2)); }
+                | ELSE statement              { $$ = new vector<ConditionalCase*>; $$->push_back(new ConditionalCase($2)); }
                 ;
 
-
-single_line_if_statement  : IF LBRACKET logical_condition RBRACKET single_line_if_body SEMI_COLON
-                          ;
-
-single_line_else_if_statement : ELSE IF LBRACKET logical_condition RBRACKET single_line_if_body SEMI_COLON
-                              ;
-
-single_line_else_statement  : ELSE single_line_if_body SEMI_COLON
-                            ;
+       
+/* ============================================== 3.6 STATEMENTS ============================================== */
 
 
-scoped_if_statement : IF LBRACKET logical_condition RBRACKET LCURLY if_body RCURLY 
+/* ---------------------------------------------- 3.6.2 COMPOUND STATEMENTS -------------------------------------------- */
+
+// This represents a block of code - e.g. body of a function, body of a loop, or body of a an if statement
+compound_statement  : LCURLY declaration_list statement_list RCURLY   { $$=vec_append($2, $3); }
+                    | LCURLY statement_list RCURLY                    { $$=$2; }
+                    | LCURLY declaration_list RCURLY                  { $$=$2; }
+                    | LCURLY RCURLY                                   { $$=NULL; }
                     ;
 
-scoped_else_if_statement : ELSE IF LBRACKET logical_condition RBRACKET LCURLY if_body RCURLY 
-                    ;
+// undefined - declaration
+// Simply a list of declarations. Note this implies one or more occurences of INT keyword
+declaration_list  : declaration                                     { $$ = new vector<Statement*>; $$->push_back($1);}
+                  | declaration_list declaration                    { $$->push_back($2);}
+                  ;
 
-scoped_else_if_statement : ELSE LCURLY if_body RCURLY 
-                    ;
-*/
+statement_list  : statement                                         { $$ = new vector<Statement*>; $$->push_back($1);}
+                | statement_list statement                          { $$->push_back($2);}
+                ;
+
+// For the purposes of the milestone restricted to for, while, if statements and arithmetic expressions
+// Add return statements as well
+statement : loop                                                    { $$=$1; }
+          | if_block_statement                                      { $$=$1; }
+          | assignment_expression                                   { $$=NULL; }
+          | SEMI_COLON                                              { $$=NULL; }
+          ;
+
+
+/* ============================================== EXPRESSIONS ============================================== */
+
+
 %%  
 
 int yyerror(const char* s){ 
-    //std::cout <<"yyerror: "<< s<< std::endl;
-    std::cout <<"Parser error in file: "<< source_file<<" at line: "<<input_file_line << std::endl;
+    std::cerr <<"************ Parser error in file: "<< source_file<<" at line: "<<input_file_line << std::endl;
     return -1;
 }
 
 int main(){
-  cout<<"Parsing starts"<<endl;
-  yyparse();
-  cout<<"Parsing ended"<<endl;
 
+  yydebug=1;
+
+  cerr<<" ************************** Parsing starts **************************"<<endl;
+  yyparse();
+  cerr<<"************************** Parsing successful **************************"<<endl;
+
+  if(root==NULL) return 0;
+
+  cerr<<"************************** Printing starts **************************"<<endl;
+
+  vector<Statement*>::iterator it;
+  for(it=root->begin(); it!=root->end(); ++it){
+    if(*it!=NULL) (*it)->pretty_print(0);
+  }
+
+  cerr<<"************************** Printing successful **************************"<<endl;
+
+  return 0;
 }
 
 

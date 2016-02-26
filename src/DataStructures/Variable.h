@@ -3,6 +3,7 @@
 
 #include <cstdint>
 #include <string.h>
+//#include "Expression.h"
 
 enum VarT{
 	int_type 	= 248,
@@ -22,6 +23,7 @@ class Variable{
 public:
 	Variable(const VarT& var_type_in, char* token_val_in, char* name_in);
 	Variable(const VarT& var_type_in, char* name_in);
+	Variable(char* name_in);
 	~Variable();
 	const char* get_name() const;
 

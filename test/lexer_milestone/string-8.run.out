@@ -1,0 +1,7 @@
+const Keyword Tconst 1  1
+char Keyword Tchar 1  1
+* Operator T* 1  1
+x Identifier TIdentifier 1  1
+= Operator T= 1  1
+"\"\"" StringLiteral TStringLiteral 1  1
+; Operator T; 1  1

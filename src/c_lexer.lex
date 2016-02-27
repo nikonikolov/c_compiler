@@ -218,7 +218,7 @@ sizeof				{ return SIZEOF; }
 \>					{ return LOGICAL_MORE; }
 \^					{ return BITWISE_XOR; }
 {StringLiteral}		{ return STRING_LITERAL; }
-{Preprocessor}		{ process_prep_include(yytext); yylval.strval = strdup(yytext); return PREPROCESSOR_INCLUDE; }
+{Preprocessor}		{ process_prep_include(yytext); yylval.strval = strdup(yytext); }
 {Invalid}			{ cout<<"In file "<<source_file<<": Invalid syntax at line "<<source_file_line<<endl; exit(EXIT_FAILURE); }
 %%
 /* ==================== User function section - optional. Define the functions called on regex matches here ==================== */

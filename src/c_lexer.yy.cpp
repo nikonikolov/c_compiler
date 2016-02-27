@@ -1599,7 +1599,7 @@ case 88:
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
 #line 221 "src/c_lexer.lex"
-{ process_prep_include(yytext); yylval.strval = strdup(yytext); return PREPROCESSOR_INCLUDE; }
+{ process_prep_include(yytext); yylval.strval = strdup(yytext); }
 	YY_BREAK
 case 89:
 YY_RULE_SETUP

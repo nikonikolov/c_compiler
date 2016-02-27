@@ -1,0 +1,17 @@
+# 2 "logical.run.in" 3 4
+int x()
+{}
+
+
+int g, b, d, f=a;
+
+
+int zz(int a, int b, int c)
+{
+
+
+	while(a+a==a){
+		a=b;
+	}
+
+}

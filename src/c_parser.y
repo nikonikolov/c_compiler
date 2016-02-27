@@ -45,35 +45,7 @@
 %token <strval> DIV_EQUALS PERCENT_EQUALS PLUS_EQUALS MINUS_EQUALS LSHIFT_EQUALS RSHIFT_EQUALS AND_EQUALS XOR_EQUALS OR_EQUALS 
 %token <strval> COMMA HASH HASH_HASH SEMI_COLON EQUALS BITWISE_OR BITWISE_AND BITWISE_XOR MULT PLUS MINUS WAVE EXL_MARK DIV PERCENT 
 %token <strval> LOGICAL_MORE LOGICAL_LESS
-/*
-useless_non_term  : ASSIGNMENT_OPERATOR
-                  | COMPARISON_OPERATOR
-                  | SIZEOF
-                  | LSHIFT
-                  | RSHIFT
-                  | Q_MARK
-                  | COLON
-                  | BITWISE_XOR
-                  | BITWISE_OR
-                  | BITWISE_AND
-                  | MULT
-                  | PLUS
-                  | MINUS
-                  | WAVE
-                  | EXL_MARK
-                  | DIV
-                  | PERCENT
-                  ;
 
-useless_expr  : useless_non_term bracketed_identifier
-              | useless_non_term CONSTANT
-              | useless_expr useless_non_term CONSTANT
-              | useless_expr useless_non_term bracketed_identifier
-              | useless_non_term
-              | useless_expr LBRACKET 
-              | useless_expr RBRACKET 
-              ;
-*/
 
 /* --------------------------------------------------- TOKENS CONSTANTS --------------------------------------------------- */
 
@@ -93,6 +65,7 @@ useless_expr  : useless_non_term bracketed_identifier
 // Expressions and Statements need to be related somehow. You can make Expression inferit from Statement
 %type <vector_var_ptr> assignment_expression_list
 %type <strval> assignment_expression
+%type <strval> expression
 
 %type <strval> bracketed_identifier
 
@@ -157,10 +130,8 @@ useless_expr  : useless_non_term bracketed_identifier
 
 program : fn_declaration                                   { root = new vector<Statement*>; root->push_back($1);}
         | declaration                                      { root = new vector<Statement*>; root->push_back($1);}
-        | PREPROCESSOR_INCLUDE                             { }
         | program fn_declaration                           { root->push_back($2); }
         | program declaration                              { root->push_back($2); }
-        | program PREPROCESSOR_INCLUDE                     { }
         ;
         
 
@@ -208,8 +179,14 @@ bracketed_identifier  : IDENTIFIER                                  { $$ = $1; }
   sure they can only appear in a declaration statement. In terms of loops, you can simply ignore the list and destroy it
 */
 // needs fixing
+/*
 assignment_expression_list  : assignment_expression              { $$ = new vector<Variable>; $$->push_back(Variable($1));}
                             | assignment_expression_list COMMA assignment_expression        { $$->push_back(Variable($3));}
+                            ;
+*/
+
+assignment_expression_list  : assignment_expression              
+                            | assignment_expression_list COMMA assignment_expression        
                             ;
 
 
@@ -226,8 +203,18 @@ equality_expression : relational_expression
 */
 // needs fixing
 // This can also be a bracketed_identifier only
-logical_condition   : bracketed_identifier COMPARISON_OPERATOR bracketed_identifier
+equality_expression : bracketed_identifier COMPARISON_OPERATOR bracketed_identifier
+                    | bracketed_const
+                    | bracketed_identifier
+                    | IDENTIFIER
+                    | arithmetic_expression COMPARISON_OPERATOR arithmetic_expression
+                    | LBRACKET equality_expression RBRACKET
                     ; 
+
+bracketed_const : CONSTANT
+                | LBRACKET bracketed_const RBRACKET
+                ;
+
 
 // Probably needs fixing
 COMPARISON_OPERATOR : LOGICAL_EQUALITY
@@ -246,9 +233,16 @@ assignment_expression : conditional_expression  /* e.g. the if statement with qu
 /*                      | bracketed_identifier ASSIGNMENT_OPERATOR arithmetic_expression
                       ;
 */
-
-assignment_expression   : bracketed_identifier ASSIGNMENT_OPERATOR bracketed_identifier { $$=$1; }
+/*
+assignment_expression : bracketed_identifier ASSIGNMENT_OPERATOR bracketed_identifier { $$=$1; }
+                      ;
+*/
+conditional_expression  : equality_expression Q_MARK arithmetic_expression COLON arithmetic_expression 
                         ;
+
+assignment_expression : bracketed_identifier ASSIGNMENT_OPERATOR arithmetic_expression { $$=$1; }
+                      //| bracketed_identifier ASSIGNMENT_OPERATOR conditional_expression  /* e.g. the if statement with question mark */
+                      ;
 
 ASSIGNMENT_OPERATOR : EQUALS
                     | MULT_EQUALS
@@ -263,6 +257,46 @@ ASSIGNMENT_OPERATOR : EQUALS
                     | OR_EQUALS
                     ;
 
+
+/* ---------------------------------------------- SOME OPERATORS -------------------------------------------- */
+
+/*
+WHAT SHOULD I DO WITH THESE ???
+                  | SIZEOF LBRACKET sth_here?? RBRACKET
+                  | Q_MARK
+                  | COLON
+SINGLE_ARG_OPERATOR : WAVE
+                    | EXL_MARK
+                    ;
+*/
+
+/* ---------------------------------------------- ARITHMETIC EXPRESSION -------------------------------------------- */
+
+arithmetic_expression : IDENTIFIER
+                      | bracketed_identifier
+                      | bracketed_const
+                      | arithmetic_expression ARITHMETIC_OPERATOR arithmetic_expression
+                      | LBRACKET arithmetic_expression RBRACKET
+                      ;
+
+ARITHMETIC_OPERATOR : BITWISE_XOR
+                    | BITWISE_OR
+                    | BITWISE_AND
+                    | MULT
+                    | PLUS
+                    | MINUS
+                    | DIV
+                    | PERCENT
+                    | LSHIFT
+                    | RSHIFT
+                    ;
+
+
+expression  : equality_expression
+            | assignment_expression                   {$$=$1; }
+            ;
+
+                    
 /* ============================================== BLOCK EXECUTION DECLARATIONS ============================================== */
 
 
@@ -291,37 +325,58 @@ loop  : for_loop                                                  { $$=$1; }
       | while_loop                                                { $$=$1; }
       ;
 
+// DO WHILE loop from c grammar
+//                    | DO STATEMENT WHILE LBRACKET EXPRESSION RBRACKET ;
+
 for_loop  : FOR LBRACKET for_loop_decl_statement RBRACKET compound_statement     { $$ = new Loop($5); }
           | FOR LBRACKET for_loop_decl_statement RBRACKET statement              { $$ = new Loop($5); }
           ;
 
 // NB: to prevent memory leaks, at this stage you need to delete the structures returned in the following conditions
-// undefined: logical_condition, var_declaration, update_statement(this can be assignment expression)          
-for_loop_decl_statement : assignment_expression_list SEMI_COLON logical_condition SEMI_COLON assignment_expression_list 
+// undefined: equality_expression, var_declaration, update_statement(this can be assignment expression)          
+// Fix memory management. Some pointer does not get deleted
+/*for_loop_decl_statement : assignment_expression_list SEMI_COLON equality_expression SEMI_COLON assignment_expression_list 
                               { delete $1; delete $5; }
-                        | assignment_expression_list SEMI_COLON logical_condition SEMI_COLON
+                        | assignment_expression_list SEMI_COLON equality_expression SEMI_COLON
                               { delete $1; }
                         | assignment_expression_list SEMI_COLON SEMI_COLON assignment_expression_list
                               { delete $1; delete $4; }
-                        | SEMI_COLON logical_condition SEMI_COLON assignment_expression_list
+                        | SEMI_COLON equality_expression SEMI_COLON assignment_expression_list
                               { delete $4; }
                         | assignment_expression_list SEMI_COLON SEMI_COLON
                               { delete $1; }
                         | SEMI_COLON SEMI_COLON assignment_expression_list
                               { delete $3; }
-                        | SEMI_COLON logical_condition SEMI_COLON
+                        | SEMI_COLON equality_expression SEMI_COLON
+                        | SEMI_COLON SEMI_COLON
+                        ;
+*/
+for_loop_decl_statement : assignment_expression_list SEMI_COLON equality_expression SEMI_COLON assignment_expression_list 
+                        | assignment_expression_list SEMI_COLON equality_expression SEMI_COLON
+                        | assignment_expression_list SEMI_COLON SEMI_COLON assignment_expression_list
+                        | SEMI_COLON equality_expression SEMI_COLON assignment_expression_list
+                        | assignment_expression_list SEMI_COLON SEMI_COLON
+                        | SEMI_COLON SEMI_COLON assignment_expression_list
+                        | SEMI_COLON equality_expression SEMI_COLON
                         | SEMI_COLON SEMI_COLON
                         ;
 
-while_loop  : WHILE LBRACKET logical_condition RBRACKET compound_statement                { $$ = new Loop($5); }
-            | WHILE LBRACKET logical_condition RBRACKET statement                         { $$ = new Loop($5); }
+while_loop  : WHILE LBRACKET equality_expression RBRACKET compound_statement                { $$ = new Loop($5); }
+            | WHILE LBRACKET equality_expression RBRACKET statement                         { $$ = new Loop($5); }
             ;
 
 /* -------------------------------------------- CONDITIONAL STATEMENTS ------------------------------------------ */
-/* Similar to SELECTION STATEMENT 3.6.4 in the c grammar. You need to add switch statements later */
+/* --------------------------------------------- 3.6.4 SELECTION STATEMENTS ------------------------------------------- */
+
+/*SELECTION_STATEMENT : IF LBRACKET EXPRESSION RBRACKET STATEMENT
+                    | IF LBRACKET EXPRESSION RBRACKET STATEMENT ELSE STATEMENT
+                    | SWITCH LBRACKET EXPRESSION RBRACKET STATEMENT
+                    ;
+Check 3.6.1 as well
+*/
 
 /* Be very careful - this can be function call, comparison, number or even assignment - maybe you can put it as a statement
-logical_condition : LBRACKET logical_condition
+equality_expression : LBRACKET equality_expression
 */
 
 // arithmetic expressions etc
@@ -333,10 +388,10 @@ else_statement_list : else_statement                          { $$ = $1; }
                     | else_statement_list else_statement      { $$ = vec_append($1, $2); }
                     ;
 
-// undefined: logical_condition
-if_statement  : IF LBRACKET logical_condition RBRACKET compound_statement               
+// undefined: equality_expression
+if_statement  : IF LBRACKET equality_expression RBRACKET compound_statement               
                                               { $$ = new vector<ConditionalCase*>; $$->push_back(new ConditionalCase($5)); }
-              | IF LBRACKET logical_condition RBRACKET statement
+              | IF LBRACKET equality_expression RBRACKET statement
                                               { $$ = new vector<ConditionalCase*>; $$->push_back(new ConditionalCase($5)); }
               ;
 
@@ -386,8 +441,18 @@ semi_colon_statement  : return_statement
                       | SEMI_COLON
                       ;
 
-return_statement  : RETURN logical_condition SEMI_COLON
+/* --------------------------------------------- 3.6.6 JUMP STATEMENTS ------------------------------------------- */
+/*JUMP_STATEMENT  : GOTO IDENTIFIER SEMI_COLON
+                | CONTINUE SEMI_COLON
+                | BREAK SEMI_COLON
+                | RETURN EXPRESSION SEMI_COLON
+                | RETURN SEMI_COLON
+                ;
+*/
+return_statement  : RETURN equality_expression SEMI_COLON
+                  | RETURN SEMI_COLON
                   ;
+
 
 /* ============================================== END RULES ============================================== */
 

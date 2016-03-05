@@ -1,0 +1,2331 @@
+Terminals unused in grammar
+
+   AUTO
+   STRUCT
+   BREAK
+   ELSE
+   LONG
+   SWITCH
+   CASE
+   ENUM
+   REGISTER
+   TYPEDEF
+   EXTERN
+   RETURN
+   UNION
+   CONST
+   FLOAT
+   SHORT
+   UNSIGNED
+   CONTINUE
+   FOR
+   SIGNED
+   VOID
+   DEFAULT
+   GOTO
+   VOLATILE
+   DO
+   IF
+   STATIC
+   WHILE
+   LCURLY
+   RCURLY
+   THREE_DOTS
+   HASH
+   HASH_HASH
+
+
+Grammar
+
+    0 $accept: program $end
+
+    1 program: expression_list SEMI_COLON
+    2        | program expression_list SEMI_COLON
+
+    3 CONSTANT: FLOATING_CONST
+    4         | INTEGER_CONST
+    5         | CHAR_CONST
+
+    6 primary_expression: IDENTIFIER
+    7                   | CONSTANT
+    8                   | STRING_LITERAL
+    9                   | LBRACKET expression RBRACKET
+
+   10 postfix_expression: primary_expression
+   11                   | postfix_expression LSQUARE expression RSQUARE
+   12                   | postfix_expression LBRACKET argument_expression_list RBRACKET
+   13                   | postfix_expression LBRACKET RBRACKET
+   14                   | postfix_expression DOT IDENTIFIER
+   15                   | postfix_expression PTR_OP IDENTIFIER
+   16                   | postfix_expression PLUS_PLUS
+   17                   | postfix_expression MINUS_MINUS
+
+   18 argument_expression_list: assignment_expression
+   19                         | argument_expression_list COMMA assignment_expression
+
+   20 unary_expression: postfix_expression
+   21                 | PLUS_PLUS unary_expression
+   22                 | MINUS_MINUS unary_expression
+   23                 | UNARY_OPERATOR cast_expression
+   24                 | SIZEOF unary_expression
+   25                 | SIZEOF LBRACKET type_name RBRACKET
+
+   26 UNARY_OPERATOR: BITWISE_AND
+   27               | MULT
+   28               | PLUS
+   29               | MINUS
+   30               | WAVE
+   31               | EXL_MARK
+
+   32 cast_expression: unary_expression
+   33                | LBRACKET type_name RBRACKET cast_expression
+
+   34 multiplicative_expression: cast_expression
+   35                          | multiplicative_expression MULT cast_expression
+   36                          | multiplicative_expression DIV cast_expression
+   37                          | multiplicative_expression PERCENT cast_expression
+
+   38 additive_expression: multiplicative_expression
+   39                    | additive_expression PLUS multiplicative_expression
+   40                    | additive_expression MINUS multiplicative_expression
+
+   41 shift_expression: additive_expression
+   42                 | shift_expression LSHIFT additive_expression
+   43                 | shift_expression RSHIFT additive_expression
+
+   44 relational_expression: shift_expression
+   45                      | relational_expression LOGICAL_LESS shift_expression
+   46                      | relational_expression LOGICAL_MORE shift_expression
+   47                      | relational_expression LESS_OR_EQUAL shift_expression
+   48                      | relational_expression MORE_OR_EQUAL shift_expression
+
+   49 equality_expression: relational_expression
+   50                    | equality_expression LOGICAL_EQUALITY relational_expression
+   51                    | equality_expression LOGICAL_INEQUALITY relational_expression
+
+   52 and_expression: equality_expression
+   53               | and_expression BITWISE_AND equality_expression
+
+   54 exclusive_or_expression: and_expression
+   55                        | exclusive_or_expression BITWISE_XOR and_expression
+
+   56 inclusive_or_expression: exclusive_or_expression
+   57                        | inclusive_or_expression BITWISE_OR exclusive_or_expression
+
+   58 logical_and_expression: inclusive_or_expression
+   59                       | logical_and_expression LOGICAL_AND inclusive_or_expression
+
+   60 logical_or_expression: logical_and_expression
+   61                      | logical_or_expression LOGICAL_OR logical_and_expression
+
+   62 conditional_expression: logical_or_expression
+   63                       | logical_or_expression Q_MARK expression COLON conditional_expression
+
+   64 assignment_expression: conditional_expression
+   65                      | postfix_expression ASSIGNMENT_OPERATOR assignment_expression
+
+   66 ASSIGNMENT_OPERATOR: EQUALS
+   67                    | MULT_EQUALS
+   68                    | DIV_EQUALS
+   69                    | PERCENT_EQUALS
+   70                    | PLUS_EQUALS
+   71                    | MINUS_EQUALS
+   72                    | LSHIFT_EQUALS
+   73                    | RSHIFT_EQUALS
+   74                    | AND_EQUALS
+   75                    | XOR_EQUALS
+   76                    | OR_EQUALS
+
+   77 expression: assignment_expression
+
+   78 expression_list: expression
+   79                | expression COMMA assignment_expression
+
+   80 type_name: INT
+   81          | DOUBLE
+   82          | CHAR
+
+
+Terminals, with rules where they appear
+
+$end (0) 0
+error (256)
+AUTO (258)
+DOUBLE (259) 81
+INT (260) 80
+STRUCT (261)
+BREAK (262)
+ELSE (263)
+LONG (264)
+SWITCH (265)
+CASE (266)
+ENUM (267)
+REGISTER (268)
+TYPEDEF (269)
+CHAR (270) 82
+EXTERN (271)
+RETURN (272)
+UNION (273)
+CONST (274)
+FLOAT (275)
+SHORT (276)
+UNSIGNED (277)
+CONTINUE (278)
+FOR (279)
+SIGNED (280)
+VOID (281)
+DEFAULT (282)
+GOTO (283)
+VOLATILE (284)
+DO (285)
+IF (286)
+STATIC (287)
+WHILE (288)
+LSQUARE (289) 11
+RSQUARE (290) 11
+LBRACKET (291) 9 12 13 25 33
+RBRACKET (292) 9 12 13 25 33
+LCURLY (293)
+RCURLY (294)
+THREE_DOTS (295)
+DOT (296) 14
+PTR_OP (297) 15
+PLUS_PLUS (298) 16 21
+MINUS_MINUS (299) 17 22
+SIZEOF (300) 24 25
+LSHIFT (301) 42
+RSHIFT (302) 43
+LESS_OR_EQUAL (303) 47
+MORE_OR_EQUAL (304) 48
+LOGICAL_EQUALITY (305) 50
+LOGICAL_INEQUALITY (306) 51
+LOGICAL_AND (307) 59
+LOGICAL_OR (308) 61
+Q_MARK (309) 63
+COLON (310) 63
+MULT_EQUALS (311) 67
+DIV_EQUALS (312) 68
+PERCENT_EQUALS (313) 69
+PLUS_EQUALS (314) 70
+MINUS_EQUALS (315) 71
+LSHIFT_EQUALS (316) 72
+RSHIFT_EQUALS (317) 73
+AND_EQUALS (318) 74
+XOR_EQUALS (319) 75
+OR_EQUALS (320) 76
+COMMA (321) 19 79
+HASH (322)
+HASH_HASH (323)
+SEMI_COLON (324) 1 2
+EQUALS (325) 66
+BITWISE_OR (326) 57
+BITWISE_AND (327) 26 53
+BITWISE_XOR (328) 55
+MULT (329) 27 35
+PLUS (330) 28 39
+MINUS (331) 29 40
+WAVE (332) 30
+EXL_MARK (333) 31
+DIV (334) 36
+PERCENT (335) 37
+LOGICAL_MORE (336) 46
+LOGICAL_LESS (337) 45
+INTEGER_CONST (338) 4
+FLOATING_CONST (339) 3
+CHAR_CONST (340) 5
+IDENTIFIER (341) 6 14 15
+STRING_LITERAL (342) 8
+
+
+Nonterminals, with rules where they appear
+
+$accept (88)
+    on left: 0
+program (89)
+    on left: 1 2, on right: 0 2
+CONSTANT (90)
+    on left: 3 4 5, on right: 7
+primary_expression (91)
+    on left: 6 7 8 9, on right: 10
+postfix_expression (92)
+    on left: 10 11 12 13 14 15 16 17, on right: 11 12 13 14 15 16 17
+    20 65
+argument_expression_list (93)
+    on left: 18 19, on right: 12 19
+unary_expression (94)
+    on left: 20 21 22 23 24 25, on right: 21 22 24 32
+UNARY_OPERATOR (95)
+    on left: 26 27 28 29 30 31, on right: 23
+cast_expression (96)
+    on left: 32 33, on right: 23 33 34 35 36 37
+multiplicative_expression (97)
+    on left: 34 35 36 37, on right: 35 36 37 38 39 40
+additive_expression (98)
+    on left: 38 39 40, on right: 39 40 41 42 43
+shift_expression (99)
+    on left: 41 42 43, on right: 42 43 44 45 46 47 48
+relational_expression (100)
+    on left: 44 45 46 47 48, on right: 45 46 47 48 49 50 51
+equality_expression (101)
+    on left: 49 50 51, on right: 50 51 52 53
+and_expression (102)
+    on left: 52 53, on right: 53 54 55
+exclusive_or_expression (103)
+    on left: 54 55, on right: 55 56 57
+inclusive_or_expression (104)
+    on left: 56 57, on right: 57 58 59
+logical_and_expression (105)
+    on left: 58 59, on right: 59 60 61
+logical_or_expression (106)
+    on left: 60 61, on right: 61 62 63
+conditional_expression (107)
+    on left: 62 63, on right: 63 64
+assignment_expression (108)
+    on left: 64 65, on right: 18 19 65 77 79
+ASSIGNMENT_OPERATOR (109)
+    on left: 66 67 68 69 70 71 72 73 74 75 76, on right: 65
+expression (110)
+    on left: 77, on right: 9 11 63 78 79
+expression_list (111)
+    on left: 78 79, on right: 1 2
+type_name (112)
+    on left: 80 81 82, on right: 25 33
+
+
+State 0
+
+    0 $accept: . program $end
+
+    LBRACKET        shift, and go to state 1
+    PLUS_PLUS       shift, and go to state 2
+    MINUS_MINUS     shift, and go to state 3
+    SIZEOF          shift, and go to state 4
+    BITWISE_AND     shift, and go to state 5
+    MULT            shift, and go to state 6
+    PLUS            shift, and go to state 7
+    MINUS           shift, and go to state 8
+    WAVE            shift, and go to state 9
+    EXL_MARK        shift, and go to state 10
+    INTEGER_CONST   shift, and go to state 11
+    FLOATING_CONST  shift, and go to state 12
+    CHAR_CONST      shift, and go to state 13
+    IDENTIFIER      shift, and go to state 14
+    STRING_LITERAL  shift, and go to state 15
+
+    program                    go to state 16
+    CONSTANT                   go to state 17
+    primary_expression         go to state 18
+    postfix_expression         go to state 19
+    unary_expression           go to state 20
+    UNARY_OPERATOR             go to state 21
+    cast_expression            go to state 22
+    multiplicative_expression  go to state 23
+    additive_expression        go to state 24
+    shift_expression           go to state 25
+    relational_expression      go to state 26
+    equality_expression        go to state 27
+    and_expression             go to state 28
+    exclusive_or_expression    go to state 29
+    inclusive_or_expression    go to state 30
+    logical_and_expression     go to state 31
+    logical_or_expression      go to state 32
+    conditional_expression     go to state 33
+    assignment_expression      go to state 34
+    expression                 go to state 35
+    expression_list            go to state 36
+
+
+State 1
+
+    9 primary_expression: LBRACKET . expression RBRACKET
+   33 cast_expression: LBRACKET . type_name RBRACKET cast_expression
+
+    DOUBLE          shift, and go to state 37
+    INT             shift, and go to state 38
+    CHAR            shift, and go to state 39
+    LBRACKET        shift, and go to state 1
+    PLUS_PLUS       shift, and go to state 2
+    MINUS_MINUS     shift, and go to state 3
+    SIZEOF          shift, and go to state 4
+    BITWISE_AND     shift, and go to state 5
+    MULT            shift, and go to state 6
+    PLUS            shift, and go to state 7
+    MINUS           shift, and go to state 8
+    WAVE            shift, and go to state 9
+    EXL_MARK        shift, and go to state 10
+    INTEGER_CONST   shift, and go to state 11
+    FLOATING_CONST  shift, and go to state 12
+    CHAR_CONST      shift, and go to state 13
+    IDENTIFIER      shift, and go to state 14
+    STRING_LITERAL  shift, and go to state 15
+
+    CONSTANT                   go to state 17
+    primary_expression         go to state 18
+    postfix_expression         go to state 19
+    unary_expression           go to state 20
+    UNARY_OPERATOR             go to state 21
+    cast_expression            go to state 22
+    multiplicative_expression  go to state 23
+    additive_expression        go to state 24
+    shift_expression           go to state 25
+    relational_expression      go to state 26
+    equality_expression        go to state 27
+    and_expression             go to state 28
+    exclusive_or_expression    go to state 29
+    inclusive_or_expression    go to state 30
+    logical_and_expression     go to state 31
+    logical_or_expression      go to state 32
+    conditional_expression     go to state 33
+    assignment_expression      go to state 34
+    expression                 go to state 40
+    type_name                  go to state 41
+
+
+State 2
+
+   21 unary_expression: PLUS_PLUS . unary_expression
+
+    LBRACKET        shift, and go to state 42
+    PLUS_PLUS       shift, and go to state 2
+    MINUS_MINUS     shift, and go to state 3
+    SIZEOF          shift, and go to state 4
+    BITWISE_AND     shift, and go to state 5
+    MULT            shift, and go to state 6
+    PLUS            shift, and go to state 7
+    MINUS           shift, and go to state 8
+    WAVE            shift, and go to state 9
+    EXL_MARK        shift, and go to state 10
+    INTEGER_CONST   shift, and go to state 11
+    FLOATING_CONST  shift, and go to state 12
+    CHAR_CONST      shift, and go to state 13
+    IDENTIFIER      shift, and go to state 14
+    STRING_LITERAL  shift, and go to state 15
+
+    CONSTANT            go to state 17
+    primary_expression  go to state 18
+    postfix_expression  go to state 43
+    unary_expression    go to state 44
+    UNARY_OPERATOR      go to state 21
+
+
+State 3
+
+   22 unary_expression: MINUS_MINUS . unary_expression
+
+    LBRACKET        shift, and go to state 42
+    PLUS_PLUS       shift, and go to state 2
+    MINUS_MINUS     shift, and go to state 3
+    SIZEOF          shift, and go to state 4
+    BITWISE_AND     shift, and go to state 5
+    MULT            shift, and go to state 6
+    PLUS            shift, and go to state 7
+    MINUS           shift, and go to state 8
+    WAVE            shift, and go to state 9
+    EXL_MARK        shift, and go to state 10
+    INTEGER_CONST   shift, and go to state 11
+    FLOATING_CONST  shift, and go to state 12
+    CHAR_CONST      shift, and go to state 13
+    IDENTIFIER      shift, and go to state 14
+    STRING_LITERAL  shift, and go to state 15
+
+    CONSTANT            go to state 17
+    primary_expression  go to state 18
+    postfix_expression  go to state 43
+    unary_expression    go to state 45
+    UNARY_OPERATOR      go to state 21
+
+
+State 4
+
+   24 unary_expression: SIZEOF . unary_expression
+   25                 | SIZEOF . LBRACKET type_name RBRACKET
+
+    LBRACKET        shift, and go to state 46
+    PLUS_PLUS       shift, and go to state 2
+    MINUS_MINUS     shift, and go to state 3
+    SIZEOF          shift, and go to state 4
+    BITWISE_AND     shift, and go to state 5
+    MULT            shift, and go to state 6
+    PLUS            shift, and go to state 7
+    MINUS           shift, and go to state 8
+    WAVE            shift, and go to state 9
+    EXL_MARK        shift, and go to state 10
+    INTEGER_CONST   shift, and go to state 11
+    FLOATING_CONST  shift, and go to state 12
+    CHAR_CONST      shift, and go to state 13
+    IDENTIFIER      shift, and go to state 14
+    STRING_LITERAL  shift, and go to state 15
+
+    CONSTANT            go to state 17
+    primary_expression  go to state 18
+    postfix_expression  go to state 43
+    unary_expression    go to state 47
+    UNARY_OPERATOR      go to state 21
+
+
+State 5
+
+   26 UNARY_OPERATOR: BITWISE_AND .
+
+    $default  reduce using rule 26 (UNARY_OPERATOR)
+
+
+State 6
+
+   27 UNARY_OPERATOR: MULT .
+
+    $default  reduce using rule 27 (UNARY_OPERATOR)
+
+
+State 7
+
+   28 UNARY_OPERATOR: PLUS .
+
+    $default  reduce using rule 28 (UNARY_OPERATOR)
+
+
+State 8
+
+   29 UNARY_OPERATOR: MINUS .
+
+    $default  reduce using rule 29 (UNARY_OPERATOR)
+
+
+State 9
+
+   30 UNARY_OPERATOR: WAVE .
+
+    $default  reduce using rule 30 (UNARY_OPERATOR)
+
+
+State 10
+
+   31 UNARY_OPERATOR: EXL_MARK .
+
+    $default  reduce using rule 31 (UNARY_OPERATOR)
+
+
+State 11
+
+    4 CONSTANT: INTEGER_CONST .
+
+    $default  reduce using rule 4 (CONSTANT)
+
+
+State 12
+
+    3 CONSTANT: FLOATING_CONST .
+
+    $default  reduce using rule 3 (CONSTANT)
+
+
+State 13
+
+    5 CONSTANT: CHAR_CONST .
+
+    $default  reduce using rule 5 (CONSTANT)
+
+
+State 14
+
+    6 primary_expression: IDENTIFIER .
+
+    $default  reduce using rule 6 (primary_expression)
+
+
+State 15
+
+    8 primary_expression: STRING_LITERAL .
+
+    $default  reduce using rule 8 (primary_expression)
+
+
+State 16
+
+    0 $accept: program . $end
+    2 program: program . expression_list SEMI_COLON
+
+    $end            shift, and go to state 48
+    LBRACKET        shift, and go to state 1
+    PLUS_PLUS       shift, and go to state 2
+    MINUS_MINUS     shift, and go to state 3
+    SIZEOF          shift, and go to state 4
+    BITWISE_AND     shift, and go to state 5
+    MULT            shift, and go to state 6
+    PLUS            shift, and go to state 7
+    MINUS           shift, and go to state 8
+    WAVE            shift, and go to state 9
+    EXL_MARK        shift, and go to state 10
+    INTEGER_CONST   shift, and go to state 11
+    FLOATING_CONST  shift, and go to state 12
+    CHAR_CONST      shift, and go to state 13
+    IDENTIFIER      shift, and go to state 14
+    STRING_LITERAL  shift, and go to state 15
+
+    CONSTANT                   go to state 17
+    primary_expression         go to state 18
+    postfix_expression         go to state 19
+    unary_expression           go to state 20
+    UNARY_OPERATOR             go to state 21
+    cast_expression            go to state 22
+    multiplicative_expression  go to state 23
+    additive_expression        go to state 24
+    shift_expression           go to state 25
+    relational_expression      go to state 26
+    equality_expression        go to state 27
+    and_expression             go to state 28
+    exclusive_or_expression    go to state 29
+    inclusive_or_expression    go to state 30
+    logical_and_expression     go to state 31
+    logical_or_expression      go to state 32
+    conditional_expression     go to state 33
+    assignment_expression      go to state 34
+    expression                 go to state 35
+    expression_list            go to state 49
+
+
+State 17
+
+    7 primary_expression: CONSTANT .
+
+    $default  reduce using rule 7 (primary_expression)
+
+
+State 18
+
+   10 postfix_expression: primary_expression .
+
+    $default  reduce using rule 10 (postfix_expression)
+
+
+State 19
+
+   11 postfix_expression: postfix_expression . LSQUARE expression RSQUARE
+   12                   | postfix_expression . LBRACKET argument_expression_list RBRACKET
+   13                   | postfix_expression . LBRACKET RBRACKET
+   14                   | postfix_expression . DOT IDENTIFIER
+   15                   | postfix_expression . PTR_OP IDENTIFIER
+   16                   | postfix_expression . PLUS_PLUS
+   17                   | postfix_expression . MINUS_MINUS
+   20 unary_expression: postfix_expression .
+   65 assignment_expression: postfix_expression . ASSIGNMENT_OPERATOR assignment_expression
+
+    LSQUARE         shift, and go to state 50
+    LBRACKET        shift, and go to state 51
+    DOT             shift, and go to state 52
+    PTR_OP          shift, and go to state 53
+    PLUS_PLUS       shift, and go to state 54
+    MINUS_MINUS     shift, and go to state 55
+    MULT_EQUALS     shift, and go to state 56
+    DIV_EQUALS      shift, and go to state 57
+    PERCENT_EQUALS  shift, and go to state 58
+    PLUS_EQUALS     shift, and go to state 59
+    MINUS_EQUALS    shift, and go to state 60
+    LSHIFT_EQUALS   shift, and go to state 61
+    RSHIFT_EQUALS   shift, and go to state 62
+    AND_EQUALS      shift, and go to state 63
+    XOR_EQUALS      shift, and go to state 64
+    OR_EQUALS       shift, and go to state 65
+    EQUALS          shift, and go to state 66
+
+    $default  reduce using rule 20 (unary_expression)
+
+    ASSIGNMENT_OPERATOR  go to state 67
+
+
+State 20
+
+   32 cast_expression: unary_expression .
+
+    $default  reduce using rule 32 (cast_expression)
+
+
+State 21
+
+   23 unary_expression: UNARY_OPERATOR . cast_expression
+
+    LBRACKET        shift, and go to state 1
+    PLUS_PLUS       shift, and go to state 2
+    MINUS_MINUS     shift, and go to state 3
+    SIZEOF          shift, and go to state 4
+    BITWISE_AND     shift, and go to state 5
+    MULT            shift, and go to state 6
+    PLUS            shift, and go to state 7
+    MINUS           shift, and go to state 8
+    WAVE            shift, and go to state 9
+    EXL_MARK        shift, and go to state 10
+    INTEGER_CONST   shift, and go to state 11
+    FLOATING_CONST  shift, and go to state 12
+    CHAR_CONST      shift, and go to state 13
+    IDENTIFIER      shift, and go to state 14
+    STRING_LITERAL  shift, and go to state 15
+
+    CONSTANT            go to state 17
+    primary_expression  go to state 18
+    postfix_expression  go to state 43
+    unary_expression    go to state 20
+    UNARY_OPERATOR      go to state 21
+    cast_expression     go to state 68
+
+
+State 22
+
+   34 multiplicative_expression: cast_expression .
+
+    $default  reduce using rule 34 (multiplicative_expression)
+
+
+State 23
+
+   35 multiplicative_expression: multiplicative_expression . MULT cast_expression
+   36                          | multiplicative_expression . DIV cast_expression
+   37                          | multiplicative_expression . PERCENT cast_expression
+   38 additive_expression: multiplicative_expression .
+
+    MULT     shift, and go to state 69
+    DIV      shift, and go to state 70
+    PERCENT  shift, and go to state 71
+
+    $default  reduce using rule 38 (additive_expression)
+
+
+State 24
+
+   39 additive_expression: additive_expression . PLUS multiplicative_expression
+   40                    | additive_expression . MINUS multiplicative_expression
+   41 shift_expression: additive_expression .
+
+    PLUS   shift, and go to state 72
+    MINUS  shift, and go to state 73
+
+    $default  reduce using rule 41 (shift_expression)
+
+
+State 25
+
+   42 shift_expression: shift_expression . LSHIFT additive_expression
+   43                 | shift_expression . RSHIFT additive_expression
+   44 relational_expression: shift_expression .
+
+    LSHIFT  shift, and go to state 74
+    RSHIFT  shift, and go to state 75
+
+    $default  reduce using rule 44 (relational_expression)
+
+
+State 26
+
+   45 relational_expression: relational_expression . LOGICAL_LESS shift_expression
+   46                      | relational_expression . LOGICAL_MORE shift_expression
+   47                      | relational_expression . LESS_OR_EQUAL shift_expression
+   48                      | relational_expression . MORE_OR_EQUAL shift_expression
+   49 equality_expression: relational_expression .
+
+    LESS_OR_EQUAL  shift, and go to state 76
+    MORE_OR_EQUAL  shift, and go to state 77
+    LOGICAL_MORE   shift, and go to state 78
+    LOGICAL_LESS   shift, and go to state 79
+
+    $default  reduce using rule 49 (equality_expression)
+
+
+State 27
+
+   50 equality_expression: equality_expression . LOGICAL_EQUALITY relational_expression
+   51                    | equality_expression . LOGICAL_INEQUALITY relational_expression
+   52 and_expression: equality_expression .
+
+    LOGICAL_EQUALITY    shift, and go to state 80
+    LOGICAL_INEQUALITY  shift, and go to state 81
+
+    $default  reduce using rule 52 (and_expression)
+
+
+State 28
+
+   53 and_expression: and_expression . BITWISE_AND equality_expression
+   54 exclusive_or_expression: and_expression .
+
+    BITWISE_AND  shift, and go to state 82
+
+    $default  reduce using rule 54 (exclusive_or_expression)
+
+
+State 29
+
+   55 exclusive_or_expression: exclusive_or_expression . BITWISE_XOR and_expression
+   56 inclusive_or_expression: exclusive_or_expression .
+
+    BITWISE_XOR  shift, and go to state 83
+
+    $default  reduce using rule 56 (inclusive_or_expression)
+
+
+State 30
+
+   57 inclusive_or_expression: inclusive_or_expression . BITWISE_OR exclusive_or_expression
+   58 logical_and_expression: inclusive_or_expression .
+
+    BITWISE_OR  shift, and go to state 84
+
+    $default  reduce using rule 58 (logical_and_expression)
+
+
+State 31
+
+   59 logical_and_expression: logical_and_expression . LOGICAL_AND inclusive_or_expression
+   60 logical_or_expression: logical_and_expression .
+
+    LOGICAL_AND  shift, and go to state 85
+
+    $default  reduce using rule 60 (logical_or_expression)
+
+
+State 32
+
+   61 logical_or_expression: logical_or_expression . LOGICAL_OR logical_and_expression
+   62 conditional_expression: logical_or_expression .
+   63                       | logical_or_expression . Q_MARK expression COLON conditional_expression
+
+    LOGICAL_OR  shift, and go to state 86
+    Q_MARK      shift, and go to state 87
+
+    $default  reduce using rule 62 (conditional_expression)
+
+
+State 33
+
+   64 assignment_expression: conditional_expression .
+
+    $default  reduce using rule 64 (assignment_expression)
+
+
+State 34
+
+   77 expression: assignment_expression .
+
+    $default  reduce using rule 77 (expression)
+
+
+State 35
+
+   78 expression_list: expression .
+   79                | expression . COMMA assignment_expression
+
+    COMMA  shift, and go to state 88
+
+    $default  reduce using rule 78 (expression_list)
+
+
+State 36
+
+    1 program: expression_list . SEMI_COLON
+
+    SEMI_COLON  shift, and go to state 89
+
+
+State 37
+
+   81 type_name: DOUBLE .
+
+    $default  reduce using rule 81 (type_name)
+
+
+State 38
+
+   80 type_name: INT .
+
+    $default  reduce using rule 80 (type_name)
+
+
+State 39
+
+   82 type_name: CHAR .
+
+    $default  reduce using rule 82 (type_name)
+
+
+State 40
+
+    9 primary_expression: LBRACKET expression . RBRACKET
+
+    RBRACKET  shift, and go to state 90
+
+
+State 41
+
+   33 cast_expression: LBRACKET type_name . RBRACKET cast_expression
+
+    RBRACKET  shift, and go to state 91
+
+
+State 42
+
+    9 primary_expression: LBRACKET . expression RBRACKET
+
+    LBRACKET        shift, and go to state 1
+    PLUS_PLUS       shift, and go to state 2
+    MINUS_MINUS     shift, and go to state 3
+    SIZEOF          shift, and go to state 4
+    BITWISE_AND     shift, and go to state 5
+    MULT            shift, and go to state 6
+    PLUS            shift, and go to state 7
+    MINUS           shift, and go to state 8
+    WAVE            shift, and go to state 9
+    EXL_MARK        shift, and go to state 10
+    INTEGER_CONST   shift, and go to state 11
+    FLOATING_CONST  shift, and go to state 12
+    CHAR_CONST      shift, and go to state 13
+    IDENTIFIER      shift, and go to state 14
+    STRING_LITERAL  shift, and go to state 15
+
+    CONSTANT                   go to state 17
+    primary_expression         go to state 18
+    postfix_expression         go to state 19
+    unary_expression           go to state 20
+    UNARY_OPERATOR             go to state 21
+    cast_expression            go to state 22
+    multiplicative_expression  go to state 23
+    additive_expression        go to state 24
+    shift_expression           go to state 25
+    relational_expression      go to state 26
+    equality_expression        go to state 27
+    and_expression             go to state 28
+    exclusive_or_expression    go to state 29
+    inclusive_or_expression    go to state 30
+    logical_and_expression     go to state 31
+    logical_or_expression      go to state 32
+    conditional_expression     go to state 33
+    assignment_expression      go to state 34
+    expression                 go to state 40
+
+
+State 43
+
+   11 postfix_expression: postfix_expression . LSQUARE expression RSQUARE
+   12                   | postfix_expression . LBRACKET argument_expression_list RBRACKET
+   13                   | postfix_expression . LBRACKET RBRACKET
+   14                   | postfix_expression . DOT IDENTIFIER
+   15                   | postfix_expression . PTR_OP IDENTIFIER
+   16                   | postfix_expression . PLUS_PLUS
+   17                   | postfix_expression . MINUS_MINUS
+   20 unary_expression: postfix_expression .
+
+    LSQUARE      shift, and go to state 50
+    LBRACKET     shift, and go to state 51
+    DOT          shift, and go to state 52
+    PTR_OP       shift, and go to state 53
+    PLUS_PLUS    shift, and go to state 54
+    MINUS_MINUS  shift, and go to state 55
+
+    $default  reduce using rule 20 (unary_expression)
+
+
+State 44
+
+   21 unary_expression: PLUS_PLUS unary_expression .
+
+    $default  reduce using rule 21 (unary_expression)
+
+
+State 45
+
+   22 unary_expression: MINUS_MINUS unary_expression .
+
+    $default  reduce using rule 22 (unary_expression)
+
+
+State 46
+
+    9 primary_expression: LBRACKET . expression RBRACKET
+   25 unary_expression: SIZEOF LBRACKET . type_name RBRACKET
+
+    DOUBLE          shift, and go to state 37
+    INT             shift, and go to state 38
+    CHAR            shift, and go to state 39
+    LBRACKET        shift, and go to state 1
+    PLUS_PLUS       shift, and go to state 2
+    MINUS_MINUS     shift, and go to state 3
+    SIZEOF          shift, and go to state 4
+    BITWISE_AND     shift, and go to state 5
+    MULT            shift, and go to state 6
+    PLUS            shift, and go to state 7
+    MINUS           shift, and go to state 8
+    WAVE            shift, and go to state 9
+    EXL_MARK        shift, and go to state 10
+    INTEGER_CONST   shift, and go to state 11
+    FLOATING_CONST  shift, and go to state 12
+    CHAR_CONST      shift, and go to state 13
+    IDENTIFIER      shift, and go to state 14
+    STRING_LITERAL  shift, and go to state 15
+
+    CONSTANT                   go to state 17
+    primary_expression         go to state 18
+    postfix_expression         go to state 19
+    unary_expression           go to state 20
+    UNARY_OPERATOR             go to state 21
+    cast_expression            go to state 22
+    multiplicative_expression  go to state 23
+    additive_expression        go to state 24
+    shift_expression           go to state 25
+    relational_expression      go to state 26
+    equality_expression        go to state 27
+    and_expression             go to state 28
+    exclusive_or_expression    go to state 29
+    inclusive_or_expression    go to state 30
+    logical_and_expression     go to state 31
+    logical_or_expression      go to state 32
+    conditional_expression     go to state 33
+    assignment_expression      go to state 34
+    expression                 go to state 40
+    type_name                  go to state 92
+
+
+State 47
+
+   24 unary_expression: SIZEOF unary_expression .
+
+    $default  reduce using rule 24 (unary_expression)
+
+
+State 48
+
+    0 $accept: program $end .
+
+    $default  accept
+
+
+State 49
+
+    2 program: program expression_list . SEMI_COLON
+
+    SEMI_COLON  shift, and go to state 93
+
+
+State 50
+
+   11 postfix_expression: postfix_expression LSQUARE . expression RSQUARE
+
+    LBRACKET        shift, and go to state 1
+    PLUS_PLUS       shift, and go to state 2
+    MINUS_MINUS     shift, and go to state 3
+    SIZEOF          shift, and go to state 4
+    BITWISE_AND     shift, and go to state 5
+    MULT            shift, and go to state 6
+    PLUS            shift, and go to state 7
+    MINUS           shift, and go to state 8
+    WAVE            shift, and go to state 9
+    EXL_MARK        shift, and go to state 10
+    INTEGER_CONST   shift, and go to state 11
+    FLOATING_CONST  shift, and go to state 12
+    CHAR_CONST      shift, and go to state 13
+    IDENTIFIER      shift, and go to state 14
+    STRING_LITERAL  shift, and go to state 15
+
+    CONSTANT                   go to state 17
+    primary_expression         go to state 18
+    postfix_expression         go to state 19
+    unary_expression           go to state 20
+    UNARY_OPERATOR             go to state 21
+    cast_expression            go to state 22
+    multiplicative_expression  go to state 23
+    additive_expression        go to state 24
+    shift_expression           go to state 25
+    relational_expression      go to state 26
+    equality_expression        go to state 27
+    and_expression             go to state 28
+    exclusive_or_expression    go to state 29
+    inclusive_or_expression    go to state 30
+    logical_and_expression     go to state 31
+    logical_or_expression      go to state 32
+    conditional_expression     go to state 33
+    assignment_expression      go to state 34
+    expression                 go to state 94
+
+
+State 51
+
+   12 postfix_expression: postfix_expression LBRACKET . argument_expression_list RBRACKET
+   13                   | postfix_expression LBRACKET . RBRACKET
+
+    LBRACKET        shift, and go to state 1
+    RBRACKET        shift, and go to state 95
+    PLUS_PLUS       shift, and go to state 2
+    MINUS_MINUS     shift, and go to state 3
+    SIZEOF          shift, and go to state 4
+    BITWISE_AND     shift, and go to state 5
+    MULT            shift, and go to state 6
+    PLUS            shift, and go to state 7
+    MINUS           shift, and go to state 8
+    WAVE            shift, and go to state 9
+    EXL_MARK        shift, and go to state 10
+    INTEGER_CONST   shift, and go to state 11
+    FLOATING_CONST  shift, and go to state 12
+    CHAR_CONST      shift, and go to state 13
+    IDENTIFIER      shift, and go to state 14
+    STRING_LITERAL  shift, and go to state 15
+
+    CONSTANT                   go to state 17
+    primary_expression         go to state 18
+    postfix_expression         go to state 19
+    argument_expression_list   go to state 96
+    unary_expression           go to state 20
+    UNARY_OPERATOR             go to state 21
+    cast_expression            go to state 22
+    multiplicative_expression  go to state 23
+    additive_expression        go to state 24
+    shift_expression           go to state 25
+    relational_expression      go to state 26
+    equality_expression        go to state 27
+    and_expression             go to state 28
+    exclusive_or_expression    go to state 29
+    inclusive_or_expression    go to state 30
+    logical_and_expression     go to state 31
+    logical_or_expression      go to state 32
+    conditional_expression     go to state 33
+    assignment_expression      go to state 97
+
+
+State 52
+
+   14 postfix_expression: postfix_expression DOT . IDENTIFIER
+
+    IDENTIFIER  shift, and go to state 98
+
+
+State 53
+
+   15 postfix_expression: postfix_expression PTR_OP . IDENTIFIER
+
+    IDENTIFIER  shift, and go to state 99
+
+
+State 54
+
+   16 postfix_expression: postfix_expression PLUS_PLUS .
+
+    $default  reduce using rule 16 (postfix_expression)
+
+
+State 55
+
+   17 postfix_expression: postfix_expression MINUS_MINUS .
+
+    $default  reduce using rule 17 (postfix_expression)
+
+
+State 56
+
+   67 ASSIGNMENT_OPERATOR: MULT_EQUALS .
+
+    $default  reduce using rule 67 (ASSIGNMENT_OPERATOR)
+
+
+State 57
+
+   68 ASSIGNMENT_OPERATOR: DIV_EQUALS .
+
+    $default  reduce using rule 68 (ASSIGNMENT_OPERATOR)
+
+
+State 58
+
+   69 ASSIGNMENT_OPERATOR: PERCENT_EQUALS .
+
+    $default  reduce using rule 69 (ASSIGNMENT_OPERATOR)
+
+
+State 59
+
+   70 ASSIGNMENT_OPERATOR: PLUS_EQUALS .
+
+    $default  reduce using rule 70 (ASSIGNMENT_OPERATOR)
+
+
+State 60
+
+   71 ASSIGNMENT_OPERATOR: MINUS_EQUALS .
+
+    $default  reduce using rule 71 (ASSIGNMENT_OPERATOR)
+
+
+State 61
+
+   72 ASSIGNMENT_OPERATOR: LSHIFT_EQUALS .
+
+    $default  reduce using rule 72 (ASSIGNMENT_OPERATOR)
+
+
+State 62
+
+   73 ASSIGNMENT_OPERATOR: RSHIFT_EQUALS .
+
+    $default  reduce using rule 73 (ASSIGNMENT_OPERATOR)
+
+
+State 63
+
+   74 ASSIGNMENT_OPERATOR: AND_EQUALS .
+
+    $default  reduce using rule 74 (ASSIGNMENT_OPERATOR)
+
+
+State 64
+
+   75 ASSIGNMENT_OPERATOR: XOR_EQUALS .
+
+    $default  reduce using rule 75 (ASSIGNMENT_OPERATOR)
+
+
+State 65
+
+   76 ASSIGNMENT_OPERATOR: OR_EQUALS .
+
+    $default  reduce using rule 76 (ASSIGNMENT_OPERATOR)
+
+
+State 66
+
+   66 ASSIGNMENT_OPERATOR: EQUALS .
+
+    $default  reduce using rule 66 (ASSIGNMENT_OPERATOR)
+
+
+State 67
+
+   65 assignment_expression: postfix_expression ASSIGNMENT_OPERATOR . assignment_expression
+
+    LBRACKET        shift, and go to state 1
+    PLUS_PLUS       shift, and go to state 2
+    MINUS_MINUS     shift, and go to state 3
+    SIZEOF          shift, and go to state 4
+    BITWISE_AND     shift, and go to state 5
+    MULT            shift, and go to state 6
+    PLUS            shift, and go to state 7
+    MINUS           shift, and go to state 8
+    WAVE            shift, and go to state 9
+    EXL_MARK        shift, and go to state 10
+    INTEGER_CONST   shift, and go to state 11
+    FLOATING_CONST  shift, and go to state 12
+    CHAR_CONST      shift, and go to state 13
+    IDENTIFIER      shift, and go to state 14
+    STRING_LITERAL  shift, and go to state 15
+
+    CONSTANT                   go to state 17
+    primary_expression         go to state 18
+    postfix_expression         go to state 19
+    unary_expression           go to state 20
+    UNARY_OPERATOR             go to state 21
+    cast_expression            go to state 22
+    multiplicative_expression  go to state 23
+    additive_expression        go to state 24
+    shift_expression           go to state 25
+    relational_expression      go to state 26
+    equality_expression        go to state 27
+    and_expression             go to state 28
+    exclusive_or_expression    go to state 29
+    inclusive_or_expression    go to state 30
+    logical_and_expression     go to state 31
+    logical_or_expression      go to state 32
+    conditional_expression     go to state 33
+    assignment_expression      go to state 100
+
+
+State 68
+
+   23 unary_expression: UNARY_OPERATOR cast_expression .
+
+    $default  reduce using rule 23 (unary_expression)
+
+
+State 69
+
+   35 multiplicative_expression: multiplicative_expression MULT . cast_expression
+
+    LBRACKET        shift, and go to state 1
+    PLUS_PLUS       shift, and go to state 2
+    MINUS_MINUS     shift, and go to state 3
+    SIZEOF          shift, and go to state 4
+    BITWISE_AND     shift, and go to state 5
+    MULT            shift, and go to state 6
+    PLUS            shift, and go to state 7
+    MINUS           shift, and go to state 8
+    WAVE            shift, and go to state 9
+    EXL_MARK        shift, and go to state 10
+    INTEGER_CONST   shift, and go to state 11
+    FLOATING_CONST  shift, and go to state 12
+    CHAR_CONST      shift, and go to state 13
+    IDENTIFIER      shift, and go to state 14
+    STRING_LITERAL  shift, and go to state 15
+
+    CONSTANT            go to state 17
+    primary_expression  go to state 18
+    postfix_expression  go to state 43
+    unary_expression    go to state 20
+    UNARY_OPERATOR      go to state 21
+    cast_expression     go to state 101
+
+
+State 70
+
+   36 multiplicative_expression: multiplicative_expression DIV . cast_expression
+
+    LBRACKET        shift, and go to state 1
+    PLUS_PLUS       shift, and go to state 2
+    MINUS_MINUS     shift, and go to state 3
+    SIZEOF          shift, and go to state 4
+    BITWISE_AND     shift, and go to state 5
+    MULT            shift, and go to state 6
+    PLUS            shift, and go to state 7
+    MINUS           shift, and go to state 8
+    WAVE            shift, and go to state 9
+    EXL_MARK        shift, and go to state 10
+    INTEGER_CONST   shift, and go to state 11
+    FLOATING_CONST  shift, and go to state 12
+    CHAR_CONST      shift, and go to state 13
+    IDENTIFIER      shift, and go to state 14
+    STRING_LITERAL  shift, and go to state 15
+
+    CONSTANT            go to state 17
+    primary_expression  go to state 18
+    postfix_expression  go to state 43
+    unary_expression    go to state 20
+    UNARY_OPERATOR      go to state 21
+    cast_expression     go to state 102
+
+
+State 71
+
+   37 multiplicative_expression: multiplicative_expression PERCENT . cast_expression
+
+    LBRACKET        shift, and go to state 1
+    PLUS_PLUS       shift, and go to state 2
+    MINUS_MINUS     shift, and go to state 3
+    SIZEOF          shift, and go to state 4
+    BITWISE_AND     shift, and go to state 5
+    MULT            shift, and go to state 6
+    PLUS            shift, and go to state 7
+    MINUS           shift, and go to state 8
+    WAVE            shift, and go to state 9
+    EXL_MARK        shift, and go to state 10
+    INTEGER_CONST   shift, and go to state 11
+    FLOATING_CONST  shift, and go to state 12
+    CHAR_CONST      shift, and go to state 13
+    IDENTIFIER      shift, and go to state 14
+    STRING_LITERAL  shift, and go to state 15
+
+    CONSTANT            go to state 17
+    primary_expression  go to state 18
+    postfix_expression  go to state 43
+    unary_expression    go to state 20
+    UNARY_OPERATOR      go to state 21
+    cast_expression     go to state 103
+
+
+State 72
+
+   39 additive_expression: additive_expression PLUS . multiplicative_expression
+
+    LBRACKET        shift, and go to state 1
+    PLUS_PLUS       shift, and go to state 2
+    MINUS_MINUS     shift, and go to state 3
+    SIZEOF          shift, and go to state 4
+    BITWISE_AND     shift, and go to state 5
+    MULT            shift, and go to state 6
+    PLUS            shift, and go to state 7
+    MINUS           shift, and go to state 8
+    WAVE            shift, and go to state 9
+    EXL_MARK        shift, and go to state 10
+    INTEGER_CONST   shift, and go to state 11
+    FLOATING_CONST  shift, and go to state 12
+    CHAR_CONST      shift, and go to state 13
+    IDENTIFIER      shift, and go to state 14
+    STRING_LITERAL  shift, and go to state 15
+
+    CONSTANT                   go to state 17
+    primary_expression         go to state 18
+    postfix_expression         go to state 43
+    unary_expression           go to state 20
+    UNARY_OPERATOR             go to state 21
+    cast_expression            go to state 22
+    multiplicative_expression  go to state 104
+
+
+State 73
+
+   40 additive_expression: additive_expression MINUS . multiplicative_expression
+
+    LBRACKET        shift, and go to state 1
+    PLUS_PLUS       shift, and go to state 2
+    MINUS_MINUS     shift, and go to state 3
+    SIZEOF          shift, and go to state 4
+    BITWISE_AND     shift, and go to state 5
+    MULT            shift, and go to state 6
+    PLUS            shift, and go to state 7
+    MINUS           shift, and go to state 8
+    WAVE            shift, and go to state 9
+    EXL_MARK        shift, and go to state 10
+    INTEGER_CONST   shift, and go to state 11
+    FLOATING_CONST  shift, and go to state 12
+    CHAR_CONST      shift, and go to state 13
+    IDENTIFIER      shift, and go to state 14
+    STRING_LITERAL  shift, and go to state 15
+
+    CONSTANT                   go to state 17
+    primary_expression         go to state 18
+    postfix_expression         go to state 43
+    unary_expression           go to state 20
+    UNARY_OPERATOR             go to state 21
+    cast_expression            go to state 22
+    multiplicative_expression  go to state 105
+
+
+State 74
+
+   42 shift_expression: shift_expression LSHIFT . additive_expression
+
+    LBRACKET        shift, and go to state 1
+    PLUS_PLUS       shift, and go to state 2
+    MINUS_MINUS     shift, and go to state 3
+    SIZEOF          shift, and go to state 4
+    BITWISE_AND     shift, and go to state 5
+    MULT            shift, and go to state 6
+    PLUS            shift, and go to state 7
+    MINUS           shift, and go to state 8
+    WAVE            shift, and go to state 9
+    EXL_MARK        shift, and go to state 10
+    INTEGER_CONST   shift, and go to state 11
+    FLOATING_CONST  shift, and go to state 12
+    CHAR_CONST      shift, and go to state 13
+    IDENTIFIER      shift, and go to state 14
+    STRING_LITERAL  shift, and go to state 15
+
+    CONSTANT                   go to state 17
+    primary_expression         go to state 18
+    postfix_expression         go to state 43
+    unary_expression           go to state 20
+    UNARY_OPERATOR             go to state 21
+    cast_expression            go to state 22
+    multiplicative_expression  go to state 23
+    additive_expression        go to state 106
+
+
+State 75
+
+   43 shift_expression: shift_expression RSHIFT . additive_expression
+
+    LBRACKET        shift, and go to state 1
+    PLUS_PLUS       shift, and go to state 2
+    MINUS_MINUS     shift, and go to state 3
+    SIZEOF          shift, and go to state 4
+    BITWISE_AND     shift, and go to state 5
+    MULT            shift, and go to state 6
+    PLUS            shift, and go to state 7
+    MINUS           shift, and go to state 8
+    WAVE            shift, and go to state 9
+    EXL_MARK        shift, and go to state 10
+    INTEGER_CONST   shift, and go to state 11
+    FLOATING_CONST  shift, and go to state 12
+    CHAR_CONST      shift, and go to state 13
+    IDENTIFIER      shift, and go to state 14
+    STRING_LITERAL  shift, and go to state 15
+
+    CONSTANT                   go to state 17
+    primary_expression         go to state 18
+    postfix_expression         go to state 43
+    unary_expression           go to state 20
+    UNARY_OPERATOR             go to state 21
+    cast_expression            go to state 22
+    multiplicative_expression  go to state 23
+    additive_expression        go to state 107
+
+
+State 76
+
+   47 relational_expression: relational_expression LESS_OR_EQUAL . shift_expression
+
+    LBRACKET        shift, and go to state 1
+    PLUS_PLUS       shift, and go to state 2
+    MINUS_MINUS     shift, and go to state 3
+    SIZEOF          shift, and go to state 4
+    BITWISE_AND     shift, and go to state 5
+    MULT            shift, and go to state 6
+    PLUS            shift, and go to state 7
+    MINUS           shift, and go to state 8
+    WAVE            shift, and go to state 9
+    EXL_MARK        shift, and go to state 10
+    INTEGER_CONST   shift, and go to state 11
+    FLOATING_CONST  shift, and go to state 12
+    CHAR_CONST      shift, and go to state 13
+    IDENTIFIER      shift, and go to state 14
+    STRING_LITERAL  shift, and go to state 15
+
+    CONSTANT                   go to state 17
+    primary_expression         go to state 18
+    postfix_expression         go to state 43
+    unary_expression           go to state 20
+    UNARY_OPERATOR             go to state 21
+    cast_expression            go to state 22
+    multiplicative_expression  go to state 23
+    additive_expression        go to state 24
+    shift_expression           go to state 108
+
+
+State 77
+
+   48 relational_expression: relational_expression MORE_OR_EQUAL . shift_expression
+
+    LBRACKET        shift, and go to state 1
+    PLUS_PLUS       shift, and go to state 2
+    MINUS_MINUS     shift, and go to state 3
+    SIZEOF          shift, and go to state 4
+    BITWISE_AND     shift, and go to state 5
+    MULT            shift, and go to state 6
+    PLUS            shift, and go to state 7
+    MINUS           shift, and go to state 8
+    WAVE            shift, and go to state 9
+    EXL_MARK        shift, and go to state 10
+    INTEGER_CONST   shift, and go to state 11
+    FLOATING_CONST  shift, and go to state 12
+    CHAR_CONST      shift, and go to state 13
+    IDENTIFIER      shift, and go to state 14
+    STRING_LITERAL  shift, and go to state 15
+
+    CONSTANT                   go to state 17
+    primary_expression         go to state 18
+    postfix_expression         go to state 43
+    unary_expression           go to state 20
+    UNARY_OPERATOR             go to state 21
+    cast_expression            go to state 22
+    multiplicative_expression  go to state 23
+    additive_expression        go to state 24
+    shift_expression           go to state 109
+
+
+State 78
+
+   46 relational_expression: relational_expression LOGICAL_MORE . shift_expression
+
+    LBRACKET        shift, and go to state 1
+    PLUS_PLUS       shift, and go to state 2
+    MINUS_MINUS     shift, and go to state 3
+    SIZEOF          shift, and go to state 4
+    BITWISE_AND     shift, and go to state 5
+    MULT            shift, and go to state 6
+    PLUS            shift, and go to state 7
+    MINUS           shift, and go to state 8
+    WAVE            shift, and go to state 9
+    EXL_MARK        shift, and go to state 10
+    INTEGER_CONST   shift, and go to state 11
+    FLOATING_CONST  shift, and go to state 12
+    CHAR_CONST      shift, and go to state 13
+    IDENTIFIER      shift, and go to state 14
+    STRING_LITERAL  shift, and go to state 15
+
+    CONSTANT                   go to state 17
+    primary_expression         go to state 18
+    postfix_expression         go to state 43
+    unary_expression           go to state 20
+    UNARY_OPERATOR             go to state 21
+    cast_expression            go to state 22
+    multiplicative_expression  go to state 23
+    additive_expression        go to state 24
+    shift_expression           go to state 110
+
+
+State 79
+
+   45 relational_expression: relational_expression LOGICAL_LESS . shift_expression
+
+    LBRACKET        shift, and go to state 1
+    PLUS_PLUS       shift, and go to state 2
+    MINUS_MINUS     shift, and go to state 3
+    SIZEOF          shift, and go to state 4
+    BITWISE_AND     shift, and go to state 5
+    MULT            shift, and go to state 6
+    PLUS            shift, and go to state 7
+    MINUS           shift, and go to state 8
+    WAVE            shift, and go to state 9
+    EXL_MARK        shift, and go to state 10
+    INTEGER_CONST   shift, and go to state 11
+    FLOATING_CONST  shift, and go to state 12
+    CHAR_CONST      shift, and go to state 13
+    IDENTIFIER      shift, and go to state 14
+    STRING_LITERAL  shift, and go to state 15
+
+    CONSTANT                   go to state 17
+    primary_expression         go to state 18
+    postfix_expression         go to state 43
+    unary_expression           go to state 20
+    UNARY_OPERATOR             go to state 21
+    cast_expression            go to state 22
+    multiplicative_expression  go to state 23
+    additive_expression        go to state 24
+    shift_expression           go to state 111
+
+
+State 80
+
+   50 equality_expression: equality_expression LOGICAL_EQUALITY . relational_expression
+
+    LBRACKET        shift, and go to state 1
+    PLUS_PLUS       shift, and go to state 2
+    MINUS_MINUS     shift, and go to state 3
+    SIZEOF          shift, and go to state 4
+    BITWISE_AND     shift, and go to state 5
+    MULT            shift, and go to state 6
+    PLUS            shift, and go to state 7
+    MINUS           shift, and go to state 8
+    WAVE            shift, and go to state 9
+    EXL_MARK        shift, and go to state 10
+    INTEGER_CONST   shift, and go to state 11
+    FLOATING_CONST  shift, and go to state 12
+    CHAR_CONST      shift, and go to state 13
+    IDENTIFIER      shift, and go to state 14
+    STRING_LITERAL  shift, and go to state 15
+
+    CONSTANT                   go to state 17
+    primary_expression         go to state 18
+    postfix_expression         go to state 43
+    unary_expression           go to state 20
+    UNARY_OPERATOR             go to state 21
+    cast_expression            go to state 22
+    multiplicative_expression  go to state 23
+    additive_expression        go to state 24
+    shift_expression           go to state 25
+    relational_expression      go to state 112
+
+
+State 81
+
+   51 equality_expression: equality_expression LOGICAL_INEQUALITY . relational_expression
+
+    LBRACKET        shift, and go to state 1
+    PLUS_PLUS       shift, and go to state 2
+    MINUS_MINUS     shift, and go to state 3
+    SIZEOF          shift, and go to state 4
+    BITWISE_AND     shift, and go to state 5
+    MULT            shift, and go to state 6
+    PLUS            shift, and go to state 7
+    MINUS           shift, and go to state 8
+    WAVE            shift, and go to state 9
+    EXL_MARK        shift, and go to state 10
+    INTEGER_CONST   shift, and go to state 11
+    FLOATING_CONST  shift, and go to state 12
+    CHAR_CONST      shift, and go to state 13
+    IDENTIFIER      shift, and go to state 14
+    STRING_LITERAL  shift, and go to state 15
+
+    CONSTANT                   go to state 17
+    primary_expression         go to state 18
+    postfix_expression         go to state 43
+    unary_expression           go to state 20
+    UNARY_OPERATOR             go to state 21
+    cast_expression            go to state 22
+    multiplicative_expression  go to state 23
+    additive_expression        go to state 24
+    shift_expression           go to state 25
+    relational_expression      go to state 113
+
+
+State 82
+
+   53 and_expression: and_expression BITWISE_AND . equality_expression
+
+    LBRACKET        shift, and go to state 1
+    PLUS_PLUS       shift, and go to state 2
+    MINUS_MINUS     shift, and go to state 3
+    SIZEOF          shift, and go to state 4
+    BITWISE_AND     shift, and go to state 5
+    MULT            shift, and go to state 6
+    PLUS            shift, and go to state 7
+    MINUS           shift, and go to state 8
+    WAVE            shift, and go to state 9
+    EXL_MARK        shift, and go to state 10
+    INTEGER_CONST   shift, and go to state 11
+    FLOATING_CONST  shift, and go to state 12
+    CHAR_CONST      shift, and go to state 13
+    IDENTIFIER      shift, and go to state 14
+    STRING_LITERAL  shift, and go to state 15
+
+    CONSTANT                   go to state 17
+    primary_expression         go to state 18
+    postfix_expression         go to state 43
+    unary_expression           go to state 20
+    UNARY_OPERATOR             go to state 21
+    cast_expression            go to state 22
+    multiplicative_expression  go to state 23
+    additive_expression        go to state 24
+    shift_expression           go to state 25
+    relational_expression      go to state 26
+    equality_expression        go to state 114
+
+
+State 83
+
+   55 exclusive_or_expression: exclusive_or_expression BITWISE_XOR . and_expression
+
+    LBRACKET        shift, and go to state 1
+    PLUS_PLUS       shift, and go to state 2
+    MINUS_MINUS     shift, and go to state 3
+    SIZEOF          shift, and go to state 4
+    BITWISE_AND     shift, and go to state 5
+    MULT            shift, and go to state 6
+    PLUS            shift, and go to state 7
+    MINUS           shift, and go to state 8
+    WAVE            shift, and go to state 9
+    EXL_MARK        shift, and go to state 10
+    INTEGER_CONST   shift, and go to state 11
+    FLOATING_CONST  shift, and go to state 12
+    CHAR_CONST      shift, and go to state 13
+    IDENTIFIER      shift, and go to state 14
+    STRING_LITERAL  shift, and go to state 15
+
+    CONSTANT                   go to state 17
+    primary_expression         go to state 18
+    postfix_expression         go to state 43
+    unary_expression           go to state 20
+    UNARY_OPERATOR             go to state 21
+    cast_expression            go to state 22
+    multiplicative_expression  go to state 23
+    additive_expression        go to state 24
+    shift_expression           go to state 25
+    relational_expression      go to state 26
+    equality_expression        go to state 27
+    and_expression             go to state 115
+
+
+State 84
+
+   57 inclusive_or_expression: inclusive_or_expression BITWISE_OR . exclusive_or_expression
+
+    LBRACKET        shift, and go to state 1
+    PLUS_PLUS       shift, and go to state 2
+    MINUS_MINUS     shift, and go to state 3
+    SIZEOF          shift, and go to state 4
+    BITWISE_AND     shift, and go to state 5
+    MULT            shift, and go to state 6
+    PLUS            shift, and go to state 7
+    MINUS           shift, and go to state 8
+    WAVE            shift, and go to state 9
+    EXL_MARK        shift, and go to state 10
+    INTEGER_CONST   shift, and go to state 11
+    FLOATING_CONST  shift, and go to state 12
+    CHAR_CONST      shift, and go to state 13
+    IDENTIFIER      shift, and go to state 14
+    STRING_LITERAL  shift, and go to state 15
+
+    CONSTANT                   go to state 17
+    primary_expression         go to state 18
+    postfix_expression         go to state 43
+    unary_expression           go to state 20
+    UNARY_OPERATOR             go to state 21
+    cast_expression            go to state 22
+    multiplicative_expression  go to state 23
+    additive_expression        go to state 24
+    shift_expression           go to state 25
+    relational_expression      go to state 26
+    equality_expression        go to state 27
+    and_expression             go to state 28
+    exclusive_or_expression    go to state 116
+
+
+State 85
+
+   59 logical_and_expression: logical_and_expression LOGICAL_AND . inclusive_or_expression
+
+    LBRACKET        shift, and go to state 1
+    PLUS_PLUS       shift, and go to state 2
+    MINUS_MINUS     shift, and go to state 3
+    SIZEOF          shift, and go to state 4
+    BITWISE_AND     shift, and go to state 5
+    MULT            shift, and go to state 6
+    PLUS            shift, and go to state 7
+    MINUS           shift, and go to state 8
+    WAVE            shift, and go to state 9
+    EXL_MARK        shift, and go to state 10
+    INTEGER_CONST   shift, and go to state 11
+    FLOATING_CONST  shift, and go to state 12
+    CHAR_CONST      shift, and go to state 13
+    IDENTIFIER      shift, and go to state 14
+    STRING_LITERAL  shift, and go to state 15
+
+    CONSTANT                   go to state 17
+    primary_expression         go to state 18
+    postfix_expression         go to state 43
+    unary_expression           go to state 20
+    UNARY_OPERATOR             go to state 21
+    cast_expression            go to state 22
+    multiplicative_expression  go to state 23
+    additive_expression        go to state 24
+    shift_expression           go to state 25
+    relational_expression      go to state 26
+    equality_expression        go to state 27
+    and_expression             go to state 28
+    exclusive_or_expression    go to state 29
+    inclusive_or_expression    go to state 117
+
+
+State 86
+
+   61 logical_or_expression: logical_or_expression LOGICAL_OR . logical_and_expression
+
+    LBRACKET        shift, and go to state 1
+    PLUS_PLUS       shift, and go to state 2
+    MINUS_MINUS     shift, and go to state 3
+    SIZEOF          shift, and go to state 4
+    BITWISE_AND     shift, and go to state 5
+    MULT            shift, and go to state 6
+    PLUS            shift, and go to state 7
+    MINUS           shift, and go to state 8
+    WAVE            shift, and go to state 9
+    EXL_MARK        shift, and go to state 10
+    INTEGER_CONST   shift, and go to state 11
+    FLOATING_CONST  shift, and go to state 12
+    CHAR_CONST      shift, and go to state 13
+    IDENTIFIER      shift, and go to state 14
+    STRING_LITERAL  shift, and go to state 15
+
+    CONSTANT                   go to state 17
+    primary_expression         go to state 18
+    postfix_expression         go to state 43
+    unary_expression           go to state 20
+    UNARY_OPERATOR             go to state 21
+    cast_expression            go to state 22
+    multiplicative_expression  go to state 23
+    additive_expression        go to state 24
+    shift_expression           go to state 25
+    relational_expression      go to state 26
+    equality_expression        go to state 27
+    and_expression             go to state 28
+    exclusive_or_expression    go to state 29
+    inclusive_or_expression    go to state 30
+    logical_and_expression     go to state 118
+
+
+State 87
+
+   63 conditional_expression: logical_or_expression Q_MARK . expression COLON conditional_expression
+
+    LBRACKET        shift, and go to state 1
+    PLUS_PLUS       shift, and go to state 2
+    MINUS_MINUS     shift, and go to state 3
+    SIZEOF          shift, and go to state 4
+    BITWISE_AND     shift, and go to state 5
+    MULT            shift, and go to state 6
+    PLUS            shift, and go to state 7
+    MINUS           shift, and go to state 8
+    WAVE            shift, and go to state 9
+    EXL_MARK        shift, and go to state 10
+    INTEGER_CONST   shift, and go to state 11
+    FLOATING_CONST  shift, and go to state 12
+    CHAR_CONST      shift, and go to state 13
+    IDENTIFIER      shift, and go to state 14
+    STRING_LITERAL  shift, and go to state 15
+
+    CONSTANT                   go to state 17
+    primary_expression         go to state 18
+    postfix_expression         go to state 19
+    unary_expression           go to state 20
+    UNARY_OPERATOR             go to state 21
+    cast_expression            go to state 22
+    multiplicative_expression  go to state 23
+    additive_expression        go to state 24
+    shift_expression           go to state 25
+    relational_expression      go to state 26
+    equality_expression        go to state 27
+    and_expression             go to state 28
+    exclusive_or_expression    go to state 29
+    inclusive_or_expression    go to state 30
+    logical_and_expression     go to state 31
+    logical_or_expression      go to state 32
+    conditional_expression     go to state 33
+    assignment_expression      go to state 34
+    expression                 go to state 119
+
+
+State 88
+
+   79 expression_list: expression COMMA . assignment_expression
+
+    LBRACKET        shift, and go to state 1
+    PLUS_PLUS       shift, and go to state 2
+    MINUS_MINUS     shift, and go to state 3
+    SIZEOF          shift, and go to state 4
+    BITWISE_AND     shift, and go to state 5
+    MULT            shift, and go to state 6
+    PLUS            shift, and go to state 7
+    MINUS           shift, and go to state 8
+    WAVE            shift, and go to state 9
+    EXL_MARK        shift, and go to state 10
+    INTEGER_CONST   shift, and go to state 11
+    FLOATING_CONST  shift, and go to state 12
+    CHAR_CONST      shift, and go to state 13
+    IDENTIFIER      shift, and go to state 14
+    STRING_LITERAL  shift, and go to state 15
+
+    CONSTANT                   go to state 17
+    primary_expression         go to state 18
+    postfix_expression         go to state 19
+    unary_expression           go to state 20
+    UNARY_OPERATOR             go to state 21
+    cast_expression            go to state 22
+    multiplicative_expression  go to state 23
+    additive_expression        go to state 24
+    shift_expression           go to state 25
+    relational_expression      go to state 26
+    equality_expression        go to state 27
+    and_expression             go to state 28
+    exclusive_or_expression    go to state 29
+    inclusive_or_expression    go to state 30
+    logical_and_expression     go to state 31
+    logical_or_expression      go to state 32
+    conditional_expression     go to state 33
+    assignment_expression      go to state 120
+
+
+State 89
+
+    1 program: expression_list SEMI_COLON .
+
+    $default  reduce using rule 1 (program)
+
+
+State 90
+
+    9 primary_expression: LBRACKET expression RBRACKET .
+
+    $default  reduce using rule 9 (primary_expression)
+
+
+State 91
+
+   33 cast_expression: LBRACKET type_name RBRACKET . cast_expression
+
+    LBRACKET        shift, and go to state 1
+    PLUS_PLUS       shift, and go to state 2
+    MINUS_MINUS     shift, and go to state 3
+    SIZEOF          shift, and go to state 4
+    BITWISE_AND     shift, and go to state 5
+    MULT            shift, and go to state 6
+    PLUS            shift, and go to state 7
+    MINUS           shift, and go to state 8
+    WAVE            shift, and go to state 9
+    EXL_MARK        shift, and go to state 10
+    INTEGER_CONST   shift, and go to state 11
+    FLOATING_CONST  shift, and go to state 12
+    CHAR_CONST      shift, and go to state 13
+    IDENTIFIER      shift, and go to state 14
+    STRING_LITERAL  shift, and go to state 15
+
+    CONSTANT            go to state 17
+    primary_expression  go to state 18
+    postfix_expression  go to state 43
+    unary_expression    go to state 20
+    UNARY_OPERATOR      go to state 21
+    cast_expression     go to state 121
+
+
+State 92
+
+   25 unary_expression: SIZEOF LBRACKET type_name . RBRACKET
+
+    RBRACKET  shift, and go to state 122
+
+
+State 93
+
+    2 program: program expression_list SEMI_COLON .
+
+    $default  reduce using rule 2 (program)
+
+
+State 94
+
+   11 postfix_expression: postfix_expression LSQUARE expression . RSQUARE
+
+    RSQUARE  shift, and go to state 123
+
+
+State 95
+
+   13 postfix_expression: postfix_expression LBRACKET RBRACKET .
+
+    $default  reduce using rule 13 (postfix_expression)
+
+
+State 96
+
+   12 postfix_expression: postfix_expression LBRACKET argument_expression_list . RBRACKET
+   19 argument_expression_list: argument_expression_list . COMMA assignment_expression
+
+    RBRACKET  shift, and go to state 124
+    COMMA     shift, and go to state 125
+
+
+State 97
+
+   18 argument_expression_list: assignment_expression .
+
+    $default  reduce using rule 18 (argument_expression_list)
+
+
+State 98
+
+   14 postfix_expression: postfix_expression DOT IDENTIFIER .
+
+    $default  reduce using rule 14 (postfix_expression)
+
+
+State 99
+
+   15 postfix_expression: postfix_expression PTR_OP IDENTIFIER .
+
+    $default  reduce using rule 15 (postfix_expression)
+
+
+State 100
+
+   65 assignment_expression: postfix_expression ASSIGNMENT_OPERATOR assignment_expression .
+
+    $default  reduce using rule 65 (assignment_expression)
+
+
+State 101
+
+   35 multiplicative_expression: multiplicative_expression MULT cast_expression .
+
+    $default  reduce using rule 35 (multiplicative_expression)
+
+
+State 102
+
+   36 multiplicative_expression: multiplicative_expression DIV cast_expression .
+
+    $default  reduce using rule 36 (multiplicative_expression)
+
+
+State 103
+
+   37 multiplicative_expression: multiplicative_expression PERCENT cast_expression .
+
+    $default  reduce using rule 37 (multiplicative_expression)
+
+
+State 104
+
+   35 multiplicative_expression: multiplicative_expression . MULT cast_expression
+   36                          | multiplicative_expression . DIV cast_expression
+   37                          | multiplicative_expression . PERCENT cast_expression
+   39 additive_expression: additive_expression PLUS multiplicative_expression .
+
+    MULT     shift, and go to state 69
+    DIV      shift, and go to state 70
+    PERCENT  shift, and go to state 71
+
+    $default  reduce using rule 39 (additive_expression)
+
+
+State 105
+
+   35 multiplicative_expression: multiplicative_expression . MULT cast_expression
+   36                          | multiplicative_expression . DIV cast_expression
+   37                          | multiplicative_expression . PERCENT cast_expression
+   40 additive_expression: additive_expression MINUS multiplicative_expression .
+
+    MULT     shift, and go to state 69
+    DIV      shift, and go to state 70
+    PERCENT  shift, and go to state 71
+
+    $default  reduce using rule 40 (additive_expression)
+
+
+State 106
+
+   39 additive_expression: additive_expression . PLUS multiplicative_expression
+   40                    | additive_expression . MINUS multiplicative_expression
+   42 shift_expression: shift_expression LSHIFT additive_expression .
+
+    PLUS   shift, and go to state 72
+    MINUS  shift, and go to state 73
+
+    $default  reduce using rule 42 (shift_expression)
+
+
+State 107
+
+   39 additive_expression: additive_expression . PLUS multiplicative_expression
+   40                    | additive_expression . MINUS multiplicative_expression
+   43 shift_expression: shift_expression RSHIFT additive_expression .
+
+    PLUS   shift, and go to state 72
+    MINUS  shift, and go to state 73
+
+    $default  reduce using rule 43 (shift_expression)
+
+
+State 108
+
+   42 shift_expression: shift_expression . LSHIFT additive_expression
+   43                 | shift_expression . RSHIFT additive_expression
+   47 relational_expression: relational_expression LESS_OR_EQUAL shift_expression .
+
+    LSHIFT  shift, and go to state 74
+    RSHIFT  shift, and go to state 75
+
+    $default  reduce using rule 47 (relational_expression)
+
+
+State 109
+
+   42 shift_expression: shift_expression . LSHIFT additive_expression
+   43                 | shift_expression . RSHIFT additive_expression
+   48 relational_expression: relational_expression MORE_OR_EQUAL shift_expression .
+
+    LSHIFT  shift, and go to state 74
+    RSHIFT  shift, and go to state 75
+
+    $default  reduce using rule 48 (relational_expression)
+
+
+State 110
+
+   42 shift_expression: shift_expression . LSHIFT additive_expression
+   43                 | shift_expression . RSHIFT additive_expression
+   46 relational_expression: relational_expression LOGICAL_MORE shift_expression .
+
+    LSHIFT  shift, and go to state 74
+    RSHIFT  shift, and go to state 75
+
+    $default  reduce using rule 46 (relational_expression)
+
+
+State 111
+
+   42 shift_expression: shift_expression . LSHIFT additive_expression
+   43                 | shift_expression . RSHIFT additive_expression
+   45 relational_expression: relational_expression LOGICAL_LESS shift_expression .
+
+    LSHIFT  shift, and go to state 74
+    RSHIFT  shift, and go to state 75
+
+    $default  reduce using rule 45 (relational_expression)
+
+
+State 112
+
+   45 relational_expression: relational_expression . LOGICAL_LESS shift_expression
+   46                      | relational_expression . LOGICAL_MORE shift_expression
+   47                      | relational_expression . LESS_OR_EQUAL shift_expression
+   48                      | relational_expression . MORE_OR_EQUAL shift_expression
+   50 equality_expression: equality_expression LOGICAL_EQUALITY relational_expression .
+
+    LESS_OR_EQUAL  shift, and go to state 76
+    MORE_OR_EQUAL  shift, and go to state 77
+    LOGICAL_MORE   shift, and go to state 78
+    LOGICAL_LESS   shift, and go to state 79
+
+    $default  reduce using rule 50 (equality_expression)
+
+
+State 113
+
+   45 relational_expression: relational_expression . LOGICAL_LESS shift_expression
+   46                      | relational_expression . LOGICAL_MORE shift_expression
+   47                      | relational_expression . LESS_OR_EQUAL shift_expression
+   48                      | relational_expression . MORE_OR_EQUAL shift_expression
+   51 equality_expression: equality_expression LOGICAL_INEQUALITY relational_expression .
+
+    LESS_OR_EQUAL  shift, and go to state 76
+    MORE_OR_EQUAL  shift, and go to state 77
+    LOGICAL_MORE   shift, and go to state 78
+    LOGICAL_LESS   shift, and go to state 79
+
+    $default  reduce using rule 51 (equality_expression)
+
+
+State 114
+
+   50 equality_expression: equality_expression . LOGICAL_EQUALITY relational_expression
+   51                    | equality_expression . LOGICAL_INEQUALITY relational_expression
+   53 and_expression: and_expression BITWISE_AND equality_expression .
+
+    LOGICAL_EQUALITY    shift, and go to state 80
+    LOGICAL_INEQUALITY  shift, and go to state 81
+
+    $default  reduce using rule 53 (and_expression)
+
+
+State 115
+
+   53 and_expression: and_expression . BITWISE_AND equality_expression
+   55 exclusive_or_expression: exclusive_or_expression BITWISE_XOR and_expression .
+
+    BITWISE_AND  shift, and go to state 82
+
+    $default  reduce using rule 55 (exclusive_or_expression)
+
+
+State 116
+
+   55 exclusive_or_expression: exclusive_or_expression . BITWISE_XOR and_expression
+   57 inclusive_or_expression: inclusive_or_expression BITWISE_OR exclusive_or_expression .
+
+    BITWISE_XOR  shift, and go to state 83
+
+    $default  reduce using rule 57 (inclusive_or_expression)
+
+
+State 117
+
+   57 inclusive_or_expression: inclusive_or_expression . BITWISE_OR exclusive_or_expression
+   59 logical_and_expression: logical_and_expression LOGICAL_AND inclusive_or_expression .
+
+    BITWISE_OR  shift, and go to state 84
+
+    $default  reduce using rule 59 (logical_and_expression)
+
+
+State 118
+
+   59 logical_and_expression: logical_and_expression . LOGICAL_AND inclusive_or_expression
+   61 logical_or_expression: logical_or_expression LOGICAL_OR logical_and_expression .
+
+    LOGICAL_AND  shift, and go to state 85
+
+    $default  reduce using rule 61 (logical_or_expression)
+
+
+State 119
+
+   63 conditional_expression: logical_or_expression Q_MARK expression . COLON conditional_expression
+
+    COLON  shift, and go to state 126
+
+
+State 120
+
+   79 expression_list: expression COMMA assignment_expression .
+
+    $default  reduce using rule 79 (expression_list)
+
+
+State 121
+
+   33 cast_expression: LBRACKET type_name RBRACKET cast_expression .
+
+    $default  reduce using rule 33 (cast_expression)
+
+
+State 122
+
+   25 unary_expression: SIZEOF LBRACKET type_name RBRACKET .
+
+    $default  reduce using rule 25 (unary_expression)
+
+
+State 123
+
+   11 postfix_expression: postfix_expression LSQUARE expression RSQUARE .
+
+    $default  reduce using rule 11 (postfix_expression)
+
+
+State 124
+
+   12 postfix_expression: postfix_expression LBRACKET argument_expression_list RBRACKET .
+
+    $default  reduce using rule 12 (postfix_expression)
+
+
+State 125
+
+   19 argument_expression_list: argument_expression_list COMMA . assignment_expression
+
+    LBRACKET        shift, and go to state 1
+    PLUS_PLUS       shift, and go to state 2
+    MINUS_MINUS     shift, and go to state 3
+    SIZEOF          shift, and go to state 4
+    BITWISE_AND     shift, and go to state 5
+    MULT            shift, and go to state 6
+    PLUS            shift, and go to state 7
+    MINUS           shift, and go to state 8
+    WAVE            shift, and go to state 9
+    EXL_MARK        shift, and go to state 10
+    INTEGER_CONST   shift, and go to state 11
+    FLOATING_CONST  shift, and go to state 12
+    CHAR_CONST      shift, and go to state 13
+    IDENTIFIER      shift, and go to state 14
+    STRING_LITERAL  shift, and go to state 15
+
+    CONSTANT                   go to state 17
+    primary_expression         go to state 18
+    postfix_expression         go to state 19
+    unary_expression           go to state 20
+    UNARY_OPERATOR             go to state 21
+    cast_expression            go to state 22
+    multiplicative_expression  go to state 23
+    additive_expression        go to state 24
+    shift_expression           go to state 25
+    relational_expression      go to state 26
+    equality_expression        go to state 27
+    and_expression             go to state 28
+    exclusive_or_expression    go to state 29
+    inclusive_or_expression    go to state 30
+    logical_and_expression     go to state 31
+    logical_or_expression      go to state 32
+    conditional_expression     go to state 33
+    assignment_expression      go to state 127
+
+
+State 126
+
+   63 conditional_expression: logical_or_expression Q_MARK expression COLON . conditional_expression
+
+    LBRACKET        shift, and go to state 1
+    PLUS_PLUS       shift, and go to state 2
+    MINUS_MINUS     shift, and go to state 3
+    SIZEOF          shift, and go to state 4
+    BITWISE_AND     shift, and go to state 5
+    MULT            shift, and go to state 6
+    PLUS            shift, and go to state 7
+    MINUS           shift, and go to state 8
+    WAVE            shift, and go to state 9
+    EXL_MARK        shift, and go to state 10
+    INTEGER_CONST   shift, and go to state 11
+    FLOATING_CONST  shift, and go to state 12
+    CHAR_CONST      shift, and go to state 13
+    IDENTIFIER      shift, and go to state 14
+    STRING_LITERAL  shift, and go to state 15
+
+    CONSTANT                   go to state 17
+    primary_expression         go to state 18
+    postfix_expression         go to state 43
+    unary_expression           go to state 20
+    UNARY_OPERATOR             go to state 21
+    cast_expression            go to state 22
+    multiplicative_expression  go to state 23
+    additive_expression        go to state 24
+    shift_expression           go to state 25
+    relational_expression      go to state 26
+    equality_expression        go to state 27
+    and_expression             go to state 28
+    exclusive_or_expression    go to state 29
+    inclusive_or_expression    go to state 30
+    logical_and_expression     go to state 31
+    logical_or_expression      go to state 32
+    conditional_expression     go to state 128
+
+
+State 127
+
+   19 argument_expression_list: argument_expression_list COMMA assignment_expression .
+
+    $default  reduce using rule 19 (argument_expression_list)
+
+
+State 128
+
+   63 conditional_expression: logical_or_expression Q_MARK expression COLON conditional_expression .
+
+    $default  reduce using rule 63 (conditional_expression)

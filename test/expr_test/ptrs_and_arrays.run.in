@@ -1,0 +1,10 @@
+a=&b;
+a=*b;
+*ptr++;
+++*ptr;
+b|=a*b-c/g*g%h-b+(*a);
+b|=a*b-c/g*g%h-b+(&a);
+b|=a*b-c/g*g%h-b+&a;
+b|=a*b-c/g*g%h-b+*a;
+
+

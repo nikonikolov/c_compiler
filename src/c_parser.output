@@ -1,7 +1,7 @@
 Nonterminals useless in grammar
 
+   var_or_const
    conditional_expression
-   expression
 
 
 Terminals unused in grammar
@@ -29,7 +29,6 @@ Terminals unused in grammar
    DEFAULT
    GOTO
    VOLATILE
-   DO
    STATIC
    LSQUARE
    RSQUARE
@@ -46,16 +45,14 @@ Terminals unused in grammar
    WAVE
    EXL_MARK
    STRING_LITERAL
-   PREPROCESSOR_INCLUDE
-   EOLINE
 
 
 Rules useless in grammar
 
-  103 conditional_expression: equality_expression Q_MARK arithmetic_expression COLON arithmetic_expression
+  107 var_or_const: IDENTIFIER
+  108             | CONSTANT
 
-  104 expression: equality_expression
-  105           | assignment_expression
+  109 conditional_expression: equality_expression Q_MARK arithmetic_expression COLON arithmetic_expression
 
 
 Rules useless in parser due to conflicts
@@ -64,20 +61,18 @@ Rules useless in parser due to conflicts
 
    45 arithmetic_expression: IDENTIFIER
 
-   84 else_statement: ELSE if_statement
-
 
 State 39 conflicts: 21 reduce/reduce
 State 47 conflicts: 1 shift/reduce
 State 48 conflicts: 1 shift/reduce
 State 66 conflicts: 10 shift/reduce
-State 81 conflicts: 1 shift/reduce
-State 90 conflicts: 20 reduce/reduce
-State 91 conflicts: 8 shift/reduce
-State 100 conflicts: 1 shift/reduce
-State 107 conflicts: 9 shift/reduce, 1 reduce/reduce
-State 109 conflicts: 1 shift/reduce, 1 reduce/reduce
-State 128 conflicts: 1 shift/reduce, 9 reduce/reduce
+State 83 conflicts: 1 shift/reduce
+State 92 conflicts: 20 reduce/reduce
+State 93 conflicts: 8 shift/reduce
+State 104 conflicts: 1 shift/reduce
+State 111 conflicts: 9 shift/reduce, 1 reduce/reduce
+State 113 conflicts: 1 shift/reduce, 1 reduce/reduce
+State 157 conflicts: 8 shift/reduce
 
 
 Grammar
@@ -156,64 +151,70 @@ Grammar
    58                    | LSHIFT
    59                    | RSHIFT
 
-   60 fn_declaration: INT IDENTIFIER LBRACKET fn_params_list RBRACKET compound_statement
+   60 expression: equality_expression
+   61           | assignment_expression
 
-   61 fn_params_list: INT bracketed_identifier
-   62               | fn_params_list COMMA INT bracketed_identifier
-   63               | %empty
+   62 fn_declaration: INT IDENTIFIER LBRACKET fn_params_list RBRACKET compound_statement
 
-   64 loop: for_loop
-   65     | while_loop
+   63 fn_params_list: INT bracketed_identifier
+   64               | fn_params_list COMMA INT bracketed_identifier
+   65               | %empty
 
-   66 for_loop: FOR LBRACKET for_loop_decl_statement RBRACKET compound_statement
-   67         | FOR LBRACKET for_loop_decl_statement RBRACKET statement
+   66 loop: for_loop
+   67     | while_loop
+   68     | do_while_loop
 
-   68 for_loop_decl_statement: assignment_expression_list SEMI_COLON equality_expression SEMI_COLON assignment_expression_list
-   69                        | assignment_expression_list SEMI_COLON equality_expression SEMI_COLON
-   70                        | assignment_expression_list SEMI_COLON SEMI_COLON assignment_expression_list
-   71                        | SEMI_COLON equality_expression SEMI_COLON assignment_expression_list
-   72                        | assignment_expression_list SEMI_COLON SEMI_COLON
-   73                        | SEMI_COLON SEMI_COLON assignment_expression_list
-   74                        | SEMI_COLON equality_expression SEMI_COLON
-   75                        | SEMI_COLON SEMI_COLON
+   69 do_while_loop: DO compound_statement WHILE LBRACKET expression RBRACKET SEMI_COLON
+   70              | DO statement WHILE LBRACKET expression RBRACKET SEMI_COLON
 
-   76 while_loop: WHILE LBRACKET equality_expression RBRACKET compound_statement
-   77           | WHILE LBRACKET equality_expression RBRACKET statement
+   71 for_loop: FOR LBRACKET for_loop_decl_statement RBRACKET compound_statement
+   72         | FOR LBRACKET for_loop_decl_statement RBRACKET statement
 
-   78 if_block_statement: if_statement
-   79                   | if_statement else_statement_list
+   73 for_loop_decl_statement: assignment_expression_list SEMI_COLON equality_expression SEMI_COLON assignment_expression_list
+   74                        | assignment_expression_list SEMI_COLON equality_expression SEMI_COLON
+   75                        | assignment_expression_list SEMI_COLON SEMI_COLON assignment_expression_list
+   76                        | SEMI_COLON equality_expression SEMI_COLON assignment_expression_list
+   77                        | assignment_expression_list SEMI_COLON SEMI_COLON
+   78                        | SEMI_COLON SEMI_COLON assignment_expression_list
+   79                        | SEMI_COLON equality_expression SEMI_COLON
+   80                        | SEMI_COLON SEMI_COLON
 
-   80 else_statement_list: else_statement
-   81                    | else_statement_list else_statement
+   81 while_loop: WHILE LBRACKET equality_expression RBRACKET compound_statement
+   82           | WHILE LBRACKET equality_expression RBRACKET statement
 
-   82 if_statement: IF LBRACKET equality_expression RBRACKET compound_statement
-   83             | IF LBRACKET equality_expression RBRACKET statement
+   83 if_block_statement: if_statement
+   84                   | if_statement else_statement_list
 
-   84 else_statement: ELSE if_statement
-   85               | ELSE compound_statement
-   86               | ELSE statement
+   85 else_statement_list: else_statement
+   86                    | else_statement_list else_statement
 
-   87 compound_statement: LCURLY declaration_list statement_list RCURLY
-   88                   | LCURLY statement_list RCURLY
-   89                   | LCURLY declaration_list RCURLY
-   90                   | LCURLY RCURLY
+   87 if_statement: IF LBRACKET equality_expression RBRACKET compound_statement
+   88             | IF LBRACKET equality_expression RBRACKET statement
 
-   91 declaration_list: declaration
-   92                 | declaration_list declaration
+   89 else_statement: ELSE compound_statement
+   90               | ELSE statement
 
-   93 statement_list: statement
-   94               | statement_list statement
+   91 compound_statement: LCURLY declaration_list statement_list RCURLY
+   92                   | LCURLY statement_list RCURLY
+   93                   | LCURLY declaration_list RCURLY
+   94                   | LCURLY RCURLY
 
-   95 statement: loop
-   96          | if_block_statement
-   97          | semi_colon_statement
+   95 declaration_list: declaration
+   96                 | declaration_list declaration
 
-   98 semi_colon_statement: return_statement
-   99                     | assignment_expression SEMI_COLON
-  100                     | SEMI_COLON
+   97 statement_list: statement
+   98               | statement_list statement
 
-  101 return_statement: RETURN equality_expression SEMI_COLON
-  102                 | RETURN SEMI_COLON
+   99 statement: loop
+  100          | if_block_statement
+  101          | semi_colon_statement
+
+  102 semi_colon_statement: return_statement
+  103                     | assignment_expression SEMI_COLON
+  104                     | SEMI_COLON
+
+  105 return_statement: RETURN equality_expression SEMI_COLON
+  106                 | RETURN SEMI_COLON
 
 
 Terminals, with rules where they appear
@@ -222,10 +223,10 @@ $end (0) 0
 error (256)
 AUTO (258)
 DOUBLE (259)
-INT (260) 8 60 61 62
+INT (260) 8 62 63 64
 STRUCT (261)
 BREAK (262)
-ELSE (263) 84 85 86
+ELSE (263) 89 90
 LONG (264)
 SWITCH (265)
 CASE (266)
@@ -234,29 +235,29 @@ REGISTER (268)
 TYPEDEF (269)
 CHAR (270)
 EXTERN (271)
-RETURN (272) 101 102
+RETURN (272) 105 106
 UNION (273)
 CONST (274)
 FLOAT (275)
 SHORT (276)
 UNSIGNED (277)
 CONTINUE (278)
-FOR (279) 66 67
+FOR (279) 71 72
 SIGNED (280)
 VOID (281)
 DEFAULT (282)
 GOTO (283)
 VOLATILE (284)
-DO (285)
-IF (286) 82 83
+DO (285) 69 70
+IF (286) 87 88
 STATIC (287)
-WHILE (288) 76 77
+WHILE (288) 69 70 81 82
 LSQUARE (289)
 RSQUARE (290)
-LBRACKET (291) 14 22 24 49 60 66 67 76 77 82 83
-RBRACKET (292) 14 22 24 49 60 66 67 76 77 82 83
-LCURLY (293) 87 88 89 90
-RCURLY (294) 87 88 89 90
+LBRACKET (291) 14 22 24 49 62 69 70 71 72 81 82 87 88
+RBRACKET (292) 14 22 24 49 62 69 70 71 72 81 82 87 88
+LCURLY (293) 91 92 93 94
+RCURLY (294) 91 92 93 94
 THREE_DOTS (295)
 DOT (296)
 PTR_OP (297)
@@ -283,10 +284,10 @@ RSHIFT_EQUALS (317) 41
 AND_EQUALS (318) 42
 XOR_EQUALS (319) 43
 OR_EQUALS (320) 44
-COMMA (321) 11 12 16 62
+COMMA (321) 11 12 16 64
 HASH (322)
 HASH_HASH (323)
-SEMI_COLON (324) 8 68 69 70 71 72 73 74 75 99 100 101 102
+SEMI_COLON (324) 8 69 70 73 74 75 76 77 78 79 80 103 104 105 106
 EQUALS (325) 34
 BITWISE_OR (326) 51
 BITWISE_AND (327) 52
@@ -303,75 +304,77 @@ LOGICAL_LESS (337) 30
 FLOATING_CONST (338) 5
 INTEGER_CONST (339) 6
 CHAR_CONST (340) 7
-IDENTIFIER (341) 13 20 45 60
+IDENTIFIER (341) 13 20 45 62
 STRING_LITERAL (342)
-PREPROCESSOR_INCLUDE (343)
-EOLINE (344)
 
 
 Nonterminals, with rules where they appear
 
-$accept (90)
+$accept (88)
     on left: 0
-program (91)
+program (89)
     on left: 1 2 3 4, on right: 0 3 4
-CONSTANT (92)
+CONSTANT (90)
     on left: 5 6 7, on right: 23
-declaration (93)
-    on left: 8, on right: 2 4 91 92
-initialization_list (94)
+declaration (91)
+    on left: 8, on right: 2 4 95 96
+initialization_list (92)
     on left: 9 10 11 12, on right: 8 11 12
-bracketed_identifier (95)
-    on left: 13 14, on right: 9 12 14 17 19 33 46 61 62
-assignment_expression_list (96)
-    on left: 15 16, on right: 16 68 69 70 71 72 73
-equality_expression (97)
-    on left: 17 18 19 20 21 22, on right: 22 68 69 71 74 76 77 82 83
-    101
-bracketed_const (98)
+bracketed_identifier (93)
+    on left: 13 14, on right: 9 12 14 17 19 33 46 63 64
+assignment_expression_list (94)
+    on left: 15 16, on right: 16 73 74 75 76 77 78
+equality_expression (95)
+    on left: 17 18 19 20 21 22, on right: 22 60 73 74 76 79 81 82 87
+    88 105
+bracketed_const (96)
     on left: 23 24, on right: 18 24 47
-COMPARISON_OPERATOR (99)
+COMPARISON_OPERATOR (97)
     on left: 25 26 27 28 29 30 31 32, on right: 17 21
-assignment_expression (100)
-    on left: 33, on right: 10 11 15 16 99
-ASSIGNMENT_OPERATOR (101)
+assignment_expression (98)
+    on left: 33, on right: 10 11 15 16 61 103
+ASSIGNMENT_OPERATOR (99)
     on left: 34 35 36 37 38 39 40 41 42 43 44, on right: 33
-arithmetic_expression (102)
+arithmetic_expression (100)
     on left: 45 46 47 48 49, on right: 21 33 48 49
-ARITHMETIC_OPERATOR (103)
+ARITHMETIC_OPERATOR (101)
     on left: 50 51 52 53 54 55 56 57 58 59, on right: 48
-fn_declaration (104)
-    on left: 60, on right: 1 3
-fn_params_list (105)
-    on left: 61 62 63, on right: 60 62
-loop (106)
-    on left: 64 65, on right: 95
+expression (102)
+    on left: 60 61, on right: 69 70
+fn_declaration (103)
+    on left: 62, on right: 1 3
+fn_params_list (104)
+    on left: 63 64 65, on right: 62 64
+loop (105)
+    on left: 66 67 68, on right: 99
+do_while_loop (106)
+    on left: 69 70, on right: 68
 for_loop (107)
-    on left: 66 67, on right: 64
+    on left: 71 72, on right: 66
 for_loop_decl_statement (108)
-    on left: 68 69 70 71 72 73 74 75, on right: 66 67
+    on left: 73 74 75 76 77 78 79 80, on right: 71 72
 while_loop (109)
-    on left: 76 77, on right: 65
+    on left: 81 82, on right: 67
 if_block_statement (110)
-    on left: 78 79, on right: 96
+    on left: 83 84, on right: 100
 else_statement_list (111)
-    on left: 80 81, on right: 79 81
+    on left: 85 86, on right: 84 86
 if_statement (112)
-    on left: 82 83, on right: 78 79 84
+    on left: 87 88, on right: 83 84
 else_statement (113)
-    on left: 84 85 86, on right: 80 81
+    on left: 89 90, on right: 85 86
 compound_statement (114)
-    on left: 87 88 89 90, on right: 60 66 76 82 85
+    on left: 91 92 93 94, on right: 62 69 71 81 87 89
 declaration_list (115)
-    on left: 91 92, on right: 87 89 92
+    on left: 95 96, on right: 91 93 96
 statement_list (116)
-    on left: 93 94, on right: 87 88 94
+    on left: 97 98, on right: 91 92 98
 statement (117)
-    on left: 95 96 97, on right: 67 77 83 86 93 94
+    on left: 99 100 101, on right: 70 72 82 88 90 97 98
 semi_colon_statement (118)
-    on left: 98 99 100, on right: 97
+    on left: 102 103 104, on right: 101
 return_statement (119)
-    on left: 101 102, on right: 98
+    on left: 105 106, on right: 102
 
 
 State 0
@@ -388,7 +391,7 @@ State 0
 State 1
 
     8 declaration: INT . initialization_list SEMI_COLON
-   60 fn_declaration: INT . IDENTIFIER LBRACKET fn_params_list RBRACKET compound_statement
+   62 fn_declaration: INT . IDENTIFIER LBRACKET fn_params_list RBRACKET compound_statement
 
     LBRACKET    shift, and go to state 5
     IDENTIFIER  shift, and go to state 6
@@ -438,7 +441,7 @@ State 5
 State 6
 
    13 bracketed_identifier: IDENTIFIER .
-   60 fn_declaration: INT IDENTIFIER . LBRACKET fn_params_list RBRACKET compound_statement
+   62 fn_declaration: INT IDENTIFIER . LBRACKET fn_params_list RBRACKET compound_statement
 
     LBRACKET  shift, and go to state 15
 
@@ -521,11 +524,11 @@ State 14
 
 State 15
 
-   60 fn_declaration: INT IDENTIFIER LBRACKET . fn_params_list RBRACKET compound_statement
+   62 fn_declaration: INT IDENTIFIER LBRACKET . fn_params_list RBRACKET compound_statement
 
     INT  shift, and go to state 31
 
-    $default  reduce using rule 63 (fn_params_list)
+    $default  reduce using rule 65 (fn_params_list)
 
     fn_params_list  go to state 32
 
@@ -651,7 +654,7 @@ State 30
 
 State 31
 
-   61 fn_params_list: INT . bracketed_identifier
+   63 fn_params_list: INT . bracketed_identifier
 
     LBRACKET    shift, and go to state 5
     IDENTIFIER  shift, and go to state 13
@@ -661,8 +664,8 @@ State 31
 
 State 32
 
-   60 fn_declaration: INT IDENTIFIER LBRACKET fn_params_list . RBRACKET compound_statement
-   62 fn_params_list: fn_params_list . COMMA INT bracketed_identifier
+   62 fn_declaration: INT IDENTIFIER LBRACKET fn_params_list . RBRACKET compound_statement
+   64 fn_params_list: fn_params_list . COMMA INT bracketed_identifier
 
     RBRACKET  shift, and go to state 45
     COMMA     shift, and go to state 46
@@ -830,14 +833,14 @@ State 43
 
 State 44
 
-   61 fn_params_list: INT bracketed_identifier .
+   63 fn_params_list: INT bracketed_identifier .
 
-    $default  reduce using rule 61 (fn_params_list)
+    $default  reduce using rule 63 (fn_params_list)
 
 
 State 45
 
-   60 fn_declaration: INT IDENTIFIER LBRACKET fn_params_list RBRACKET . compound_statement
+   62 fn_declaration: INT IDENTIFIER LBRACKET fn_params_list RBRACKET . compound_statement
 
     LCURLY  shift, and go to state 61
 
@@ -846,7 +849,7 @@ State 45
 
 State 46
 
-   62 fn_params_list: fn_params_list COMMA . INT bracketed_identifier
+   64 fn_params_list: fn_params_list COMMA . INT bracketed_identifier
 
     INT  shift, and go to state 63
 
@@ -981,51 +984,53 @@ State 60
 
 State 61
 
-   87 compound_statement: LCURLY . declaration_list statement_list RCURLY
-   88                   | LCURLY . statement_list RCURLY
-   89                   | LCURLY . declaration_list RCURLY
-   90                   | LCURLY . RCURLY
+   91 compound_statement: LCURLY . declaration_list statement_list RCURLY
+   92                   | LCURLY . statement_list RCURLY
+   93                   | LCURLY . declaration_list RCURLY
+   94                   | LCURLY . RCURLY
 
     INT         shift, and go to state 67
     RETURN      shift, and go to state 68
     FOR         shift, and go to state 69
-    IF          shift, and go to state 70
-    WHILE       shift, and go to state 71
+    DO          shift, and go to state 70
+    IF          shift, and go to state 71
+    WHILE       shift, and go to state 72
     LBRACKET    shift, and go to state 5
-    RCURLY      shift, and go to state 72
-    SEMI_COLON  shift, and go to state 73
+    RCURLY      shift, and go to state 73
+    SEMI_COLON  shift, and go to state 74
     IDENTIFIER  shift, and go to state 13
 
-    declaration            go to state 74
-    bracketed_identifier   go to state 75
-    assignment_expression  go to state 76
-    loop                   go to state 77
-    for_loop               go to state 78
-    while_loop             go to state 79
-    if_block_statement     go to state 80
-    if_statement           go to state 81
-    declaration_list       go to state 82
-    statement_list         go to state 83
-    statement              go to state 84
-    semi_colon_statement   go to state 85
-    return_statement       go to state 86
+    declaration            go to state 75
+    bracketed_identifier   go to state 76
+    assignment_expression  go to state 77
+    loop                   go to state 78
+    do_while_loop          go to state 79
+    for_loop               go to state 80
+    while_loop             go to state 81
+    if_block_statement     go to state 82
+    if_statement           go to state 83
+    declaration_list       go to state 84
+    statement_list         go to state 85
+    statement              go to state 86
+    semi_colon_statement   go to state 87
+    return_statement       go to state 88
 
 
 State 62
 
-   60 fn_declaration: INT IDENTIFIER LBRACKET fn_params_list RBRACKET compound_statement .
+   62 fn_declaration: INT IDENTIFIER LBRACKET fn_params_list RBRACKET compound_statement .
 
-    $default  reduce using rule 60 (fn_declaration)
+    $default  reduce using rule 62 (fn_declaration)
 
 
 State 63
 
-   62 fn_params_list: fn_params_list COMMA INT . bracketed_identifier
+   64 fn_params_list: fn_params_list COMMA INT . bracketed_identifier
 
     LBRACKET    shift, and go to state 5
     IDENTIFIER  shift, and go to state 13
 
-    bracketed_identifier  go to state 87
+    bracketed_identifier  go to state 89
 
 
 State 64
@@ -1087,69 +1092,98 @@ State 67
 
 State 68
 
-  101 return_statement: RETURN . equality_expression SEMI_COLON
-  102                 | RETURN . SEMI_COLON
+  105 return_statement: RETURN . equality_expression SEMI_COLON
+  106                 | RETURN . SEMI_COLON
 
-    LBRACKET        shift, and go to state 88
-    SEMI_COLON      shift, and go to state 89
+    LBRACKET        shift, and go to state 90
+    SEMI_COLON      shift, and go to state 91
     FLOATING_CONST  shift, and go to state 36
     INTEGER_CONST   shift, and go to state 37
     CHAR_CONST      shift, and go to state 38
-    IDENTIFIER      shift, and go to state 90
+    IDENTIFIER      shift, and go to state 92
 
     CONSTANT               go to state 40
-    bracketed_identifier   go to state 91
-    equality_expression    go to state 92
-    bracketed_const        go to state 93
-    arithmetic_expression  go to state 94
+    bracketed_identifier   go to state 93
+    equality_expression    go to state 94
+    bracketed_const        go to state 95
+    arithmetic_expression  go to state 96
 
 
 State 69
 
-   66 for_loop: FOR . LBRACKET for_loop_decl_statement RBRACKET compound_statement
-   67         | FOR . LBRACKET for_loop_decl_statement RBRACKET statement
-
-    LBRACKET  shift, and go to state 95
-
-
-State 70
-
-   82 if_statement: IF . LBRACKET equality_expression RBRACKET compound_statement
-   83             | IF . LBRACKET equality_expression RBRACKET statement
-
-    LBRACKET  shift, and go to state 96
-
-
-State 71
-
-   76 while_loop: WHILE . LBRACKET equality_expression RBRACKET compound_statement
-   77           | WHILE . LBRACKET equality_expression RBRACKET statement
+   71 for_loop: FOR . LBRACKET for_loop_decl_statement RBRACKET compound_statement
+   72         | FOR . LBRACKET for_loop_decl_statement RBRACKET statement
 
     LBRACKET  shift, and go to state 97
 
 
+State 70
+
+   69 do_while_loop: DO . compound_statement WHILE LBRACKET expression RBRACKET SEMI_COLON
+   70              | DO . statement WHILE LBRACKET expression RBRACKET SEMI_COLON
+
+    RETURN      shift, and go to state 68
+    FOR         shift, and go to state 69
+    DO          shift, and go to state 70
+    IF          shift, and go to state 71
+    WHILE       shift, and go to state 72
+    LBRACKET    shift, and go to state 5
+    LCURLY      shift, and go to state 61
+    SEMI_COLON  shift, and go to state 74
+    IDENTIFIER  shift, and go to state 13
+
+    bracketed_identifier   go to state 76
+    assignment_expression  go to state 77
+    loop                   go to state 78
+    do_while_loop          go to state 79
+    for_loop               go to state 80
+    while_loop             go to state 81
+    if_block_statement     go to state 82
+    if_statement           go to state 83
+    compound_statement     go to state 98
+    statement              go to state 99
+    semi_colon_statement   go to state 87
+    return_statement       go to state 88
+
+
+State 71
+
+   87 if_statement: IF . LBRACKET equality_expression RBRACKET compound_statement
+   88             | IF . LBRACKET equality_expression RBRACKET statement
+
+    LBRACKET  shift, and go to state 100
+
+
 State 72
 
-   90 compound_statement: LCURLY RCURLY .
+   81 while_loop: WHILE . LBRACKET equality_expression RBRACKET compound_statement
+   82           | WHILE . LBRACKET equality_expression RBRACKET statement
 
-    $default  reduce using rule 90 (compound_statement)
+    LBRACKET  shift, and go to state 101
 
 
 State 73
 
-  100 semi_colon_statement: SEMI_COLON .
+   94 compound_statement: LCURLY RCURLY .
 
-    $default  reduce using rule 100 (semi_colon_statement)
+    $default  reduce using rule 94 (compound_statement)
 
 
 State 74
 
-   91 declaration_list: declaration .
+  104 semi_colon_statement: SEMI_COLON .
 
-    $default  reduce using rule 91 (declaration_list)
+    $default  reduce using rule 104 (semi_colon_statement)
 
 
 State 75
+
+   95 declaration_list: declaration .
+
+    $default  reduce using rule 95 (declaration_list)
+
+
+State 76
 
    33 assignment_expression: bracketed_identifier . ASSIGNMENT_OPERATOR arithmetic_expression
 
@@ -1168,167 +1202,178 @@ State 75
     ASSIGNMENT_OPERATOR  go to state 29
 
 
-State 76
-
-   99 semi_colon_statement: assignment_expression . SEMI_COLON
-
-    SEMI_COLON  shift, and go to state 98
-
-
 State 77
 
-   95 statement: loop .
+  103 semi_colon_statement: assignment_expression . SEMI_COLON
 
-    $default  reduce using rule 95 (statement)
+    SEMI_COLON  shift, and go to state 102
 
 
 State 78
 
-   64 loop: for_loop .
+   99 statement: loop .
 
-    $default  reduce using rule 64 (loop)
+    $default  reduce using rule 99 (statement)
 
 
 State 79
 
-   65 loop: while_loop .
+   68 loop: do_while_loop .
 
-    $default  reduce using rule 65 (loop)
+    $default  reduce using rule 68 (loop)
 
 
 State 80
 
-   96 statement: if_block_statement .
+   66 loop: for_loop .
 
-    $default  reduce using rule 96 (statement)
+    $default  reduce using rule 66 (loop)
 
 
 State 81
 
-   78 if_block_statement: if_statement .
-   79                   | if_statement . else_statement_list
+   67 loop: while_loop .
 
-    ELSE  shift, and go to state 99
-
-    ELSE      [reduce using rule 78 (if_block_statement)]
-    $default  reduce using rule 78 (if_block_statement)
-
-    else_statement_list  go to state 100
-    else_statement       go to state 101
+    $default  reduce using rule 67 (loop)
 
 
 State 82
 
-   87 compound_statement: LCURLY declaration_list . statement_list RCURLY
-   89                   | LCURLY declaration_list . RCURLY
-   92 declaration_list: declaration_list . declaration
+  100 statement: if_block_statement .
 
-    INT         shift, and go to state 67
-    RETURN      shift, and go to state 68
-    FOR         shift, and go to state 69
-    IF          shift, and go to state 70
-    WHILE       shift, and go to state 71
-    LBRACKET    shift, and go to state 5
-    RCURLY      shift, and go to state 102
-    SEMI_COLON  shift, and go to state 73
-    IDENTIFIER  shift, and go to state 13
-
-    declaration            go to state 103
-    bracketed_identifier   go to state 75
-    assignment_expression  go to state 76
-    loop                   go to state 77
-    for_loop               go to state 78
-    while_loop             go to state 79
-    if_block_statement     go to state 80
-    if_statement           go to state 81
-    statement_list         go to state 104
-    statement              go to state 84
-    semi_colon_statement   go to state 85
-    return_statement       go to state 86
+    $default  reduce using rule 100 (statement)
 
 
 State 83
 
-   88 compound_statement: LCURLY statement_list . RCURLY
-   94 statement_list: statement_list . statement
+   83 if_block_statement: if_statement .
+   84                   | if_statement . else_statement_list
 
-    RETURN      shift, and go to state 68
-    FOR         shift, and go to state 69
-    IF          shift, and go to state 70
-    WHILE       shift, and go to state 71
-    LBRACKET    shift, and go to state 5
-    RCURLY      shift, and go to state 105
-    SEMI_COLON  shift, and go to state 73
-    IDENTIFIER  shift, and go to state 13
+    ELSE  shift, and go to state 103
 
-    bracketed_identifier   go to state 75
-    assignment_expression  go to state 76
-    loop                   go to state 77
-    for_loop               go to state 78
-    while_loop             go to state 79
-    if_block_statement     go to state 80
-    if_statement           go to state 81
-    statement              go to state 106
-    semi_colon_statement   go to state 85
-    return_statement       go to state 86
+    ELSE      [reduce using rule 83 (if_block_statement)]
+    $default  reduce using rule 83 (if_block_statement)
+
+    else_statement_list  go to state 104
+    else_statement       go to state 105
 
 
 State 84
 
-   93 statement_list: statement .
+   91 compound_statement: LCURLY declaration_list . statement_list RCURLY
+   93                   | LCURLY declaration_list . RCURLY
+   96 declaration_list: declaration_list . declaration
 
-    $default  reduce using rule 93 (statement_list)
+    INT         shift, and go to state 67
+    RETURN      shift, and go to state 68
+    FOR         shift, and go to state 69
+    DO          shift, and go to state 70
+    IF          shift, and go to state 71
+    WHILE       shift, and go to state 72
+    LBRACKET    shift, and go to state 5
+    RCURLY      shift, and go to state 106
+    SEMI_COLON  shift, and go to state 74
+    IDENTIFIER  shift, and go to state 13
+
+    declaration            go to state 107
+    bracketed_identifier   go to state 76
+    assignment_expression  go to state 77
+    loop                   go to state 78
+    do_while_loop          go to state 79
+    for_loop               go to state 80
+    while_loop             go to state 81
+    if_block_statement     go to state 82
+    if_statement           go to state 83
+    statement_list         go to state 108
+    statement              go to state 86
+    semi_colon_statement   go to state 87
+    return_statement       go to state 88
 
 
 State 85
 
-   97 statement: semi_colon_statement .
+   92 compound_statement: LCURLY statement_list . RCURLY
+   98 statement_list: statement_list . statement
 
-    $default  reduce using rule 97 (statement)
+    RETURN      shift, and go to state 68
+    FOR         shift, and go to state 69
+    DO          shift, and go to state 70
+    IF          shift, and go to state 71
+    WHILE       shift, and go to state 72
+    LBRACKET    shift, and go to state 5
+    RCURLY      shift, and go to state 109
+    SEMI_COLON  shift, and go to state 74
+    IDENTIFIER  shift, and go to state 13
+
+    bracketed_identifier   go to state 76
+    assignment_expression  go to state 77
+    loop                   go to state 78
+    do_while_loop          go to state 79
+    for_loop               go to state 80
+    while_loop             go to state 81
+    if_block_statement     go to state 82
+    if_statement           go to state 83
+    statement              go to state 110
+    semi_colon_statement   go to state 87
+    return_statement       go to state 88
 
 
 State 86
 
-   98 semi_colon_statement: return_statement .
+   97 statement_list: statement .
 
-    $default  reduce using rule 98 (semi_colon_statement)
+    $default  reduce using rule 97 (statement_list)
 
 
 State 87
 
-   62 fn_params_list: fn_params_list COMMA INT bracketed_identifier .
+  101 statement: semi_colon_statement .
 
-    $default  reduce using rule 62 (fn_params_list)
+    $default  reduce using rule 101 (statement)
 
 
 State 88
+
+  102 semi_colon_statement: return_statement .
+
+    $default  reduce using rule 102 (semi_colon_statement)
+
+
+State 89
+
+   64 fn_params_list: fn_params_list COMMA INT bracketed_identifier .
+
+    $default  reduce using rule 64 (fn_params_list)
+
+
+State 90
 
    14 bracketed_identifier: LBRACKET . bracketed_identifier RBRACKET
    22 equality_expression: LBRACKET . equality_expression RBRACKET
    24 bracketed_const: LBRACKET . bracketed_const RBRACKET
    49 arithmetic_expression: LBRACKET . arithmetic_expression RBRACKET
 
-    LBRACKET        shift, and go to state 88
+    LBRACKET        shift, and go to state 90
     FLOATING_CONST  shift, and go to state 36
     INTEGER_CONST   shift, and go to state 37
     CHAR_CONST      shift, and go to state 38
-    IDENTIFIER      shift, and go to state 90
+    IDENTIFIER      shift, and go to state 92
 
     CONSTANT               go to state 40
-    bracketed_identifier   go to state 107
-    equality_expression    go to state 108
-    bracketed_const        go to state 109
-    arithmetic_expression  go to state 110
+    bracketed_identifier   go to state 111
+    equality_expression    go to state 112
+    bracketed_const        go to state 113
+    arithmetic_expression  go to state 114
 
 
-State 89
+State 91
 
-  102 return_statement: RETURN SEMI_COLON .
+  106 return_statement: RETURN SEMI_COLON .
 
-    $default  reduce using rule 102 (return_statement)
+    $default  reduce using rule 106 (return_statement)
 
 
-State 90
+State 92
 
    13 bracketed_identifier: IDENTIFIER .
    20 equality_expression: IDENTIFIER .
@@ -1378,20 +1423,20 @@ State 90
     $default            reduce using rule 13 (bracketed_identifier)
 
 
-State 91
+State 93
 
    17 equality_expression: bracketed_identifier . COMPARISON_OPERATOR bracketed_identifier
    19                    | bracketed_identifier .
    46 arithmetic_expression: bracketed_identifier .
 
-    LESS_OR_EQUAL       shift, and go to state 111
-    MORE_OR_EQUAL       shift, and go to state 112
-    LOGICAL_EQUALITY    shift, and go to state 113
-    LOGICAL_INEQUALITY  shift, and go to state 114
-    LOGICAL_AND         shift, and go to state 115
-    LOGICAL_OR          shift, and go to state 116
-    LOGICAL_MORE        shift, and go to state 117
-    LOGICAL_LESS        shift, and go to state 118
+    LESS_OR_EQUAL       shift, and go to state 115
+    MORE_OR_EQUAL       shift, and go to state 116
+    LOGICAL_EQUALITY    shift, and go to state 117
+    LOGICAL_INEQUALITY  shift, and go to state 118
+    LOGICAL_AND         shift, and go to state 119
+    LOGICAL_OR          shift, and go to state 120
+    LOGICAL_MORE        shift, and go to state 121
+    LOGICAL_LESS        shift, and go to state 122
 
     RBRACKET            reduce using rule 19 (equality_expression)
     LESS_OR_EQUAL       [reduce using rule 46 (arithmetic_expression)]
@@ -1405,17 +1450,17 @@ State 91
     LOGICAL_LESS        [reduce using rule 46 (arithmetic_expression)]
     $default            reduce using rule 46 (arithmetic_expression)
 
-    COMPARISON_OPERATOR  go to state 119
+    COMPARISON_OPERATOR  go to state 123
 
 
-State 92
+State 94
 
-  101 return_statement: RETURN equality_expression . SEMI_COLON
+  105 return_statement: RETURN equality_expression . SEMI_COLON
 
-    SEMI_COLON  shift, and go to state 120
+    SEMI_COLON  shift, and go to state 124
 
 
-State 93
+State 95
 
    18 equality_expression: bracketed_const .
    47 arithmetic_expression: bracketed_const .
@@ -1425,19 +1470,19 @@ State 93
     $default    reduce using rule 47 (arithmetic_expression)
 
 
-State 94
+State 96
 
    21 equality_expression: arithmetic_expression . COMPARISON_OPERATOR arithmetic_expression
    48 arithmetic_expression: arithmetic_expression . ARITHMETIC_OPERATOR arithmetic_expression
 
     LSHIFT              shift, and go to state 50
     RSHIFT              shift, and go to state 51
-    LESS_OR_EQUAL       shift, and go to state 111
-    MORE_OR_EQUAL       shift, and go to state 112
-    LOGICAL_EQUALITY    shift, and go to state 113
-    LOGICAL_INEQUALITY  shift, and go to state 114
-    LOGICAL_AND         shift, and go to state 115
-    LOGICAL_OR          shift, and go to state 116
+    LESS_OR_EQUAL       shift, and go to state 115
+    MORE_OR_EQUAL       shift, and go to state 116
+    LOGICAL_EQUALITY    shift, and go to state 117
+    LOGICAL_INEQUALITY  shift, and go to state 118
+    LOGICAL_AND         shift, and go to state 119
+    LOGICAL_OR          shift, and go to state 120
     BITWISE_OR          shift, and go to state 52
     BITWISE_AND         shift, and go to state 53
     BITWISE_XOR         shift, and go to state 54
@@ -1446,174 +1491,191 @@ State 94
     MINUS               shift, and go to state 57
     DIV                 shift, and go to state 58
     PERCENT             shift, and go to state 59
-    LOGICAL_MORE        shift, and go to state 117
-    LOGICAL_LESS        shift, and go to state 118
+    LOGICAL_MORE        shift, and go to state 121
+    LOGICAL_LESS        shift, and go to state 122
 
-    COMPARISON_OPERATOR  go to state 121
+    COMPARISON_OPERATOR  go to state 125
     ARITHMETIC_OPERATOR  go to state 60
-
-
-State 95
-
-   66 for_loop: FOR LBRACKET . for_loop_decl_statement RBRACKET compound_statement
-   67         | FOR LBRACKET . for_loop_decl_statement RBRACKET statement
-
-    LBRACKET    shift, and go to state 5
-    SEMI_COLON  shift, and go to state 122
-    IDENTIFIER  shift, and go to state 13
-
-    bracketed_identifier        go to state 75
-    assignment_expression_list  go to state 123
-    assignment_expression       go to state 124
-    for_loop_decl_statement     go to state 125
-
-
-State 96
-
-   82 if_statement: IF LBRACKET . equality_expression RBRACKET compound_statement
-   83             | IF LBRACKET . equality_expression RBRACKET statement
-
-    LBRACKET        shift, and go to state 88
-    FLOATING_CONST  shift, and go to state 36
-    INTEGER_CONST   shift, and go to state 37
-    CHAR_CONST      shift, and go to state 38
-    IDENTIFIER      shift, and go to state 90
-
-    CONSTANT               go to state 40
-    bracketed_identifier   go to state 91
-    equality_expression    go to state 126
-    bracketed_const        go to state 93
-    arithmetic_expression  go to state 94
 
 
 State 97
 
-   76 while_loop: WHILE LBRACKET . equality_expression RBRACKET compound_statement
-   77           | WHILE LBRACKET . equality_expression RBRACKET statement
+   71 for_loop: FOR LBRACKET . for_loop_decl_statement RBRACKET compound_statement
+   72         | FOR LBRACKET . for_loop_decl_statement RBRACKET statement
 
-    LBRACKET        shift, and go to state 88
-    FLOATING_CONST  shift, and go to state 36
-    INTEGER_CONST   shift, and go to state 37
-    CHAR_CONST      shift, and go to state 38
-    IDENTIFIER      shift, and go to state 90
+    LBRACKET    shift, and go to state 5
+    SEMI_COLON  shift, and go to state 126
+    IDENTIFIER  shift, and go to state 13
 
-    CONSTANT               go to state 40
-    bracketed_identifier   go to state 91
-    equality_expression    go to state 127
-    bracketed_const        go to state 93
-    arithmetic_expression  go to state 94
+    bracketed_identifier        go to state 76
+    assignment_expression_list  go to state 127
+    assignment_expression       go to state 128
+    for_loop_decl_statement     go to state 129
 
 
 State 98
 
-   99 semi_colon_statement: assignment_expression SEMI_COLON .
+   69 do_while_loop: DO compound_statement . WHILE LBRACKET expression RBRACKET SEMI_COLON
 
-    $default  reduce using rule 99 (semi_colon_statement)
+    WHILE  shift, and go to state 130
 
 
 State 99
 
-   84 else_statement: ELSE . if_statement
-   85               | ELSE . compound_statement
-   86               | ELSE . statement
+   70 do_while_loop: DO statement . WHILE LBRACKET expression RBRACKET SEMI_COLON
 
-    RETURN      shift, and go to state 68
-    FOR         shift, and go to state 69
-    IF          shift, and go to state 70
-    WHILE       shift, and go to state 71
-    LBRACKET    shift, and go to state 5
-    LCURLY      shift, and go to state 61
-    SEMI_COLON  shift, and go to state 73
-    IDENTIFIER  shift, and go to state 13
-
-    bracketed_identifier   go to state 75
-    assignment_expression  go to state 76
-    loop                   go to state 77
-    for_loop               go to state 78
-    while_loop             go to state 79
-    if_block_statement     go to state 80
-    if_statement           go to state 128
-    compound_statement     go to state 129
-    statement              go to state 130
-    semi_colon_statement   go to state 85
-    return_statement       go to state 86
+    WHILE  shift, and go to state 131
 
 
 State 100
 
-   79 if_block_statement: if_statement else_statement_list .
-   81 else_statement_list: else_statement_list . else_statement
+   87 if_statement: IF LBRACKET . equality_expression RBRACKET compound_statement
+   88             | IF LBRACKET . equality_expression RBRACKET statement
 
-    ELSE  shift, and go to state 99
+    LBRACKET        shift, and go to state 90
+    FLOATING_CONST  shift, and go to state 36
+    INTEGER_CONST   shift, and go to state 37
+    CHAR_CONST      shift, and go to state 38
+    IDENTIFIER      shift, and go to state 92
 
-    ELSE      [reduce using rule 79 (if_block_statement)]
-    $default  reduce using rule 79 (if_block_statement)
-
-    else_statement  go to state 131
+    CONSTANT               go to state 40
+    bracketed_identifier   go to state 93
+    equality_expression    go to state 132
+    bracketed_const        go to state 95
+    arithmetic_expression  go to state 96
 
 
 State 101
 
-   80 else_statement_list: else_statement .
+   81 while_loop: WHILE LBRACKET . equality_expression RBRACKET compound_statement
+   82           | WHILE LBRACKET . equality_expression RBRACKET statement
 
-    $default  reduce using rule 80 (else_statement_list)
+    LBRACKET        shift, and go to state 90
+    FLOATING_CONST  shift, and go to state 36
+    INTEGER_CONST   shift, and go to state 37
+    CHAR_CONST      shift, and go to state 38
+    IDENTIFIER      shift, and go to state 92
+
+    CONSTANT               go to state 40
+    bracketed_identifier   go to state 93
+    equality_expression    go to state 133
+    bracketed_const        go to state 95
+    arithmetic_expression  go to state 96
 
 
 State 102
 
-   89 compound_statement: LCURLY declaration_list RCURLY .
+  103 semi_colon_statement: assignment_expression SEMI_COLON .
 
-    $default  reduce using rule 89 (compound_statement)
+    $default  reduce using rule 103 (semi_colon_statement)
 
 
 State 103
 
-   92 declaration_list: declaration_list declaration .
+   89 else_statement: ELSE . compound_statement
+   90               | ELSE . statement
 
-    $default  reduce using rule 92 (declaration_list)
+    RETURN      shift, and go to state 68
+    FOR         shift, and go to state 69
+    DO          shift, and go to state 70
+    IF          shift, and go to state 71
+    WHILE       shift, and go to state 72
+    LBRACKET    shift, and go to state 5
+    LCURLY      shift, and go to state 61
+    SEMI_COLON  shift, and go to state 74
+    IDENTIFIER  shift, and go to state 13
+
+    bracketed_identifier   go to state 76
+    assignment_expression  go to state 77
+    loop                   go to state 78
+    do_while_loop          go to state 79
+    for_loop               go to state 80
+    while_loop             go to state 81
+    if_block_statement     go to state 82
+    if_statement           go to state 83
+    compound_statement     go to state 134
+    statement              go to state 135
+    semi_colon_statement   go to state 87
+    return_statement       go to state 88
 
 
 State 104
 
-   87 compound_statement: LCURLY declaration_list statement_list . RCURLY
-   94 statement_list: statement_list . statement
+   84 if_block_statement: if_statement else_statement_list .
+   86 else_statement_list: else_statement_list . else_statement
 
-    RETURN      shift, and go to state 68
-    FOR         shift, and go to state 69
-    IF          shift, and go to state 70
-    WHILE       shift, and go to state 71
-    LBRACKET    shift, and go to state 5
-    RCURLY      shift, and go to state 132
-    SEMI_COLON  shift, and go to state 73
-    IDENTIFIER  shift, and go to state 13
+    ELSE  shift, and go to state 103
 
-    bracketed_identifier   go to state 75
-    assignment_expression  go to state 76
-    loop                   go to state 77
-    for_loop               go to state 78
-    while_loop             go to state 79
-    if_block_statement     go to state 80
-    if_statement           go to state 81
-    statement              go to state 106
-    semi_colon_statement   go to state 85
-    return_statement       go to state 86
+    ELSE      [reduce using rule 84 (if_block_statement)]
+    $default  reduce using rule 84 (if_block_statement)
+
+    else_statement  go to state 136
 
 
 State 105
 
-   88 compound_statement: LCURLY statement_list RCURLY .
+   85 else_statement_list: else_statement .
 
-    $default  reduce using rule 88 (compound_statement)
+    $default  reduce using rule 85 (else_statement_list)
 
 
 State 106
 
-   94 statement_list: statement_list statement .
+   93 compound_statement: LCURLY declaration_list RCURLY .
 
-    $default  reduce using rule 94 (statement_list)
+    $default  reduce using rule 93 (compound_statement)
 
 
 State 107
+
+   96 declaration_list: declaration_list declaration .
+
+    $default  reduce using rule 96 (declaration_list)
+
+
+State 108
+
+   91 compound_statement: LCURLY declaration_list statement_list . RCURLY
+   98 statement_list: statement_list . statement
+
+    RETURN      shift, and go to state 68
+    FOR         shift, and go to state 69
+    DO          shift, and go to state 70
+    IF          shift, and go to state 71
+    WHILE       shift, and go to state 72
+    LBRACKET    shift, and go to state 5
+    RCURLY      shift, and go to state 137
+    SEMI_COLON  shift, and go to state 74
+    IDENTIFIER  shift, and go to state 13
+
+    bracketed_identifier   go to state 76
+    assignment_expression  go to state 77
+    loop                   go to state 78
+    do_while_loop          go to state 79
+    for_loop               go to state 80
+    while_loop             go to state 81
+    if_block_statement     go to state 82
+    if_statement           go to state 83
+    statement              go to state 110
+    semi_colon_statement   go to state 87
+    return_statement       go to state 88
+
+
+State 109
+
+   92 compound_statement: LCURLY statement_list RCURLY .
+
+    $default  reduce using rule 92 (compound_statement)
+
+
+State 110
+
+   98 statement_list: statement_list statement .
+
+    $default  reduce using rule 98 (statement_list)
+
+
+State 111
 
    14 bracketed_identifier: LBRACKET bracketed_identifier . RBRACKET
    17 equality_expression: bracketed_identifier . COMPARISON_OPERATOR bracketed_identifier
@@ -1621,14 +1683,14 @@ State 107
    46 arithmetic_expression: bracketed_identifier .
 
     RBRACKET            shift, and go to state 30
-    LESS_OR_EQUAL       shift, and go to state 111
-    MORE_OR_EQUAL       shift, and go to state 112
-    LOGICAL_EQUALITY    shift, and go to state 113
-    LOGICAL_INEQUALITY  shift, and go to state 114
-    LOGICAL_AND         shift, and go to state 115
-    LOGICAL_OR          shift, and go to state 116
-    LOGICAL_MORE        shift, and go to state 117
-    LOGICAL_LESS        shift, and go to state 118
+    LESS_OR_EQUAL       shift, and go to state 115
+    MORE_OR_EQUAL       shift, and go to state 116
+    LOGICAL_EQUALITY    shift, and go to state 117
+    LOGICAL_INEQUALITY  shift, and go to state 118
+    LOGICAL_AND         shift, and go to state 119
+    LOGICAL_OR          shift, and go to state 120
+    LOGICAL_MORE        shift, and go to state 121
+    LOGICAL_LESS        shift, and go to state 122
 
     RBRACKET            [reduce using rule 19 (equality_expression)]
     RBRACKET            [reduce using rule 46 (arithmetic_expression)]
@@ -1642,17 +1704,17 @@ State 107
     LOGICAL_LESS        [reduce using rule 46 (arithmetic_expression)]
     $default            reduce using rule 46 (arithmetic_expression)
 
-    COMPARISON_OPERATOR  go to state 119
+    COMPARISON_OPERATOR  go to state 123
 
 
-State 108
+State 112
 
    22 equality_expression: LBRACKET equality_expression . RBRACKET
 
-    RBRACKET  shift, and go to state 133
+    RBRACKET  shift, and go to state 138
 
 
-State 109
+State 113
 
    18 equality_expression: bracketed_const .
    24 bracketed_const: LBRACKET bracketed_const . RBRACKET
@@ -1665,7 +1727,7 @@ State 109
     $default  reduce using rule 47 (arithmetic_expression)
 
 
-State 110
+State 114
 
    21 equality_expression: arithmetic_expression . COMPARISON_OPERATOR arithmetic_expression
    48 arithmetic_expression: arithmetic_expression . ARITHMETIC_OPERATOR arithmetic_expression
@@ -1674,12 +1736,12 @@ State 110
     RBRACKET            shift, and go to state 65
     LSHIFT              shift, and go to state 50
     RSHIFT              shift, and go to state 51
-    LESS_OR_EQUAL       shift, and go to state 111
-    MORE_OR_EQUAL       shift, and go to state 112
-    LOGICAL_EQUALITY    shift, and go to state 113
-    LOGICAL_INEQUALITY  shift, and go to state 114
-    LOGICAL_AND         shift, and go to state 115
-    LOGICAL_OR          shift, and go to state 116
+    LESS_OR_EQUAL       shift, and go to state 115
+    MORE_OR_EQUAL       shift, and go to state 116
+    LOGICAL_EQUALITY    shift, and go to state 117
+    LOGICAL_INEQUALITY  shift, and go to state 118
+    LOGICAL_AND         shift, and go to state 119
+    LOGICAL_OR          shift, and go to state 120
     BITWISE_OR          shift, and go to state 52
     BITWISE_AND         shift, and go to state 53
     BITWISE_XOR         shift, and go to state 54
@@ -1688,87 +1750,87 @@ State 110
     MINUS               shift, and go to state 57
     DIV                 shift, and go to state 58
     PERCENT             shift, and go to state 59
-    LOGICAL_MORE        shift, and go to state 117
-    LOGICAL_LESS        shift, and go to state 118
+    LOGICAL_MORE        shift, and go to state 121
+    LOGICAL_LESS        shift, and go to state 122
 
-    COMPARISON_OPERATOR  go to state 121
+    COMPARISON_OPERATOR  go to state 125
     ARITHMETIC_OPERATOR  go to state 60
 
 
-State 111
+State 115
 
    31 COMPARISON_OPERATOR: LESS_OR_EQUAL .
 
     $default  reduce using rule 31 (COMPARISON_OPERATOR)
 
 
-State 112
+State 116
 
    32 COMPARISON_OPERATOR: MORE_OR_EQUAL .
 
     $default  reduce using rule 32 (COMPARISON_OPERATOR)
 
 
-State 113
+State 117
 
    25 COMPARISON_OPERATOR: LOGICAL_EQUALITY .
 
     $default  reduce using rule 25 (COMPARISON_OPERATOR)
 
 
-State 114
+State 118
 
    26 COMPARISON_OPERATOR: LOGICAL_INEQUALITY .
 
     $default  reduce using rule 26 (COMPARISON_OPERATOR)
 
 
-State 115
+State 119
 
    27 COMPARISON_OPERATOR: LOGICAL_AND .
 
     $default  reduce using rule 27 (COMPARISON_OPERATOR)
 
 
-State 116
+State 120
 
    28 COMPARISON_OPERATOR: LOGICAL_OR .
 
     $default  reduce using rule 28 (COMPARISON_OPERATOR)
 
 
-State 117
+State 121
 
    29 COMPARISON_OPERATOR: LOGICAL_MORE .
 
     $default  reduce using rule 29 (COMPARISON_OPERATOR)
 
 
-State 118
+State 122
 
    30 COMPARISON_OPERATOR: LOGICAL_LESS .
 
     $default  reduce using rule 30 (COMPARISON_OPERATOR)
 
 
-State 119
+State 123
 
    17 equality_expression: bracketed_identifier COMPARISON_OPERATOR . bracketed_identifier
 
     LBRACKET    shift, and go to state 5
     IDENTIFIER  shift, and go to state 13
 
-    bracketed_identifier  go to state 134
+    bracketed_identifier  go to state 139
 
 
-State 120
+State 124
 
-  101 return_statement: RETURN equality_expression SEMI_COLON .
+  105 return_statement: RETURN equality_expression SEMI_COLON .
 
-    $default  reduce using rule 101 (return_statement)
+    $default  reduce using rule 105 (return_statement)
 
 
-State 121
+State 125
 
    21 equality_expression: arithmetic_expression COMPARISON_OPERATOR . arithmetic_expression
 
@@ -1781,148 +1843,130 @@ State 121
     CONSTANT               go to state 40
     bracketed_identifier   go to state 41
     bracketed_const        go to state 42
-    arithmetic_expression  go to state 135
+    arithmetic_expression  go to state 140
 
 
-State 122
+State 126
 
-   71 for_loop_decl_statement: SEMI_COLON . equality_expression SEMI_COLON assignment_expression_list
-   73                        | SEMI_COLON . SEMI_COLON assignment_expression_list
-   74                        | SEMI_COLON . equality_expression SEMI_COLON
-   75                        | SEMI_COLON . SEMI_COLON
+   76 for_loop_decl_statement: SEMI_COLON . equality_expression SEMI_COLON assignment_expression_list
+   78                        | SEMI_COLON . SEMI_COLON assignment_expression_list
+   79                        | SEMI_COLON . equality_expression SEMI_COLON
+   80                        | SEMI_COLON . SEMI_COLON
 
-    LBRACKET        shift, and go to state 88
-    SEMI_COLON      shift, and go to state 136
+    LBRACKET        shift, and go to state 90
+    SEMI_COLON      shift, and go to state 141
     FLOATING_CONST  shift, and go to state 36
     INTEGER_CONST   shift, and go to state 37
     CHAR_CONST      shift, and go to state 38
-    IDENTIFIER      shift, and go to state 90
+    IDENTIFIER      shift, and go to state 92
 
     CONSTANT               go to state 40
-    bracketed_identifier   go to state 91
-    equality_expression    go to state 137
-    bracketed_const        go to state 93
-    arithmetic_expression  go to state 94
+    bracketed_identifier   go to state 93
+    equality_expression    go to state 142
+    bracketed_const        go to state 95
+    arithmetic_expression  go to state 96
 
 
-State 123
+State 127
 
    16 assignment_expression_list: assignment_expression_list . COMMA assignment_expression
-   68 for_loop_decl_statement: assignment_expression_list . SEMI_COLON equality_expression SEMI_COLON assignment_expression_list
-   69                        | assignment_expression_list . SEMI_COLON equality_expression SEMI_COLON
-   70                        | assignment_expression_list . SEMI_COLON SEMI_COLON assignment_expression_list
-   72                        | assignment_expression_list . SEMI_COLON SEMI_COLON
+   73 for_loop_decl_statement: assignment_expression_list . SEMI_COLON equality_expression SEMI_COLON assignment_expression_list
+   74                        | assignment_expression_list . SEMI_COLON equality_expression SEMI_COLON
+   75                        | assignment_expression_list . SEMI_COLON SEMI_COLON assignment_expression_list
+   77                        | assignment_expression_list . SEMI_COLON SEMI_COLON
 
-    COMMA       shift, and go to state 138
-    SEMI_COLON  shift, and go to state 139
+    COMMA       shift, and go to state 143
+    SEMI_COLON  shift, and go to state 144
 
 
-State 124
+State 128
 
    15 assignment_expression_list: assignment_expression .
 
     $default  reduce using rule 15 (assignment_expression_list)
 
 
-State 125
-
-   66 for_loop: FOR LBRACKET for_loop_decl_statement . RBRACKET compound_statement
-   67         | FOR LBRACKET for_loop_decl_statement . RBRACKET statement
-
-    RBRACKET  shift, and go to state 140
-
-
-State 126
-
-   82 if_statement: IF LBRACKET equality_expression . RBRACKET compound_statement
-   83             | IF LBRACKET equality_expression . RBRACKET statement
-
-    RBRACKET  shift, and go to state 141
-
-
-State 127
-
-   76 while_loop: WHILE LBRACKET equality_expression . RBRACKET compound_statement
-   77           | WHILE LBRACKET equality_expression . RBRACKET statement
-
-    RBRACKET  shift, and go to state 142
-
-
-State 128
-
-   78 if_block_statement: if_statement .
-   79                   | if_statement . else_statement_list
-   84 else_statement: ELSE if_statement .
-
-    ELSE  shift, and go to state 99
-
-    ELSE        [reduce using rule 78 (if_block_statement)]
-    ELSE        [reduce using rule 84 (else_statement)]
-    RETURN      reduce using rule 78 (if_block_statement)
-    RETURN      [reduce using rule 84 (else_statement)]
-    FOR         reduce using rule 78 (if_block_statement)
-    FOR         [reduce using rule 84 (else_statement)]
-    IF          reduce using rule 78 (if_block_statement)
-    IF          [reduce using rule 84 (else_statement)]
-    WHILE       reduce using rule 78 (if_block_statement)
-    WHILE       [reduce using rule 84 (else_statement)]
-    LBRACKET    reduce using rule 78 (if_block_statement)
-    LBRACKET    [reduce using rule 84 (else_statement)]
-    RCURLY      reduce using rule 78 (if_block_statement)
-    RCURLY      [reduce using rule 84 (else_statement)]
-    SEMI_COLON  reduce using rule 78 (if_block_statement)
-    SEMI_COLON  [reduce using rule 84 (else_statement)]
-    IDENTIFIER  reduce using rule 78 (if_block_statement)
-    IDENTIFIER  [reduce using rule 84 (else_statement)]
-    $default    reduce using rule 78 (if_block_statement)
-
-    else_statement_list  go to state 100
-    else_statement       go to state 101
-
-
 State 129
 
-   85 else_statement: ELSE compound_statement .
+   71 for_loop: FOR LBRACKET for_loop_decl_statement . RBRACKET compound_statement
+   72         | FOR LBRACKET for_loop_decl_statement . RBRACKET statement
 
-    $default  reduce using rule 85 (else_statement)
+    RBRACKET  shift, and go to state 145
 
 
 State 130
 
-   86 else_statement: ELSE statement .
+   69 do_while_loop: DO compound_statement WHILE . LBRACKET expression RBRACKET SEMI_COLON
 
-    $default  reduce using rule 86 (else_statement)
+    LBRACKET  shift, and go to state 146
 
 
 State 131
 
-   81 else_statement_list: else_statement_list else_statement .
+   70 do_while_loop: DO statement WHILE . LBRACKET expression RBRACKET SEMI_COLON
 
-    $default  reduce using rule 81 (else_statement_list)
+    LBRACKET  shift, and go to state 147
 
 
 State 132
 
-   87 compound_statement: LCURLY declaration_list statement_list RCURLY .
+   87 if_statement: IF LBRACKET equality_expression . RBRACKET compound_statement
+   88             | IF LBRACKET equality_expression . RBRACKET statement
 
-    $default  reduce using rule 87 (compound_statement)
+    RBRACKET  shift, and go to state 148
 
 
 State 133
+
+   81 while_loop: WHILE LBRACKET equality_expression . RBRACKET compound_statement
+   82           | WHILE LBRACKET equality_expression . RBRACKET statement
+
+    RBRACKET  shift, and go to state 149
+
+
+State 134
+
+   89 else_statement: ELSE compound_statement .
+
+    $default  reduce using rule 89 (else_statement)
+
+
+State 135
+
+   90 else_statement: ELSE statement .
+
+    $default  reduce using rule 90 (else_statement)
+
+
+State 136
+
+   86 else_statement_list: else_statement_list else_statement .
+
+    $default  reduce using rule 86 (else_statement_list)
+
+
+State 137
+
+   91 compound_statement: LCURLY declaration_list statement_list RCURLY .
+
+    $default  reduce using rule 91 (compound_statement)
+
+
+State 138
 
    22 equality_expression: LBRACKET equality_expression RBRACKET .
 
     $default  reduce using rule 22 (equality_expression)
 
 
-State 134
+State 139
 
    17 equality_expression: bracketed_identifier COMPARISON_OPERATOR bracketed_identifier .
 
     $default  reduce using rule 17 (equality_expression)
 
 
-State 135
+State 140
 
    21 equality_expression: arithmetic_expression COMPARISON_OPERATOR arithmetic_expression .
    48 arithmetic_expression: arithmetic_expression . ARITHMETIC_OPERATOR arithmetic_expression
@@ -1943,279 +1987,421 @@ State 135
     ARITHMETIC_OPERATOR  go to state 60
 
 
-State 136
+State 141
 
-   73 for_loop_decl_statement: SEMI_COLON SEMI_COLON . assignment_expression_list
-   75                        | SEMI_COLON SEMI_COLON .
+   78 for_loop_decl_statement: SEMI_COLON SEMI_COLON . assignment_expression_list
+   80                        | SEMI_COLON SEMI_COLON .
 
     LBRACKET    shift, and go to state 5
     IDENTIFIER  shift, and go to state 13
 
-    $default  reduce using rule 75 (for_loop_decl_statement)
+    $default  reduce using rule 80 (for_loop_decl_statement)
 
-    bracketed_identifier        go to state 75
-    assignment_expression_list  go to state 143
-    assignment_expression       go to state 124
-
-
-State 137
-
-   71 for_loop_decl_statement: SEMI_COLON equality_expression . SEMI_COLON assignment_expression_list
-   74                        | SEMI_COLON equality_expression . SEMI_COLON
-
-    SEMI_COLON  shift, and go to state 144
+    bracketed_identifier        go to state 76
+    assignment_expression_list  go to state 150
+    assignment_expression       go to state 128
 
 
-State 138
+State 142
+
+   76 for_loop_decl_statement: SEMI_COLON equality_expression . SEMI_COLON assignment_expression_list
+   79                        | SEMI_COLON equality_expression . SEMI_COLON
+
+    SEMI_COLON  shift, and go to state 151
+
+
+State 143
 
    16 assignment_expression_list: assignment_expression_list COMMA . assignment_expression
 
     LBRACKET    shift, and go to state 5
     IDENTIFIER  shift, and go to state 13
 
-    bracketed_identifier   go to state 75
-    assignment_expression  go to state 145
-
-
-State 139
-
-   68 for_loop_decl_statement: assignment_expression_list SEMI_COLON . equality_expression SEMI_COLON assignment_expression_list
-   69                        | assignment_expression_list SEMI_COLON . equality_expression SEMI_COLON
-   70                        | assignment_expression_list SEMI_COLON . SEMI_COLON assignment_expression_list
-   72                        | assignment_expression_list SEMI_COLON . SEMI_COLON
-
-    LBRACKET        shift, and go to state 88
-    SEMI_COLON      shift, and go to state 146
-    FLOATING_CONST  shift, and go to state 36
-    INTEGER_CONST   shift, and go to state 37
-    CHAR_CONST      shift, and go to state 38
-    IDENTIFIER      shift, and go to state 90
-
-    CONSTANT               go to state 40
-    bracketed_identifier   go to state 91
-    equality_expression    go to state 147
-    bracketed_const        go to state 93
-    arithmetic_expression  go to state 94
-
-
-State 140
-
-   66 for_loop: FOR LBRACKET for_loop_decl_statement RBRACKET . compound_statement
-   67         | FOR LBRACKET for_loop_decl_statement RBRACKET . statement
-
-    RETURN      shift, and go to state 68
-    FOR         shift, and go to state 69
-    IF          shift, and go to state 70
-    WHILE       shift, and go to state 71
-    LBRACKET    shift, and go to state 5
-    LCURLY      shift, and go to state 61
-    SEMI_COLON  shift, and go to state 73
-    IDENTIFIER  shift, and go to state 13
-
-    bracketed_identifier   go to state 75
-    assignment_expression  go to state 76
-    loop                   go to state 77
-    for_loop               go to state 78
-    while_loop             go to state 79
-    if_block_statement     go to state 80
-    if_statement           go to state 81
-    compound_statement     go to state 148
-    statement              go to state 149
-    semi_colon_statement   go to state 85
-    return_statement       go to state 86
-
-
-State 141
-
-   82 if_statement: IF LBRACKET equality_expression RBRACKET . compound_statement
-   83             | IF LBRACKET equality_expression RBRACKET . statement
-
-    RETURN      shift, and go to state 68
-    FOR         shift, and go to state 69
-    IF          shift, and go to state 70
-    WHILE       shift, and go to state 71
-    LBRACKET    shift, and go to state 5
-    LCURLY      shift, and go to state 61
-    SEMI_COLON  shift, and go to state 73
-    IDENTIFIER  shift, and go to state 13
-
-    bracketed_identifier   go to state 75
-    assignment_expression  go to state 76
-    loop                   go to state 77
-    for_loop               go to state 78
-    while_loop             go to state 79
-    if_block_statement     go to state 80
-    if_statement           go to state 81
-    compound_statement     go to state 150
-    statement              go to state 151
-    semi_colon_statement   go to state 85
-    return_statement       go to state 86
-
-
-State 142
-
-   76 while_loop: WHILE LBRACKET equality_expression RBRACKET . compound_statement
-   77           | WHILE LBRACKET equality_expression RBRACKET . statement
-
-    RETURN      shift, and go to state 68
-    FOR         shift, and go to state 69
-    IF          shift, and go to state 70
-    WHILE       shift, and go to state 71
-    LBRACKET    shift, and go to state 5
-    LCURLY      shift, and go to state 61
-    SEMI_COLON  shift, and go to state 73
-    IDENTIFIER  shift, and go to state 13
-
-    bracketed_identifier   go to state 75
-    assignment_expression  go to state 76
-    loop                   go to state 77
-    for_loop               go to state 78
-    while_loop             go to state 79
-    if_block_statement     go to state 80
-    if_statement           go to state 81
-    compound_statement     go to state 152
-    statement              go to state 153
-    semi_colon_statement   go to state 85
-    return_statement       go to state 86
-
-
-State 143
-
-   16 assignment_expression_list: assignment_expression_list . COMMA assignment_expression
-   73 for_loop_decl_statement: SEMI_COLON SEMI_COLON assignment_expression_list .
-
-    COMMA  shift, and go to state 138
-
-    $default  reduce using rule 73 (for_loop_decl_statement)
+    bracketed_identifier   go to state 76
+    assignment_expression  go to state 152
 
 
 State 144
 
-   71 for_loop_decl_statement: SEMI_COLON equality_expression SEMI_COLON . assignment_expression_list
-   74                        | SEMI_COLON equality_expression SEMI_COLON .
+   73 for_loop_decl_statement: assignment_expression_list SEMI_COLON . equality_expression SEMI_COLON assignment_expression_list
+   74                        | assignment_expression_list SEMI_COLON . equality_expression SEMI_COLON
+   75                        | assignment_expression_list SEMI_COLON . SEMI_COLON assignment_expression_list
+   77                        | assignment_expression_list SEMI_COLON . SEMI_COLON
+
+    LBRACKET        shift, and go to state 90
+    SEMI_COLON      shift, and go to state 153
+    FLOATING_CONST  shift, and go to state 36
+    INTEGER_CONST   shift, and go to state 37
+    CHAR_CONST      shift, and go to state 38
+    IDENTIFIER      shift, and go to state 92
+
+    CONSTANT               go to state 40
+    bracketed_identifier   go to state 93
+    equality_expression    go to state 154
+    bracketed_const        go to state 95
+    arithmetic_expression  go to state 96
+
+
+State 145
+
+   71 for_loop: FOR LBRACKET for_loop_decl_statement RBRACKET . compound_statement
+   72         | FOR LBRACKET for_loop_decl_statement RBRACKET . statement
+
+    RETURN      shift, and go to state 68
+    FOR         shift, and go to state 69
+    DO          shift, and go to state 70
+    IF          shift, and go to state 71
+    WHILE       shift, and go to state 72
+    LBRACKET    shift, and go to state 5
+    LCURLY      shift, and go to state 61
+    SEMI_COLON  shift, and go to state 74
+    IDENTIFIER  shift, and go to state 13
+
+    bracketed_identifier   go to state 76
+    assignment_expression  go to state 77
+    loop                   go to state 78
+    do_while_loop          go to state 79
+    for_loop               go to state 80
+    while_loop             go to state 81
+    if_block_statement     go to state 82
+    if_statement           go to state 83
+    compound_statement     go to state 155
+    statement              go to state 156
+    semi_colon_statement   go to state 87
+    return_statement       go to state 88
+
+
+State 146
+
+   69 do_while_loop: DO compound_statement WHILE LBRACKET . expression RBRACKET SEMI_COLON
+
+    LBRACKET        shift, and go to state 90
+    FLOATING_CONST  shift, and go to state 36
+    INTEGER_CONST   shift, and go to state 37
+    CHAR_CONST      shift, and go to state 38
+    IDENTIFIER      shift, and go to state 92
+
+    CONSTANT               go to state 40
+    bracketed_identifier   go to state 157
+    equality_expression    go to state 158
+    bracketed_const        go to state 95
+    assignment_expression  go to state 159
+    arithmetic_expression  go to state 96
+    expression             go to state 160
+
+
+State 147
+
+   70 do_while_loop: DO statement WHILE LBRACKET . expression RBRACKET SEMI_COLON
+
+    LBRACKET        shift, and go to state 90
+    FLOATING_CONST  shift, and go to state 36
+    INTEGER_CONST   shift, and go to state 37
+    CHAR_CONST      shift, and go to state 38
+    IDENTIFIER      shift, and go to state 92
+
+    CONSTANT               go to state 40
+    bracketed_identifier   go to state 157
+    equality_expression    go to state 158
+    bracketed_const        go to state 95
+    assignment_expression  go to state 159
+    arithmetic_expression  go to state 96
+    expression             go to state 161
+
+
+State 148
+
+   87 if_statement: IF LBRACKET equality_expression RBRACKET . compound_statement
+   88             | IF LBRACKET equality_expression RBRACKET . statement
+
+    RETURN      shift, and go to state 68
+    FOR         shift, and go to state 69
+    DO          shift, and go to state 70
+    IF          shift, and go to state 71
+    WHILE       shift, and go to state 72
+    LBRACKET    shift, and go to state 5
+    LCURLY      shift, and go to state 61
+    SEMI_COLON  shift, and go to state 74
+    IDENTIFIER  shift, and go to state 13
+
+    bracketed_identifier   go to state 76
+    assignment_expression  go to state 77
+    loop                   go to state 78
+    do_while_loop          go to state 79
+    for_loop               go to state 80
+    while_loop             go to state 81
+    if_block_statement     go to state 82
+    if_statement           go to state 83
+    compound_statement     go to state 162
+    statement              go to state 163
+    semi_colon_statement   go to state 87
+    return_statement       go to state 88
+
+
+State 149
+
+   81 while_loop: WHILE LBRACKET equality_expression RBRACKET . compound_statement
+   82           | WHILE LBRACKET equality_expression RBRACKET . statement
+
+    RETURN      shift, and go to state 68
+    FOR         shift, and go to state 69
+    DO          shift, and go to state 70
+    IF          shift, and go to state 71
+    WHILE       shift, and go to state 72
+    LBRACKET    shift, and go to state 5
+    LCURLY      shift, and go to state 61
+    SEMI_COLON  shift, and go to state 74
+    IDENTIFIER  shift, and go to state 13
+
+    bracketed_identifier   go to state 76
+    assignment_expression  go to state 77
+    loop                   go to state 78
+    do_while_loop          go to state 79
+    for_loop               go to state 80
+    while_loop             go to state 81
+    if_block_statement     go to state 82
+    if_statement           go to state 83
+    compound_statement     go to state 164
+    statement              go to state 165
+    semi_colon_statement   go to state 87
+    return_statement       go to state 88
+
+
+State 150
+
+   16 assignment_expression_list: assignment_expression_list . COMMA assignment_expression
+   78 for_loop_decl_statement: SEMI_COLON SEMI_COLON assignment_expression_list .
+
+    COMMA  shift, and go to state 143
+
+    $default  reduce using rule 78 (for_loop_decl_statement)
+
+
+State 151
+
+   76 for_loop_decl_statement: SEMI_COLON equality_expression SEMI_COLON . assignment_expression_list
+   79                        | SEMI_COLON equality_expression SEMI_COLON .
 
     LBRACKET    shift, and go to state 5
     IDENTIFIER  shift, and go to state 13
 
-    $default  reduce using rule 74 (for_loop_decl_statement)
+    $default  reduce using rule 79 (for_loop_decl_statement)
 
-    bracketed_identifier        go to state 75
-    assignment_expression_list  go to state 154
-    assignment_expression       go to state 124
+    bracketed_identifier        go to state 76
+    assignment_expression_list  go to state 166
+    assignment_expression       go to state 128
 
 
-State 145
+State 152
 
    16 assignment_expression_list: assignment_expression_list COMMA assignment_expression .
 
     $default  reduce using rule 16 (assignment_expression_list)
 
 
-State 146
+State 153
 
-   70 for_loop_decl_statement: assignment_expression_list SEMI_COLON SEMI_COLON . assignment_expression_list
-   72                        | assignment_expression_list SEMI_COLON SEMI_COLON .
+   75 for_loop_decl_statement: assignment_expression_list SEMI_COLON SEMI_COLON . assignment_expression_list
+   77                        | assignment_expression_list SEMI_COLON SEMI_COLON .
 
     LBRACKET    shift, and go to state 5
     IDENTIFIER  shift, and go to state 13
 
-    $default  reduce using rule 72 (for_loop_decl_statement)
+    $default  reduce using rule 77 (for_loop_decl_statement)
 
-    bracketed_identifier        go to state 75
-    assignment_expression_list  go to state 155
-    assignment_expression       go to state 124
-
-
-State 147
-
-   68 for_loop_decl_statement: assignment_expression_list SEMI_COLON equality_expression . SEMI_COLON assignment_expression_list
-   69                        | assignment_expression_list SEMI_COLON equality_expression . SEMI_COLON
-
-    SEMI_COLON  shift, and go to state 156
-
-
-State 148
-
-   66 for_loop: FOR LBRACKET for_loop_decl_statement RBRACKET compound_statement .
-
-    $default  reduce using rule 66 (for_loop)
-
-
-State 149
-
-   67 for_loop: FOR LBRACKET for_loop_decl_statement RBRACKET statement .
-
-    $default  reduce using rule 67 (for_loop)
-
-
-State 150
-
-   82 if_statement: IF LBRACKET equality_expression RBRACKET compound_statement .
-
-    $default  reduce using rule 82 (if_statement)
-
-
-State 151
-
-   83 if_statement: IF LBRACKET equality_expression RBRACKET statement .
-
-    $default  reduce using rule 83 (if_statement)
-
-
-State 152
-
-   76 while_loop: WHILE LBRACKET equality_expression RBRACKET compound_statement .
-
-    $default  reduce using rule 76 (while_loop)
-
-
-State 153
-
-   77 while_loop: WHILE LBRACKET equality_expression RBRACKET statement .
-
-    $default  reduce using rule 77 (while_loop)
+    bracketed_identifier        go to state 76
+    assignment_expression_list  go to state 167
+    assignment_expression       go to state 128
 
 
 State 154
 
-   16 assignment_expression_list: assignment_expression_list . COMMA assignment_expression
-   71 for_loop_decl_statement: SEMI_COLON equality_expression SEMI_COLON assignment_expression_list .
+   73 for_loop_decl_statement: assignment_expression_list SEMI_COLON equality_expression . SEMI_COLON assignment_expression_list
+   74                        | assignment_expression_list SEMI_COLON equality_expression . SEMI_COLON
 
-    COMMA  shift, and go to state 138
-
-    $default  reduce using rule 71 (for_loop_decl_statement)
+    SEMI_COLON  shift, and go to state 168
 
 
 State 155
 
-   16 assignment_expression_list: assignment_expression_list . COMMA assignment_expression
-   70 for_loop_decl_statement: assignment_expression_list SEMI_COLON SEMI_COLON assignment_expression_list .
+   71 for_loop: FOR LBRACKET for_loop_decl_statement RBRACKET compound_statement .
 
-    COMMA  shift, and go to state 138
-
-    $default  reduce using rule 70 (for_loop_decl_statement)
+    $default  reduce using rule 71 (for_loop)
 
 
 State 156
 
-   68 for_loop_decl_statement: assignment_expression_list SEMI_COLON equality_expression SEMI_COLON . assignment_expression_list
-   69                        | assignment_expression_list SEMI_COLON equality_expression SEMI_COLON .
+   72 for_loop: FOR LBRACKET for_loop_decl_statement RBRACKET statement .
 
-    LBRACKET    shift, and go to state 5
-    IDENTIFIER  shift, and go to state 13
-
-    $default  reduce using rule 69 (for_loop_decl_statement)
-
-    bracketed_identifier        go to state 75
-    assignment_expression_list  go to state 157
-    assignment_expression       go to state 124
+    $default  reduce using rule 72 (for_loop)
 
 
 State 157
 
+   17 equality_expression: bracketed_identifier . COMPARISON_OPERATOR bracketed_identifier
+   19                    | bracketed_identifier .
+   33 assignment_expression: bracketed_identifier . ASSIGNMENT_OPERATOR arithmetic_expression
+   46 arithmetic_expression: bracketed_identifier .
+
+    LESS_OR_EQUAL       shift, and go to state 115
+    MORE_OR_EQUAL       shift, and go to state 116
+    LOGICAL_EQUALITY    shift, and go to state 117
+    LOGICAL_INEQUALITY  shift, and go to state 118
+    LOGICAL_AND         shift, and go to state 119
+    LOGICAL_OR          shift, and go to state 120
+    MULT_EQUALS         shift, and go to state 18
+    DIV_EQUALS          shift, and go to state 19
+    PERCENT_EQUALS      shift, and go to state 20
+    PLUS_EQUALS         shift, and go to state 21
+    MINUS_EQUALS        shift, and go to state 22
+    LSHIFT_EQUALS       shift, and go to state 23
+    RSHIFT_EQUALS       shift, and go to state 24
+    AND_EQUALS          shift, and go to state 25
+    XOR_EQUALS          shift, and go to state 26
+    OR_EQUALS           shift, and go to state 27
+    EQUALS              shift, and go to state 28
+    LOGICAL_MORE        shift, and go to state 121
+    LOGICAL_LESS        shift, and go to state 122
+
+    RBRACKET            reduce using rule 19 (equality_expression)
+    LESS_OR_EQUAL       [reduce using rule 46 (arithmetic_expression)]
+    MORE_OR_EQUAL       [reduce using rule 46 (arithmetic_expression)]
+    LOGICAL_EQUALITY    [reduce using rule 46 (arithmetic_expression)]
+    LOGICAL_INEQUALITY  [reduce using rule 46 (arithmetic_expression)]
+    LOGICAL_AND         [reduce using rule 46 (arithmetic_expression)]
+    LOGICAL_OR          [reduce using rule 46 (arithmetic_expression)]
+    LOGICAL_MORE        [reduce using rule 46 (arithmetic_expression)]
+    LOGICAL_LESS        [reduce using rule 46 (arithmetic_expression)]
+    $default            reduce using rule 46 (arithmetic_expression)
+
+    COMPARISON_OPERATOR  go to state 123
+    ASSIGNMENT_OPERATOR  go to state 29
+
+
+State 158
+
+   60 expression: equality_expression .
+
+    $default  reduce using rule 60 (expression)
+
+
+State 159
+
+   61 expression: assignment_expression .
+
+    $default  reduce using rule 61 (expression)
+
+
+State 160
+
+   69 do_while_loop: DO compound_statement WHILE LBRACKET expression . RBRACKET SEMI_COLON
+
+    RBRACKET  shift, and go to state 169
+
+
+State 161
+
+   70 do_while_loop: DO statement WHILE LBRACKET expression . RBRACKET SEMI_COLON
+
+    RBRACKET  shift, and go to state 170
+
+
+State 162
+
+   87 if_statement: IF LBRACKET equality_expression RBRACKET compound_statement .
+
+    $default  reduce using rule 87 (if_statement)
+
+
+State 163
+
+   88 if_statement: IF LBRACKET equality_expression RBRACKET statement .
+
+    $default  reduce using rule 88 (if_statement)
+
+
+State 164
+
+   81 while_loop: WHILE LBRACKET equality_expression RBRACKET compound_statement .
+
+    $default  reduce using rule 81 (while_loop)
+
+
+State 165
+
+   82 while_loop: WHILE LBRACKET equality_expression RBRACKET statement .
+
+    $default  reduce using rule 82 (while_loop)
+
+
+State 166
+
    16 assignment_expression_list: assignment_expression_list . COMMA assignment_expression
-   68 for_loop_decl_statement: assignment_expression_list SEMI_COLON equality_expression SEMI_COLON assignment_expression_list .
+   76 for_loop_decl_statement: SEMI_COLON equality_expression SEMI_COLON assignment_expression_list .
 
-    COMMA  shift, and go to state 138
+    COMMA  shift, and go to state 143
 
-    $default  reduce using rule 68 (for_loop_decl_statement)
+    $default  reduce using rule 76 (for_loop_decl_statement)
+
+
+State 167
+
+   16 assignment_expression_list: assignment_expression_list . COMMA assignment_expression
+   75 for_loop_decl_statement: assignment_expression_list SEMI_COLON SEMI_COLON assignment_expression_list .
+
+    COMMA  shift, and go to state 143
+
+    $default  reduce using rule 75 (for_loop_decl_statement)
+
+
+State 168
+
+   73 for_loop_decl_statement: assignment_expression_list SEMI_COLON equality_expression SEMI_COLON . assignment_expression_list
+   74                        | assignment_expression_list SEMI_COLON equality_expression SEMI_COLON .
+
+    LBRACKET    shift, and go to state 5
+    IDENTIFIER  shift, and go to state 13
+
+    $default  reduce using rule 74 (for_loop_decl_statement)
+
+    bracketed_identifier        go to state 76
+    assignment_expression_list  go to state 171
+    assignment_expression       go to state 128
+
+
+State 169
+
+   69 do_while_loop: DO compound_statement WHILE LBRACKET expression RBRACKET . SEMI_COLON
+
+    SEMI_COLON  shift, and go to state 172
+
+
+State 170
+
+   70 do_while_loop: DO statement WHILE LBRACKET expression RBRACKET . SEMI_COLON
+
+    SEMI_COLON  shift, and go to state 173
+
+
+State 171
+
+   16 assignment_expression_list: assignment_expression_list . COMMA assignment_expression
+   73 for_loop_decl_statement: assignment_expression_list SEMI_COLON equality_expression SEMI_COLON assignment_expression_list .
+
+    COMMA  shift, and go to state 143
+
+    $default  reduce using rule 73 (for_loop_decl_statement)
+
+
+State 172
+
+   69 do_while_loop: DO compound_statement WHILE LBRACKET expression RBRACKET SEMI_COLON .
+
+    $default  reduce using rule 69 (do_while_loop)
+
+
+State 173
+
+   70 do_while_loop: DO statement WHILE LBRACKET expression RBRACKET SEMI_COLON .
+
+    $default  reduce using rule 70 (do_while_loop)

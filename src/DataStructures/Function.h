@@ -20,7 +20,7 @@ private:
 	*/
 
 	VarT return_type;						// Specifies the return type of the function
-	NumValue return_val;					// Holds the result of the return value for the function
+	NumT return_val;					// Holds the result of the return value for the function
 
 	char* name;								// Name given to the function in the source code
 	vector<Variable>* params;				// Pointer to a vector of the parameters the function takes in the exact order specified

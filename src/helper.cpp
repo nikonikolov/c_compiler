@@ -17,3 +17,36 @@ void process_prep_include(const std::string& content){
 
 
 
+uint64_t dec_to_uint64(const char* number){
+    uint64_t result;
+    stringstream ss;
+    ss << number;
+    ss>>result;
+    return result;
+}
+
+uint64_t hex_to_uint64(const char* number){
+    uint64_t result;
+    stringstream ss;
+    ss <<hex<< number;
+    ss>>result;
+    return result;
+}
+
+uint64_t oct_to_uint64(const char* number){
+    uint64_t result;
+    stringstream ss;
+    ss <<oct<< number;
+    ss>>result;
+    return result;
+}
+
+double64_t to_double64(const char* number){
+    double64_t result;
+    stringstream ss;
+    ss << number;
+    ss>>result;
+    return result;
+}
+
+

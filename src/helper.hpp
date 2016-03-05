@@ -7,11 +7,14 @@
 #include <list>
 #include <vector>
 #include <iostream>
+#include <cstdint>
 
 using std::list;
 using std::vector;
 using std::cout;
 using std::endl;
+using std::hex;
+using std::oct;
 using std::string;
 using std::stringstream;
 
@@ -19,8 +22,16 @@ extern int input_file_line;
 extern int source_file_line;
 extern string source_file;
 
+typedef long double double64_t;
 
 void process_prep_include(const string& content);
+uint64_t dec_to_uint64(const char* number);
+uint64_t hex_to_uint64(const char* number);
+uint64_t oct_to_uint64(const char* number);
+double64_t to_double64(const char* number);
+
+
+
 
 template<class T>
 void list_push_to_front(list<T>*& headptr, const T& element){

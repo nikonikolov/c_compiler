@@ -17,8 +17,7 @@
 #include <string>
 #include <sstream>
 #include <cstdlib>
-//#include "c_parser.tab.hpp"
-#include "../src_tmp/parser_expr.tab.hpp"
+#include "c_parser.tab.hpp"
 
 using namespace std;
 
@@ -84,10 +83,7 @@ HEX_CONST				(0[xX]{HEX_DIGIT}+)
 OCTAL_DIGIT				([0-7])
 OCTAL_CONST				(0{OCTAL_DIGIT}*)
 DECIMAL_CONST			({NONZERO_DIGIT}[0-9]*)
-/*Integer_const			(({DECIMAL_CONST}{INT_SUFFIX}?)|({HEX_CONST}{INT_SUFFIX}?)|({OCTAL_CONST}{INT_SUFFIX}?))*/
-Decimal_constant 		({DECIMAL_CONST}{INT_SUFFIX}?)
-Hex_constant 			({HEX_CONST}{INT_SUFFIX}?)
-Octal_constant			({OCTAL_CONST}{INT_SUFFIX}?)
+Integer_const			(({DECIMAL_CONST}{INT_SUFFIX}?)|({HEX_CONST}{INT_SUFFIX}?)|({OCTAL_CONST}{INT_SUFFIX}?))
 /* NOTE: 0 currently recognized in OCTAL */
 
 ENUM_CONST				{Identifier}
@@ -168,12 +164,10 @@ do					{ return DO; }
 if					{ return IF; }
 static				{ return STATIC; }
 while				{ return WHILE; }
-sizeof				{ yylval.strval = strdup(yytext); return SIZEOF; }
+sizeof				{ return SIZEOF; }
 {Identifier}		{ yylval.strval = strdup(yytext); return IDENTIFIER; }
-{Floating_const}	{ yylval.floatval = to_double64(yytext); return FLOATING_CONST; }
-{Decimal_constant}	{ yylval.intval = dec_to_uint64(yytext); return INTEGER_CONST; }
-{Octal_constant}	{ yylval.intval = dec_to_uint64(yytext); return INTEGER_CONST; }
-{Hex_constant}		{ yylval.intval = dec_to_uint64(yytext); return INTEGER_CONST; }
+{Floating_const}	{ return FLOATING_CONST; }
+{Integer_const}		{ yylval.intval = atoi(yytext); return INTEGER_CONST; }
 {Char_const}		{ return CHAR_CONST; }
 \[					{ return LSQUARE; }
 \]					{ return RSQUARE; }
@@ -182,55 +176,52 @@ sizeof				{ yylval.strval = strdup(yytext); return SIZEOF; }
 \{					{ return LCURLY; }
 \}					{ return RCURLY; }
 \.\.\.				{ return THREE_DOTS; }
-\.					{ yylval.strval = strdup(yytext); return DOT; }
-\-\>				{ yylval.strval = strdup(yytext); return PTR_OP; }
-\+\+				{ yylval.strval = strdup(yytext); return PLUS_PLUS; }
-\-\-				{ yylval.strval = strdup(yytext); return MINUS_MINUS; }
-\<\<				{ yylval.strval = strdup(yytext); return LSHIFT; }
-\>\>				{ yylval.strval = strdup(yytext); return RSHIFT; }
-\<\=				{ yylval.strval = strdup(yytext); return LESS_OR_EQUAL; }
-\>\=				{ yylval.strval = strdup(yytext); return MORE_OR_EQUAL; }
-\=\=				{ yylval.strval = strdup(yytext); return LOGICAL_EQUALITY; }
-\!\=				{ yylval.strval = strdup(yytext); return LOGICAL_INEQUALITY; }
-\&\&				{ yylval.strval = strdup(yytext); return LOGICAL_AND; }
-\|\|				{ yylval.strval = strdup(yytext); return LOGICAL_OR; }
-\?					{ yylval.strval = strdup(yytext); return Q_MARK; }
-\:					{ yylval.strval = strdup(yytext); return COLON; }
-\*\=				{ yylval.strval = strdup(yytext); return MULT_EQUALS; }
-\/\=				{ yylval.strval = strdup(yytext); return DIV_EQUALS; }
-\%\=				{ yylval.strval = strdup(yytext); return PERCENT_EQUALS; }
-\+\=				{ yylval.strval = strdup(yytext); return PLUS_EQUALS; }
-\-\=				{ yylval.strval = strdup(yytext); return MINUS_EQUALS; }
-\<\<\=				{ yylval.strval = strdup(yytext); return LSHIFT_EQUALS; }
-\>\>\=				{ yylval.strval = strdup(yytext); return RSHIFT_EQUALS; }
-\&\=				{ yylval.strval = strdup(yytext); return AND_EQUALS; }
-\^\=				{ yylval.strval = strdup(yytext); return XOR_EQUALS; }
-\|\=				{ yylval.strval = strdup(yytext); return OR_EQUALS; }
-\,					{ yylval.strval = strdup(yytext); return COMMA; }
+\.					{ return DOT; }
+\-\>				{ return PTR_OP; }
+\+\+				{ return PLUS_PLUS; }
+\-\-				{ return MINUS_MINUS; }
+\<\<				{ return LSHIFT; }
+\>\>				{ return RSHIFT; }
+\<\=				{ return LESS_OR_EQUAL; }
+\>\=				{ return MORE_OR_EQUAL; }
+\=\=				{ return LOGICAL_EQUALITY; }
+\!\=				{ return LOGICAL_INEQUALITY; }
+\&\&				{ return LOGICAL_AND; }
+\|\|				{ return LOGICAL_OR; }
+\?					{ return Q_MARK; }
+\:					{ return COLON; }
+\*\=				{ return MULT_EQUALS; }
+\/\=				{ return DIV_EQUALS; }
+\%\=				{ return PERCENT_EQUALS; }
+\+\=				{ return PLUS_EQUALS; }
+\-\=				{ return MINUS_EQUALS; }
+\<\<\=				{ return LSHIFT_EQUALS; }
+\>\>\=				{ return RSHIFT_EQUALS; }
+\&\=				{ return AND_EQUALS; }
+\^\=				{ return XOR_EQUALS; }
+\|\=				{ return OR_EQUALS; }
+\,					{ return COMMA; }
 \#\#				{ return HASH; }
 \#					{ return HASH_HASH; }
 \;					{ return SEMI_COLON; }
-\=					{ yylval.strval = strdup(yytext); return EQUALS; }
-\|					{ yylval.strval = strdup(yytext); return BITWISE_OR; }
-\&					{ yylval.strval = strdup(yytext); return BITWISE_AND; }
-\*					{ yylval.strval = strdup(yytext); return MULT; }
-\+					{ yylval.strval = strdup(yytext); return PLUS; }
-\-					{ yylval.strval = strdup(yytext); return MINUS; }
-\~					{ yylval.strval = strdup(yytext); return WAVE; }
-\!					{ yylval.strval = strdup(yytext); return EXL_MARK; }
-\/					{ yylval.strval = strdup(yytext); return DIV; }
-\%					{ yylval.strval = strdup(yytext); return PERCENT; }
-\<					{ yylval.strval = strdup(yytext); return LOGICAL_LESS; }
-\>					{ yylval.strval = strdup(yytext); return LOGICAL_MORE; }
-\^					{ yylval.strval = strdup(yytext); return BITWISE_XOR; }
-{StringLiteral}		{ yylval.strval = strdup(yytext); return STRING_LITERAL; }
+\=					{ return EQUALS; }
+\|					{ return BITWISE_OR; }
+\&					{ return BITWISE_AND; }
+\*					{ return MULT; }
+\+					{ return PLUS; }
+\-					{ return MINUS; }
+\~					{ return WAVE; }
+\!					{ return EXL_MARK; }
+\/					{ return DIV; }
+\%					{ return PERCENT; }
+\<					{ return LOGICAL_LESS; }
+\>					{ return LOGICAL_MORE; }
+\^					{ return BITWISE_XOR; }
+{StringLiteral}		{ return STRING_LITERAL; }
 {Preprocessor}		{ process_prep_include(yytext); yylval.strval = strdup(yytext); }
 {Invalid}			{ cerr<<"In file "<<source_file<<": Invalid syntax at line "<<source_file_line<<endl; exit(EXIT_FAILURE); }
 %%
 /* ==================== User function section - optional. Define the functions called on regex matches here ==================== */
-
-//{Integer_const}		{ yylval.intval = atoi(yytext); return INTEGER_CONST; }
-
 
 /*
 int main(){

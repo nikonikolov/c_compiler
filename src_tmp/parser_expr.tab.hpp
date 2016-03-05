@@ -30,8 +30,8 @@
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
 
-#ifndef YY_YY_SRC_C_PARSER_TAB_HPP_INCLUDED
-# define YY_YY_SRC_C_PARSER_TAB_HPP_INCLUDED
+#ifndef YY_YY_SRC_TMP_PARSER_EXPR_TAB_HPP_INCLUDED
+# define YY_YY_SRC_TMP_PARSER_EXPR_TAB_HPP_INCLUDED
 /* Debug traces.  */
 #ifndef YYDEBUG
 # define YYDEBUG 1
@@ -40,16 +40,19 @@
 extern int yydebug;
 #endif
 /* "%code requires" blocks.  */
-#line 1 "src/c_parser.y" /* yacc.c:1909  */
+#line 1 "src_tmp/parser_expr.y" /* yacc.c:1909  */
 
   #include <iostream>
   #include <string>  
-  #include "helper.hpp"
-  #include "DataStructures/Function.h"
-  #include "DataStructures/Loop.h"
-  #include "DataStructures/Variable.h"
-  #include "DataStructures/Conditional.h"
-  #include "DataStructures/VarDeclaration.h"
+  #include "../src/helper.hpp"
+  #include "../src/DataStructures/Function.h"
+  #include "../src/DataStructures/Loop.h"
+  #include "../src/DataStructures/Variable.h"
+  #include "../src/DataStructures/Constant.h"
+  #include "../src/DataStructures/Conditional.h"
+  #include "../src/DataStructures/VarDeclaration.h"
+  #include "../src/DataStructures/ExpressionStatement.h"
+  #include "../src/DataStructures/Expression.h"
   
   using namespace std;
 
@@ -60,7 +63,7 @@ extern int yydebug;
   //extern Function* root;
   
 
-#line 64 "src/c_parser.tab.hpp" /* yacc.c:1909  */
+#line 67 "src_tmp/parser_expr.tab.hpp" /* yacc.c:1909  */
 
 /* Token type.  */
 #ifndef YYTOKENTYPE
@@ -147,13 +150,11 @@ extern int yydebug;
     PERCENT = 335,
     LOGICAL_MORE = 336,
     LOGICAL_LESS = 337,
-    FLOATING_CONST = 338,
-    INTEGER_CONST = 339,
+    INTEGER_CONST = 338,
+    FLOATING_CONST = 339,
     CHAR_CONST = 340,
     IDENTIFIER = 341,
-    STRING_LITERAL = 342,
-    PREPROCESSOR_INCLUDE = 343,
-    EOLINE = 344
+    STRING_LITERAL = 342
   };
 #endif
 
@@ -162,22 +163,28 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 21 "src/c_parser.y" /* yacc.c:1909  */
+#line 24 "src_tmp/parser_expr.y" /* yacc.c:1909  */
 
   char* strval;
-  int intval;
+  uint64_t intval;
+  //int intval;
+  double64_t floatval;
+
   Variable* varptr;
   list<Variable>* list_var_ptr=NULL;
   
   vector<Variable>* vector_var_ptr;
   vector<Statement*>* vector_statement_pointers_ptr;
+  vector<Expression*>* vector_expr_pointers_ptr;
   
   vector<ConditionalCase*>* vector_conditional_case_pointers_ptr;
   
   Function* fn_ptr;
   Statement* statement_ptr;
+  Expression* expr_ptr;
+  ExpressionStatement* expr_statement_ptr;
 
-#line 181 "src/c_parser.tab.hpp" /* yacc.c:1909  */
+#line 188 "src_tmp/parser_expr.tab.hpp" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;
@@ -190,4 +197,4 @@ extern YYSTYPE yylval;
 
 int yyparse (void);
 
-#endif /* !YY_YY_SRC_C_PARSER_TAB_HPP_INCLUDED  */
+#endif /* !YY_YY_SRC_TMP_PARSER_EXPR_TAB_HPP_INCLUDED  */

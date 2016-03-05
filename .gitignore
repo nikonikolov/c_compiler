@@ -6,3 +6,5 @@ Notes.txt
 ctest
 *.zip
 syntaxtest.c
+tmp
+tmp/*

@@ -5,8 +5,11 @@
   #include "DataStructures/Function.h"
   #include "DataStructures/Loop.h"
   #include "DataStructures/Variable.h"
+  #include "DataStructures/Constant.h"
   #include "DataStructures/Conditional.h"
   #include "DataStructures/VarDeclaration.h"
+  #include "DataStructures/Expression.h"
+  #include "DataStructures/ExpressionStatement.h"
   
   using namespace std;
 
@@ -20,7 +23,9 @@
 
 %union{
   char* strval;
-  int intval;
+  uint64_t intval;
+  //int intval;
+  double64_t floatval;
   Variable* varptr;
   list<Variable>* list_var_ptr=NULL;
   
@@ -31,6 +36,7 @@
   
   Function* fn_ptr;
   Statement* statement_ptr;
+  Expression* expr_ptr;
 }
 
 /* --------------------------------------------------- TOKENS KEYWORDS --------------------------------------------------- */
@@ -53,7 +59,7 @@
 
 /* --------------------------------------------------- TOKENS OTHER --------------------------------------------------- */
 
-%token <strval> IDENTIFIER STRING_LITERAL PREPROCESSOR_INCLUDE EOLINE
+%token <strval> IDENTIFIER STRING_LITERAL
 
 /* **** Only types that you use in the C++ code need to be defined **** */
 %type <vector_var_ptr> fn_params_list initialization_list
@@ -69,7 +75,7 @@
 
 %type <strval> bracketed_identifier
 
-%type <statement_ptr> loop for_loop while_loop if_block_statement fn_declaration declaration statement 
+%type <statement_ptr> loop for_loop while_loop do_while_loop if_block_statement fn_declaration declaration statement 
 
 %type <vector_statement_pointers_ptr> compound_statement declaration_list statement_list
 
@@ -87,7 +93,7 @@
 
 /* Formatting semantic values.  */
 //%printer { fprintf (yyoutput, "%s", $$.strval); } <char*>;
-%printer { cerr<<$$.strval; } <char*>;
+//%printer { cerr<<$$.strval; } <char*>;
 //%printer { fprintf (yyoutput, "%s()", $$->strval); } FNCT;
 //%printer { fprintf (yyoutput, "%g", $$); } <double>;
 
@@ -119,7 +125,10 @@
         expseq1 : exp
                 | expseq1 ',' exp
                 ;
-
+    3. Managing constants:
+      The lexer converts the constant to a uint64_t representation and passes that value to the parser. The parser saves the value 
+      in a Variable or Constant object and casts it to the required type. NOTE: you are compiling for MIPS 32 bit so every 32 bit 
+      constant can be cast to unsigned 64 bit constant without losing any information, even long and negative 
 */
 
 
@@ -215,6 +224,12 @@ bracketed_const : CONSTANT
                 | LBRACKET bracketed_const RBRACKET
                 ;
 
+
+
+
+var_or_const  : IDENTIFIER
+              | CONSTANT
+              ;
 
 // Probably needs fixing
 COMPARISON_OPERATOR : LOGICAL_EQUALITY
@@ -323,17 +338,18 @@ fn_params_list  : INT bracketed_identifier                      { $$ = new vecto
 // Add do while for final version
 loop  : for_loop                                                  { $$=$1; }
       | while_loop                                                { $$=$1; }
+      | do_while_loop                                             { $$=$1; }
       ;
 
-// DO WHILE loop from c grammar
-//                    | DO STATEMENT WHILE LBRACKET EXPRESSION RBRACKET ;
+do_while_loop : DO compound_statement WHILE LBRACKET expression RBRACKET SEMI_COLON;
+              | DO statement WHILE LBRACKET expression RBRACKET SEMI_COLON;
+              ;
 
 for_loop  : FOR LBRACKET for_loop_decl_statement RBRACKET compound_statement     { $$ = new Loop($5); }
           | FOR LBRACKET for_loop_decl_statement RBRACKET statement              { $$ = new Loop($5); }
           ;
 
 // NB: to prevent memory leaks, at this stage you need to delete the structures returned in the following conditions
-// undefined: equality_expression, var_declaration, update_statement(this can be assignment expression)          
 // Fix memory management. Some pointer does not get deleted
 /*for_loop_decl_statement : assignment_expression_list SEMI_COLON equality_expression SEMI_COLON assignment_expression_list 
                               { delete $1; delete $5; }
@@ -388,18 +404,24 @@ else_statement_list : else_statement                          { $$ = $1; }
                     | else_statement_list else_statement      { $$ = vec_append($1, $2); }
                     ;
 
-// undefined: equality_expression
 if_statement  : IF LBRACKET equality_expression RBRACKET compound_statement               
                                               { $$ = new vector<ConditionalCase*>; $$->push_back(new ConditionalCase($5)); }
               | IF LBRACKET equality_expression RBRACKET statement
                                               { $$ = new vector<ConditionalCase*>; $$->push_back(new ConditionalCase($5)); }
               ;
 
+/*
+// if_statement can be reduced to a statement so basically the first rule is useless
 else_statement  : ELSE if_statement           { $$ = $2; }
                 | ELSE compound_statement     { $$ = new vector<ConditionalCase*>; $$->push_back(new ConditionalCase($2)); }
                 | ELSE statement              { $$ = new vector<ConditionalCase*>; $$->push_back(new ConditionalCase($2)); }
                 ;
+*/
 
+
+else_statement  : ELSE compound_statement     { $$ = new vector<ConditionalCase*>; $$->push_back(new ConditionalCase($2)); }
+                | ELSE statement              { $$ = new vector<ConditionalCase*>; $$->push_back(new ConditionalCase($2)); }
+                ;
        
 /* ============================================== 3.6 STATEMENTS ============================================== */
 
@@ -413,7 +435,6 @@ compound_statement  : LCURLY declaration_list statement_list RCURLY   { $$=vec_a
                     | LCURLY RCURLY                                   { $$=NULL; }
                     ;
 
-// undefined - declaration
 // Simply a list of declarations. Note this implies one or more occurences of INT keyword
 declaration_list  : declaration                                     { $$ = new vector<Statement*>; $$->push_back($1);}
                   | declaration_list declaration                    { $$->push_back($2);}
@@ -456,7 +477,42 @@ return_statement  : RETURN equality_expression SEMI_COLON
 
 /* ============================================== END RULES ============================================== */
 
+// NB: THIS GRAMMAR WORKS FOR ALL KINDS OF EXPRESSIONS. KEEP SEPARATION BETWEEN OPERATORS, THOUGH. OTHERWISE YOU BREAK IT
+/*expr   : expr ADDOP term
+       | term 
+       ; 
+term   : term MULTOP factor 
+       | factor 
+       ;
+factor : LBRACKET expr RBRACKET 
+       | CONSTANT 
+       | IDENTIFIER
+       ;
 
+
+ARITHMETIC_OPERATOR : BITWISE_XOR
+                    | BITWISE_OR
+                    | BITWISE_AND
+                    | MULT
+                    | PLUS
+                    | MINUS
+                    | DIV
+                    | PERCENT
+                    | LSHIFT
+                    | RSHIFT
+                    ;
+
+
+COMPARISON_OPERATOR : LOGICAL_EQUALITY
+                    | LOGICAL_INEQUALITY
+                    | LOGICAL_AND
+                    | LOGICAL_OR
+                    | LOGICAL_MORE
+                    | LOGICAL_LESS
+                    | LESS_OR_EQUAL
+                    | MORE_OR_EQUAL
+                    ;
+*/
 %%  
 
 int yyerror(const char* s){ 

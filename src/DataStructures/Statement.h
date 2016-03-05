@@ -5,16 +5,15 @@
 #include <list>
 #include <iomanip>
 #include <iostream>
-// You will need to delete that eventually
-#include "Variable.h"
 
 using std::list;
 using std::vector;
 using std::cout;
+using std::cerr;
 using std::endl;
 using std::string;
 /*	
-	An abstract class that can cover arithmetic expressions, function declarations and calls, if statements, loops
+	An abstract class that can cover expressions, function declarations and calls, if statements, loops
 */
 
 enum StatementT{
@@ -24,8 +23,23 @@ enum StatementT{
 	// function_prototype = 4; // maybe??
 	stat_conditional = 5,
 	stat_conditional_case = 6,
-	stat_arithmetic = 7,
-	stat_var_declaration = 8
+	stat_expression = 7,
+	stat_var_declaration = 8,
+	stat_constant = 9,
+	stat_exprstat = 10
+};
+
+enum VarT{
+	int_type 	= 248,
+	double_type = 247,
+	char_type	= 246,
+	void_type	= 245
+};
+
+union NumT{
+	int 	intval;
+	double 	doubleval;
+
 };
 
 class Statement{

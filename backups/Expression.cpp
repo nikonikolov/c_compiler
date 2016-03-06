@@ -1,8 +1,8 @@
 #include "Expression.h"
 
+Expression::Expression(Expression* lhs_in, char* oper_in, Expression* rhs_in) : Statement(ST_expression), lhs(lhs_in), rhs(rhs_in), oper(oper_in) {}
 
-Expression::Expression(BaseExpression* lhs_in, char* oper_in, BaseExpression* rhs_in) : 
-	BaseExpression(ST_expression), lhs(lhs_in), rhs(rhs_in), oper(oper_in) {}
+Expression::Expression(const StatementT& stat_type_in) : Statement(stat_type_in), lhs(NULL), rhs(NULL), oper(NULL) {}
 
 
 Expression::~Expression(){
@@ -24,6 +24,7 @@ void Expression::set_rhs(Expression* rhs_in){
 	if(rhs!=NULL) return;
 	rhs=rhs_in;
 }
+
 
 void Expression::pretty_print(const int& indent) const{
 	string white_space;

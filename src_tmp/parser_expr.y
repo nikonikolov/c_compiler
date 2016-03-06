@@ -30,7 +30,7 @@
   Variable* varptr;
   list<Variable>* list_var_ptr=NULL;
   
-  vector<Variable>* vector_var_ptr;
+  vector<Variable>* vector_vars_ptr;
   vector<Statement*>* vector_statement_pointers_ptr;
   vector<Expression*>* vector_expr_pointers_ptr;
   
@@ -66,14 +66,14 @@
 %token <strval> IDENTIFIER STRING_LITERAL
 
 /* **** Only types that you use in the C++ code need to be defined **** */
-/*%type <vector_var_ptr> fn_params_list initialization_list
+/*%type <vector_vars_ptr> fn_params_list initialization_list
 
 // NOTE: assignment_expression_list and assignment_expression are defined like that only for the purposes of the MILESTONE. 
 // Need to think of a better solution for the final version. You will probably need some special class that can be both 
 // a variable and a statement. Probably variable can inherit Statement. Or you make a new class called expression. It can be
 // useful when dealing with arithmetic expressions. Variable can inherit from it, as a Variable is practically an expression 
 // Expressions and Statements need to be related somehow. You can make Expression inferit from Statement
-%type <vector_var_ptr> assignment_expression_list
+%type <vector_vars_ptr> assignment_expression_list
 %type <strval> assignment_expression
 %type <strval> expression
 
@@ -87,11 +87,16 @@
 
 %type <vector_conditional_case_pointers_ptr> if_statement else_statement else_statement_list
 */
+
+/* ---------------------------------------------- EXPRESSION TYPES -------------------------------------------- */
+
 %type <expr_ptr> CONSTANT primary_expression postfix_expression unary_expression cast_expression expression
 %type <expr_ptr> multiplicative_expression additive_expression shift_expression relational_expression equality_expression
 %type <expr_ptr> and_expression inclusive_or_expression exclusive_or_expression logical_and_expression logical_or_expression
 %type <expr_ptr> conditional_expression assignment_expression 
 %type <expr_statement_ptr> expression_list 
+
+%type <statement_ptr> expression_statement 
 
 %type <strval> UNARY_OPERATOR type_name ASSIGNMENT_OPERATOR
 /* ---------------------------------------------- FOR DEBUGGING PURPOSES -------------------------------------------- */
@@ -127,8 +132,8 @@
 /* ============================================== PROGRAM START ELEMENTS ============================================== */
 
 
-program : expression_list SEMI_COLON                                   { root = new vector<Statement*>; root->push_back($1);}
-        | program expression_list SEMI_COLON                           { root->push_back($2);}
+program : expression_statement                                   { root = new vector<Statement*>; root->push_back($1);}
+        | program expression_statement                           { root->push_back($2);}
         ;
         
 
@@ -360,8 +365,7 @@ conditional_expression  // Reduction to Level 12
 assignment_expression // Reduction to Level 13
                       : conditional_expression                                          { $$ = $1; }
                       // Assignment
-                      | postfix_expression ASSIGNMENT_OPERATOR assignment_expression    { $$ = new Expression($1, $2, $3);}
-                      // Original: | unary_expression ASSIGNMENT_OPERATOR assignment_expression
+                      | unary_expression ASSIGNMENT_OPERATOR assignment_expression      { $$ = new Expression($1, $2, $3);}
                       ;
 
 ASSIGNMENT_OPERATOR : EQUALS                      { $$ = $1;}
@@ -377,8 +381,10 @@ ASSIGNMENT_OPERATOR : EQUALS                      { $$ = $1;}
                     | OR_EQUALS                   { $$ = $1;}
                     ;
 
+// Level 14 Precedence
 expression  : assignment_expression               { $$ = $1;}
             ;
+
 /* -------------------------------------------- 3.3.17 COMMA OPERATOR ------------------------------------------ */
 
 // You probably need to make some synchronizations with your grammar at this point
@@ -390,6 +396,8 @@ expression_list // Reduction to Level 14
                 | expression COMMA assignment_expression            { $$->push_back($3);}
                 ;
 
+expression_statement  : expression_list SEMI_COLON                  { $$ = $1;}
+                      ;
 
 /* ============================================== 3.4 CONSTANT EXPRESSIONS ============================================== */
 

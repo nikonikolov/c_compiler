@@ -1,39 +1,24 @@
 #ifndef EXPRESSION_H
 #define EXPRESSION_H
 
-#include "Statement.h"
-/*
-enum OpT{
-	empty_oper=1,
-	plus=2,
-	mult=3,
-	minus=4
+#include "BaseExpression.h"
 
-};
-*/
-
-class Expression : public Statement{
+class Expression : public BaseExpression{
 
 public:
-	Expression(Expression* lhs_in, char* oper_in, Expression* rhs_in);
-	Expression(const StatementT stat_type_in);
-	virtual ~Expression();
+	Expression(BaseExpression* lhs_in, char* oper_in, BaseExpression* rhs_in);
+	~Expression();
 
-	virtual NumT eval();
+	NumT eval();
+	void pretty_print(const int& indent) const;
 
-	virtual void pretty_print(const int& indent) const;
+	void set_lhs(Expression* lhs_in);	
+	void set_rhs(Expression* rhs_in);
+
 private:
-	//pretty_print_oper() const;
-	
-	/* 
-	NOTE: All vector pointers point to dynamically allocated vectors. In case of vector of Statement* 
-	the objects in the vector are dynamically allocated as well
-	*/
-
 	char* oper;
-	Expression* lhs;
-	Expression* rhs;
-	int a;
+	BaseExpression* lhs;
+	BaseExpression* rhs;
 };
 
 

@@ -1,0 +1,18 @@
+FUNCTION : x
+SCOPE
+VARIABLE : g
+VARIABLE : b
+VARIABLE : d
+VARIABLE : f
+FUNCTION : zz
+    PARAM : a
+    PARAM : b
+    PARAM : c
+SCOPE
+    (a)=(b)
+    SCOPE
+        VARIABLE : fsdfsdfs
+    SCOPE
+        (a)=(b)
+    SCOPE
+        (a)=(b)

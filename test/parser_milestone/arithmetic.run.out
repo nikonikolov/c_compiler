@@ -1,0 +1,31 @@
+FUNCTION : x
+SCOPE
+VARIABLE : g
+VARIABLE : b
+VARIABLE : d
+VARIABLE : f
+FUNCTION : zz
+    PARAM : a
+    PARAM : b
+    PARAM : c
+SCOPE
+    VARIABLE : a
+    VARIABLE : b
+    VARIABLE : c
+    (b)!=(((((a)*(b))-((((c)/(g))*(g))%(h)))-(b))+((a)|(b)))
+    (b)==(((((a)*(b))-((((c)/(g))*(g))%(h)))-(b))+((a)|(b)))
+    (a)||(b)
+    (a)&&(b)
+    (a)||(b)
+    (a)=(!(b))
+    (a)=(~(b))
+    (A)||((b)&&((c)+(d)))
+    (A)||((b)&&(c))
+    ((a)|(b))||(((a)&(b))&&(c))
+    (a)=(b)
+    SCOPE
+        VARIABLE : fsdfsdfs
+    SCOPE
+        (a)=(b)
+    SCOPE
+        (a)=(b)

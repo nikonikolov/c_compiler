@@ -36,7 +36,6 @@ private:
 class Conditional : public Statement{
 
 public:
-	//Conditional(const VarT& return_type_in, char* name_in);
 	Conditional(vector<ConditionalCase*>* conditions_in);
 	~Conditional();
 

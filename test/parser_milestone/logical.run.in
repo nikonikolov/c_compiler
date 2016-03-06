@@ -1,17 +1,14 @@
-# 2 "logical.run.in" 3 4
-int x()
-{}
+int bla(int t, int p, int (c)){
+	b!=a*b-c/g*g%h-b+(a|b);
+	b==a*b-c/g*g%h-b+(a|b);
+	a||b;
+	a&&b;
+	a||b;
+	a=!b;
+	a=~b;
+	A||b&&c+d;
+	A||b&&c;
+	(a|b)||(a&b)&&c;
+	
+}	
 
-
-int g, b, d, f=a;
-
-
-int zz(int a, int b, int c)
-{
-
-
-	while(a+a==a){
-		a=b;
-	}
-
-}

@@ -13,7 +13,6 @@ public:
 
 	//void pretty_print(const int& indent) const;
 private:
-	//VarT return_type;						// Specifies the return type of the program - int should be it. Do you need the field at all
 	//char* name;								// Name given to the function in the source code
 	//char* assembler_name;					// Name associated with the assembler code
 	list<Function>* functions;				// Pointer to a list of all the functions defined. The MAIN is included here

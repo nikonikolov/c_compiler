@@ -39,8 +39,8 @@ Grammar
 
     0 $accept: program $end
 
-    1 program: expression_list SEMI_COLON
-    2        | program expression_list SEMI_COLON
+    1 program: expression_statement
+    2        | program expression_statement
 
     3 CONSTANT: FLOATING_CONST
     4         | INTEGER_CONST
@@ -122,7 +122,7 @@ Grammar
    63                       | logical_or_expression Q_MARK expression COLON conditional_expression
 
    64 assignment_expression: conditional_expression
-   65                      | postfix_expression ASSIGNMENT_OPERATOR assignment_expression
+   65                      | unary_expression ASSIGNMENT_OPERATOR assignment_expression
 
    66 ASSIGNMENT_OPERATOR: EQUALS
    67                    | MULT_EQUALS
@@ -141,9 +141,11 @@ Grammar
    78 expression_list: expression
    79                | expression COMMA assignment_expression
 
-   80 type_name: INT
-   81          | DOUBLE
-   82          | CHAR
+   80 expression_statement: expression_list SEMI_COLON
+
+   81 type_name: INT
+   82          | DOUBLE
+   83          | CHAR
 
 
 Terminals, with rules where they appear
@@ -151,8 +153,8 @@ Terminals, with rules where they appear
 $end (0) 0
 error (256)
 AUTO (258)
-DOUBLE (259) 81
-INT (260) 80
+DOUBLE (259) 82
+INT (260) 81
 STRUCT (261)
 BREAK (262)
 ELSE (263)
@@ -162,7 +164,7 @@ CASE (266)
 ENUM (267)
 REGISTER (268)
 TYPEDEF (269)
-CHAR (270) 82
+CHAR (270) 83
 EXTERN (271)
 RETURN (272)
 UNION (273)
@@ -216,7 +218,7 @@ OR_EQUALS (320) 76
 COMMA (321) 19 79
 HASH (322)
 HASH_HASH (323)
-SEMI_COLON (324) 1 2
+SEMI_COLON (324) 80
 EQUALS (325) 66
 BITWISE_OR (326) 57
 BITWISE_AND (327) 26 53
@@ -249,11 +251,11 @@ primary_expression (91)
     on left: 6 7 8 9, on right: 10
 postfix_expression (92)
     on left: 10 11 12 13 14 15 16 17, on right: 11 12 13 14 15 16 17
-    20 65
+    20
 argument_expression_list (93)
     on left: 18 19, on right: 12 19
 unary_expression (94)
-    on left: 20 21 22 23 24 25, on right: 21 22 24 32
+    on left: 20 21 22 23 24 25, on right: 21 22 24 32 65
 UNARY_OPERATOR (95)
     on left: 26 27 28 29 30 31, on right: 23
 cast_expression (96)
@@ -287,9 +289,11 @@ ASSIGNMENT_OPERATOR (109)
 expression (110)
     on left: 77, on right: 9 11 63 78 79
 expression_list (111)
-    on left: 78 79, on right: 1 2
-type_name (112)
-    on left: 80 81 82, on right: 25 33
+    on left: 78 79, on right: 80
+expression_statement (112)
+    on left: 80, on right: 1 2
+type_name (113)
+    on left: 81 82 83, on right: 25 33
 
 
 State 0
@@ -333,6 +337,7 @@ State 0
     assignment_expression      go to state 34
     expression                 go to state 35
     expression_list            go to state 36
+    expression_statement       go to state 37
 
 
 State 1
@@ -340,9 +345,9 @@ State 1
     9 primary_expression: LBRACKET . expression RBRACKET
    33 cast_expression: LBRACKET . type_name RBRACKET cast_expression
 
-    DOUBLE          shift, and go to state 37
-    INT             shift, and go to state 38
-    CHAR            shift, and go to state 39
+    DOUBLE          shift, and go to state 38
+    INT             shift, and go to state 39
+    CHAR            shift, and go to state 40
     LBRACKET        shift, and go to state 1
     PLUS_PLUS       shift, and go to state 2
     MINUS_MINUS     shift, and go to state 3
@@ -377,15 +382,15 @@ State 1
     logical_or_expression      go to state 32
     conditional_expression     go to state 33
     assignment_expression      go to state 34
-    expression                 go to state 40
-    type_name                  go to state 41
+    expression                 go to state 41
+    type_name                  go to state 42
 
 
 State 2
 
    21 unary_expression: PLUS_PLUS . unary_expression
 
-    LBRACKET        shift, and go to state 42
+    LBRACKET        shift, and go to state 43
     PLUS_PLUS       shift, and go to state 2
     MINUS_MINUS     shift, and go to state 3
     SIZEOF          shift, and go to state 4
@@ -403,7 +408,7 @@ State 2
 
     CONSTANT            go to state 17
     primary_expression  go to state 18
-    postfix_expression  go to state 43
+    postfix_expression  go to state 19
     unary_expression    go to state 44
     UNARY_OPERATOR      go to state 21
 
@@ -412,7 +417,7 @@ State 3
 
    22 unary_expression: MINUS_MINUS . unary_expression
 
-    LBRACKET        shift, and go to state 42
+    LBRACKET        shift, and go to state 43
     PLUS_PLUS       shift, and go to state 2
     MINUS_MINUS     shift, and go to state 3
     SIZEOF          shift, and go to state 4
@@ -430,7 +435,7 @@ State 3
 
     CONSTANT            go to state 17
     primary_expression  go to state 18
-    postfix_expression  go to state 43
+    postfix_expression  go to state 19
     unary_expression    go to state 45
     UNARY_OPERATOR      go to state 21
 
@@ -458,7 +463,7 @@ State 4
 
     CONSTANT            go to state 17
     primary_expression  go to state 18
-    postfix_expression  go to state 43
+    postfix_expression  go to state 19
     unary_expression    go to state 47
     UNARY_OPERATOR      go to state 21
 
@@ -543,7 +548,7 @@ State 15
 State 16
 
     0 $accept: program . $end
-    2 program: program . expression_list SEMI_COLON
+    2 program: program . expression_statement
 
     $end            shift, and go to state 48
     LBRACKET        shift, and go to state 1
@@ -581,7 +586,8 @@ State 16
     conditional_expression     go to state 33
     assignment_expression      go to state 34
     expression                 go to state 35
-    expression_list            go to state 49
+    expression_list            go to state 36
+    expression_statement       go to state 49
 
 
 State 17
@@ -608,14 +614,22 @@ State 19
    16                   | postfix_expression . PLUS_PLUS
    17                   | postfix_expression . MINUS_MINUS
    20 unary_expression: postfix_expression .
-   65 assignment_expression: postfix_expression . ASSIGNMENT_OPERATOR assignment_expression
 
-    LSQUARE         shift, and go to state 50
-    LBRACKET        shift, and go to state 51
-    DOT             shift, and go to state 52
-    PTR_OP          shift, and go to state 53
-    PLUS_PLUS       shift, and go to state 54
-    MINUS_MINUS     shift, and go to state 55
+    LSQUARE      shift, and go to state 50
+    LBRACKET     shift, and go to state 51
+    DOT          shift, and go to state 52
+    PTR_OP       shift, and go to state 53
+    PLUS_PLUS    shift, and go to state 54
+    MINUS_MINUS  shift, and go to state 55
+
+    $default  reduce using rule 20 (unary_expression)
+
+
+State 20
+
+   32 cast_expression: unary_expression .
+   65 assignment_expression: unary_expression . ASSIGNMENT_OPERATOR assignment_expression
+
     MULT_EQUALS     shift, and go to state 56
     DIV_EQUALS      shift, and go to state 57
     PERCENT_EQUALS  shift, and go to state 58
@@ -628,16 +642,9 @@ State 19
     OR_EQUALS       shift, and go to state 65
     EQUALS          shift, and go to state 66
 
-    $default  reduce using rule 20 (unary_expression)
+    $default  reduce using rule 32 (cast_expression)
 
     ASSIGNMENT_OPERATOR  go to state 67
-
-
-State 20
-
-   32 cast_expression: unary_expression .
-
-    $default  reduce using rule 32 (cast_expression)
 
 
 State 21
@@ -662,10 +669,10 @@ State 21
 
     CONSTANT            go to state 17
     primary_expression  go to state 18
-    postfix_expression  go to state 43
-    unary_expression    go to state 20
+    postfix_expression  go to state 19
+    unary_expression    go to state 68
     UNARY_OPERATOR      go to state 21
-    cast_expression     go to state 68
+    cast_expression     go to state 69
 
 
 State 22
@@ -682,9 +689,9 @@ State 23
    37                          | multiplicative_expression . PERCENT cast_expression
    38 additive_expression: multiplicative_expression .
 
-    MULT     shift, and go to state 69
-    DIV      shift, and go to state 70
-    PERCENT  shift, and go to state 71
+    MULT     shift, and go to state 70
+    DIV      shift, and go to state 71
+    PERCENT  shift, and go to state 72
 
     $default  reduce using rule 38 (additive_expression)
 
@@ -695,8 +702,8 @@ State 24
    40                    | additive_expression . MINUS multiplicative_expression
    41 shift_expression: additive_expression .
 
-    PLUS   shift, and go to state 72
-    MINUS  shift, and go to state 73
+    PLUS   shift, and go to state 73
+    MINUS  shift, and go to state 74
 
     $default  reduce using rule 41 (shift_expression)
 
@@ -707,8 +714,8 @@ State 25
    43                 | shift_expression . RSHIFT additive_expression
    44 relational_expression: shift_expression .
 
-    LSHIFT  shift, and go to state 74
-    RSHIFT  shift, and go to state 75
+    LSHIFT  shift, and go to state 75
+    RSHIFT  shift, and go to state 76
 
     $default  reduce using rule 44 (relational_expression)
 
@@ -721,10 +728,10 @@ State 26
    48                      | relational_expression . MORE_OR_EQUAL shift_expression
    49 equality_expression: relational_expression .
 
-    LESS_OR_EQUAL  shift, and go to state 76
-    MORE_OR_EQUAL  shift, and go to state 77
-    LOGICAL_MORE   shift, and go to state 78
-    LOGICAL_LESS   shift, and go to state 79
+    LESS_OR_EQUAL  shift, and go to state 77
+    MORE_OR_EQUAL  shift, and go to state 78
+    LOGICAL_MORE   shift, and go to state 79
+    LOGICAL_LESS   shift, and go to state 80
 
     $default  reduce using rule 49 (equality_expression)
 
@@ -735,8 +742,8 @@ State 27
    51                    | equality_expression . LOGICAL_INEQUALITY relational_expression
    52 and_expression: equality_expression .
 
-    LOGICAL_EQUALITY    shift, and go to state 80
-    LOGICAL_INEQUALITY  shift, and go to state 81
+    LOGICAL_EQUALITY    shift, and go to state 81
+    LOGICAL_INEQUALITY  shift, and go to state 82
 
     $default  reduce using rule 52 (and_expression)
 
@@ -746,7 +753,7 @@ State 28
    53 and_expression: and_expression . BITWISE_AND equality_expression
    54 exclusive_or_expression: and_expression .
 
-    BITWISE_AND  shift, and go to state 82
+    BITWISE_AND  shift, and go to state 83
 
     $default  reduce using rule 54 (exclusive_or_expression)
 
@@ -756,7 +763,7 @@ State 29
    55 exclusive_or_expression: exclusive_or_expression . BITWISE_XOR and_expression
    56 inclusive_or_expression: exclusive_or_expression .
 
-    BITWISE_XOR  shift, and go to state 83
+    BITWISE_XOR  shift, and go to state 84
 
     $default  reduce using rule 56 (inclusive_or_expression)
 
@@ -766,7 +773,7 @@ State 30
    57 inclusive_or_expression: inclusive_or_expression . BITWISE_OR exclusive_or_expression
    58 logical_and_expression: inclusive_or_expression .
 
-    BITWISE_OR  shift, and go to state 84
+    BITWISE_OR  shift, and go to state 85
 
     $default  reduce using rule 58 (logical_and_expression)
 
@@ -776,7 +783,7 @@ State 31
    59 logical_and_expression: logical_and_expression . LOGICAL_AND inclusive_or_expression
    60 logical_or_expression: logical_and_expression .
 
-    LOGICAL_AND  shift, and go to state 85
+    LOGICAL_AND  shift, and go to state 86
 
     $default  reduce using rule 60 (logical_or_expression)
 
@@ -787,8 +794,8 @@ State 32
    62 conditional_expression: logical_or_expression .
    63                       | logical_or_expression . Q_MARK expression COLON conditional_expression
 
-    LOGICAL_OR  shift, and go to state 86
-    Q_MARK      shift, and go to state 87
+    LOGICAL_OR  shift, and go to state 87
+    Q_MARK      shift, and go to state 88
 
     $default  reduce using rule 62 (conditional_expression)
 
@@ -812,54 +819,61 @@ State 35
    78 expression_list: expression .
    79                | expression . COMMA assignment_expression
 
-    COMMA  shift, and go to state 88
+    COMMA  shift, and go to state 89
 
     $default  reduce using rule 78 (expression_list)
 
 
 State 36
 
-    1 program: expression_list . SEMI_COLON
+   80 expression_statement: expression_list . SEMI_COLON
 
-    SEMI_COLON  shift, and go to state 89
+    SEMI_COLON  shift, and go to state 90
 
 
 State 37
 
-   81 type_name: DOUBLE .
+    1 program: expression_statement .
 
-    $default  reduce using rule 81 (type_name)
+    $default  reduce using rule 1 (program)
 
 
 State 38
 
-   80 type_name: INT .
-
-    $default  reduce using rule 80 (type_name)
-
-
-State 39
-
-   82 type_name: CHAR .
+   82 type_name: DOUBLE .
 
     $default  reduce using rule 82 (type_name)
 
 
+State 39
+
+   81 type_name: INT .
+
+    $default  reduce using rule 81 (type_name)
+
+
 State 40
 
-    9 primary_expression: LBRACKET expression . RBRACKET
+   83 type_name: CHAR .
 
-    RBRACKET  shift, and go to state 90
+    $default  reduce using rule 83 (type_name)
 
 
 State 41
 
-   33 cast_expression: LBRACKET type_name . RBRACKET cast_expression
+    9 primary_expression: LBRACKET expression . RBRACKET
 
     RBRACKET  shift, and go to state 91
 
 
 State 42
+
+   33 cast_expression: LBRACKET type_name . RBRACKET cast_expression
+
+    RBRACKET  shift, and go to state 92
+
+
+State 43
 
     9 primary_expression: LBRACKET . expression RBRACKET
 
@@ -897,28 +911,7 @@ State 42
     logical_or_expression      go to state 32
     conditional_expression     go to state 33
     assignment_expression      go to state 34
-    expression                 go to state 40
-
-
-State 43
-
-   11 postfix_expression: postfix_expression . LSQUARE expression RSQUARE
-   12                   | postfix_expression . LBRACKET argument_expression_list RBRACKET
-   13                   | postfix_expression . LBRACKET RBRACKET
-   14                   | postfix_expression . DOT IDENTIFIER
-   15                   | postfix_expression . PTR_OP IDENTIFIER
-   16                   | postfix_expression . PLUS_PLUS
-   17                   | postfix_expression . MINUS_MINUS
-   20 unary_expression: postfix_expression .
-
-    LSQUARE      shift, and go to state 50
-    LBRACKET     shift, and go to state 51
-    DOT          shift, and go to state 52
-    PTR_OP       shift, and go to state 53
-    PLUS_PLUS    shift, and go to state 54
-    MINUS_MINUS  shift, and go to state 55
-
-    $default  reduce using rule 20 (unary_expression)
+    expression                 go to state 41
 
 
 State 44
@@ -940,9 +933,9 @@ State 46
     9 primary_expression: LBRACKET . expression RBRACKET
    25 unary_expression: SIZEOF LBRACKET . type_name RBRACKET
 
-    DOUBLE          shift, and go to state 37
-    INT             shift, and go to state 38
-    CHAR            shift, and go to state 39
+    DOUBLE          shift, and go to state 38
+    INT             shift, and go to state 39
+    CHAR            shift, and go to state 40
     LBRACKET        shift, and go to state 1
     PLUS_PLUS       shift, and go to state 2
     MINUS_MINUS     shift, and go to state 3
@@ -977,8 +970,8 @@ State 46
     logical_or_expression      go to state 32
     conditional_expression     go to state 33
     assignment_expression      go to state 34
-    expression                 go to state 40
-    type_name                  go to state 92
+    expression                 go to state 41
+    type_name                  go to state 93
 
 
 State 47
@@ -997,9 +990,9 @@ State 48
 
 State 49
 
-    2 program: program expression_list . SEMI_COLON
+    2 program: program expression_statement .
 
-    SEMI_COLON  shift, and go to state 93
+    $default  reduce using rule 2 (program)
 
 
 State 50
@@ -1193,7 +1186,7 @@ State 66
 
 State 67
 
-   65 assignment_expression: postfix_expression ASSIGNMENT_OPERATOR . assignment_expression
+   65 assignment_expression: unary_expression ASSIGNMENT_OPERATOR . assignment_expression
 
     LBRACKET        shift, and go to state 1
     PLUS_PLUS       shift, and go to state 2
@@ -1233,12 +1226,19 @@ State 67
 
 State 68
 
+   32 cast_expression: unary_expression .
+
+    $default  reduce using rule 32 (cast_expression)
+
+
+State 69
+
    23 unary_expression: UNARY_OPERATOR cast_expression .
 
     $default  reduce using rule 23 (unary_expression)
 
 
-State 69
+State 70
 
    35 multiplicative_expression: multiplicative_expression MULT . cast_expression
 
@@ -1260,13 +1260,13 @@ State 69
 
     CONSTANT            go to state 17
     primary_expression  go to state 18
-    postfix_expression  go to state 43
-    unary_expression    go to state 20
+    postfix_expression  go to state 19
+    unary_expression    go to state 68
     UNARY_OPERATOR      go to state 21
     cast_expression     go to state 101
 
 
-State 70
+State 71
 
    36 multiplicative_expression: multiplicative_expression DIV . cast_expression
 
@@ -1288,13 +1288,13 @@ State 70
 
     CONSTANT            go to state 17
     primary_expression  go to state 18
-    postfix_expression  go to state 43
-    unary_expression    go to state 20
+    postfix_expression  go to state 19
+    unary_expression    go to state 68
     UNARY_OPERATOR      go to state 21
     cast_expression     go to state 102
 
 
-State 71
+State 72
 
    37 multiplicative_expression: multiplicative_expression PERCENT . cast_expression
 
@@ -1316,13 +1316,13 @@ State 71
 
     CONSTANT            go to state 17
     primary_expression  go to state 18
-    postfix_expression  go to state 43
-    unary_expression    go to state 20
+    postfix_expression  go to state 19
+    unary_expression    go to state 68
     UNARY_OPERATOR      go to state 21
     cast_expression     go to state 103
 
 
-State 72
+State 73
 
    39 additive_expression: additive_expression PLUS . multiplicative_expression
 
@@ -1344,14 +1344,14 @@ State 72
 
     CONSTANT                   go to state 17
     primary_expression         go to state 18
-    postfix_expression         go to state 43
-    unary_expression           go to state 20
+    postfix_expression         go to state 19
+    unary_expression           go to state 68
     UNARY_OPERATOR             go to state 21
     cast_expression            go to state 22
     multiplicative_expression  go to state 104
 
 
-State 73
+State 74
 
    40 additive_expression: additive_expression MINUS . multiplicative_expression
 
@@ -1373,14 +1373,14 @@ State 73
 
     CONSTANT                   go to state 17
     primary_expression         go to state 18
-    postfix_expression         go to state 43
-    unary_expression           go to state 20
+    postfix_expression         go to state 19
+    unary_expression           go to state 68
     UNARY_OPERATOR             go to state 21
     cast_expression            go to state 22
     multiplicative_expression  go to state 105
 
 
-State 74
+State 75
 
    42 shift_expression: shift_expression LSHIFT . additive_expression
 
@@ -1402,15 +1402,15 @@ State 74
 
     CONSTANT                   go to state 17
     primary_expression         go to state 18
-    postfix_expression         go to state 43
-    unary_expression           go to state 20
+    postfix_expression         go to state 19
+    unary_expression           go to state 68
     UNARY_OPERATOR             go to state 21
     cast_expression            go to state 22
     multiplicative_expression  go to state 23
     additive_expression        go to state 106
 
 
-State 75
+State 76
 
    43 shift_expression: shift_expression RSHIFT . additive_expression
 
@@ -1432,15 +1432,15 @@ State 75
 
     CONSTANT                   go to state 17
     primary_expression         go to state 18
-    postfix_expression         go to state 43
-    unary_expression           go to state 20
+    postfix_expression         go to state 19
+    unary_expression           go to state 68
     UNARY_OPERATOR             go to state 21
     cast_expression            go to state 22
     multiplicative_expression  go to state 23
     additive_expression        go to state 107
 
 
-State 76
+State 77
 
    47 relational_expression: relational_expression LESS_OR_EQUAL . shift_expression
 
@@ -1462,8 +1462,8 @@ State 76
 
     CONSTANT                   go to state 17
     primary_expression         go to state 18
-    postfix_expression         go to state 43
-    unary_expression           go to state 20
+    postfix_expression         go to state 19
+    unary_expression           go to state 68
     UNARY_OPERATOR             go to state 21
     cast_expression            go to state 22
     multiplicative_expression  go to state 23
@@ -1471,7 +1471,7 @@ State 76
     shift_expression           go to state 108
 
 
-State 77
+State 78
 
    48 relational_expression: relational_expression MORE_OR_EQUAL . shift_expression
 
@@ -1493,8 +1493,8 @@ State 77
 
     CONSTANT                   go to state 17
     primary_expression         go to state 18
-    postfix_expression         go to state 43
-    unary_expression           go to state 20
+    postfix_expression         go to state 19
+    unary_expression           go to state 68
     UNARY_OPERATOR             go to state 21
     cast_expression            go to state 22
     multiplicative_expression  go to state 23
@@ -1502,7 +1502,7 @@ State 77
     shift_expression           go to state 109
 
 
-State 78
+State 79
 
    46 relational_expression: relational_expression LOGICAL_MORE . shift_expression
 
@@ -1524,8 +1524,8 @@ State 78
 
     CONSTANT                   go to state 17
     primary_expression         go to state 18
-    postfix_expression         go to state 43
-    unary_expression           go to state 20
+    postfix_expression         go to state 19
+    unary_expression           go to state 68
     UNARY_OPERATOR             go to state 21
     cast_expression            go to state 22
     multiplicative_expression  go to state 23
@@ -1533,7 +1533,7 @@ State 78
     shift_expression           go to state 110
 
 
-State 79
+State 80
 
    45 relational_expression: relational_expression LOGICAL_LESS . shift_expression
 
@@ -1555,8 +1555,8 @@ State 79
 
     CONSTANT                   go to state 17
     primary_expression         go to state 18
-    postfix_expression         go to state 43
-    unary_expression           go to state 20
+    postfix_expression         go to state 19
+    unary_expression           go to state 68
     UNARY_OPERATOR             go to state 21
     cast_expression            go to state 22
     multiplicative_expression  go to state 23
@@ -1564,7 +1564,7 @@ State 79
     shift_expression           go to state 111
 
 
-State 80
+State 81
 
    50 equality_expression: equality_expression LOGICAL_EQUALITY . relational_expression
 
@@ -1586,8 +1586,8 @@ State 80
 
     CONSTANT                   go to state 17
     primary_expression         go to state 18
-    postfix_expression         go to state 43
-    unary_expression           go to state 20
+    postfix_expression         go to state 19
+    unary_expression           go to state 68
     UNARY_OPERATOR             go to state 21
     cast_expression            go to state 22
     multiplicative_expression  go to state 23
@@ -1596,7 +1596,7 @@ State 80
     relational_expression      go to state 112
 
 
-State 81
+State 82
 
    51 equality_expression: equality_expression LOGICAL_INEQUALITY . relational_expression
 
@@ -1618,8 +1618,8 @@ State 81
 
     CONSTANT                   go to state 17
     primary_expression         go to state 18
-    postfix_expression         go to state 43
-    unary_expression           go to state 20
+    postfix_expression         go to state 19
+    unary_expression           go to state 68
     UNARY_OPERATOR             go to state 21
     cast_expression            go to state 22
     multiplicative_expression  go to state 23
@@ -1628,7 +1628,7 @@ State 81
     relational_expression      go to state 113
 
 
-State 82
+State 83
 
    53 and_expression: and_expression BITWISE_AND . equality_expression
 
@@ -1650,8 +1650,8 @@ State 82
 
     CONSTANT                   go to state 17
     primary_expression         go to state 18
-    postfix_expression         go to state 43
-    unary_expression           go to state 20
+    postfix_expression         go to state 19
+    unary_expression           go to state 68
     UNARY_OPERATOR             go to state 21
     cast_expression            go to state 22
     multiplicative_expression  go to state 23
@@ -1661,7 +1661,7 @@ State 82
     equality_expression        go to state 114
 
 
-State 83
+State 84
 
    55 exclusive_or_expression: exclusive_or_expression BITWISE_XOR . and_expression
 
@@ -1683,8 +1683,8 @@ State 83
 
     CONSTANT                   go to state 17
     primary_expression         go to state 18
-    postfix_expression         go to state 43
-    unary_expression           go to state 20
+    postfix_expression         go to state 19
+    unary_expression           go to state 68
     UNARY_OPERATOR             go to state 21
     cast_expression            go to state 22
     multiplicative_expression  go to state 23
@@ -1695,7 +1695,7 @@ State 83
     and_expression             go to state 115
 
 
-State 84
+State 85
 
    57 inclusive_or_expression: inclusive_or_expression BITWISE_OR . exclusive_or_expression
 
@@ -1717,8 +1717,8 @@ State 84
 
     CONSTANT                   go to state 17
     primary_expression         go to state 18
-    postfix_expression         go to state 43
-    unary_expression           go to state 20
+    postfix_expression         go to state 19
+    unary_expression           go to state 68
     UNARY_OPERATOR             go to state 21
     cast_expression            go to state 22
     multiplicative_expression  go to state 23
@@ -1730,7 +1730,7 @@ State 84
     exclusive_or_expression    go to state 116
 
 
-State 85
+State 86
 
    59 logical_and_expression: logical_and_expression LOGICAL_AND . inclusive_or_expression
 
@@ -1752,8 +1752,8 @@ State 85
 
     CONSTANT                   go to state 17
     primary_expression         go to state 18
-    postfix_expression         go to state 43
-    unary_expression           go to state 20
+    postfix_expression         go to state 19
+    unary_expression           go to state 68
     UNARY_OPERATOR             go to state 21
     cast_expression            go to state 22
     multiplicative_expression  go to state 23
@@ -1766,7 +1766,7 @@ State 85
     inclusive_or_expression    go to state 117
 
 
-State 86
+State 87
 
    61 logical_or_expression: logical_or_expression LOGICAL_OR . logical_and_expression
 
@@ -1788,8 +1788,8 @@ State 86
 
     CONSTANT                   go to state 17
     primary_expression         go to state 18
-    postfix_expression         go to state 43
-    unary_expression           go to state 20
+    postfix_expression         go to state 19
+    unary_expression           go to state 68
     UNARY_OPERATOR             go to state 21
     cast_expression            go to state 22
     multiplicative_expression  go to state 23
@@ -1803,7 +1803,7 @@ State 86
     logical_and_expression     go to state 118
 
 
-State 87
+State 88
 
    63 conditional_expression: logical_or_expression Q_MARK . expression COLON conditional_expression
 
@@ -1844,7 +1844,7 @@ State 87
     expression                 go to state 119
 
 
-State 88
+State 89
 
    79 expression_list: expression COMMA . assignment_expression
 
@@ -1884,21 +1884,21 @@ State 88
     assignment_expression      go to state 120
 
 
-State 89
-
-    1 program: expression_list SEMI_COLON .
-
-    $default  reduce using rule 1 (program)
-
-
 State 90
+
+   80 expression_statement: expression_list SEMI_COLON .
+
+    $default  reduce using rule 80 (expression_statement)
+
+
+State 91
 
     9 primary_expression: LBRACKET expression RBRACKET .
 
     $default  reduce using rule 9 (primary_expression)
 
 
-State 91
+State 92
 
    33 cast_expression: LBRACKET type_name RBRACKET . cast_expression
 
@@ -1920,24 +1920,17 @@ State 91
 
     CONSTANT            go to state 17
     primary_expression  go to state 18
-    postfix_expression  go to state 43
-    unary_expression    go to state 20
+    postfix_expression  go to state 19
+    unary_expression    go to state 68
     UNARY_OPERATOR      go to state 21
     cast_expression     go to state 121
 
 
-State 92
+State 93
 
    25 unary_expression: SIZEOF LBRACKET type_name . RBRACKET
 
     RBRACKET  shift, and go to state 122
-
-
-State 93
-
-    2 program: program expression_list SEMI_COLON .
-
-    $default  reduce using rule 2 (program)
 
 
 State 94
@@ -1986,7 +1979,7 @@ State 99
 
 State 100
 
-   65 assignment_expression: postfix_expression ASSIGNMENT_OPERATOR assignment_expression .
+   65 assignment_expression: unary_expression ASSIGNMENT_OPERATOR assignment_expression .
 
     $default  reduce using rule 65 (assignment_expression)
 
@@ -2019,9 +2012,9 @@ State 104
    37                          | multiplicative_expression . PERCENT cast_expression
    39 additive_expression: additive_expression PLUS multiplicative_expression .
 
-    MULT     shift, and go to state 69
-    DIV      shift, and go to state 70
-    PERCENT  shift, and go to state 71
+    MULT     shift, and go to state 70
+    DIV      shift, and go to state 71
+    PERCENT  shift, and go to state 72
 
     $default  reduce using rule 39 (additive_expression)
 
@@ -2033,9 +2026,9 @@ State 105
    37                          | multiplicative_expression . PERCENT cast_expression
    40 additive_expression: additive_expression MINUS multiplicative_expression .
 
-    MULT     shift, and go to state 69
-    DIV      shift, and go to state 70
-    PERCENT  shift, and go to state 71
+    MULT     shift, and go to state 70
+    DIV      shift, and go to state 71
+    PERCENT  shift, and go to state 72
 
     $default  reduce using rule 40 (additive_expression)
 
@@ -2046,8 +2039,8 @@ State 106
    40                    | additive_expression . MINUS multiplicative_expression
    42 shift_expression: shift_expression LSHIFT additive_expression .
 
-    PLUS   shift, and go to state 72
-    MINUS  shift, and go to state 73
+    PLUS   shift, and go to state 73
+    MINUS  shift, and go to state 74
 
     $default  reduce using rule 42 (shift_expression)
 
@@ -2058,8 +2051,8 @@ State 107
    40                    | additive_expression . MINUS multiplicative_expression
    43 shift_expression: shift_expression RSHIFT additive_expression .
 
-    PLUS   shift, and go to state 72
-    MINUS  shift, and go to state 73
+    PLUS   shift, and go to state 73
+    MINUS  shift, and go to state 74
 
     $default  reduce using rule 43 (shift_expression)
 
@@ -2070,8 +2063,8 @@ State 108
    43                 | shift_expression . RSHIFT additive_expression
    47 relational_expression: relational_expression LESS_OR_EQUAL shift_expression .
 
-    LSHIFT  shift, and go to state 74
-    RSHIFT  shift, and go to state 75
+    LSHIFT  shift, and go to state 75
+    RSHIFT  shift, and go to state 76
 
     $default  reduce using rule 47 (relational_expression)
 
@@ -2082,8 +2075,8 @@ State 109
    43                 | shift_expression . RSHIFT additive_expression
    48 relational_expression: relational_expression MORE_OR_EQUAL shift_expression .
 
-    LSHIFT  shift, and go to state 74
-    RSHIFT  shift, and go to state 75
+    LSHIFT  shift, and go to state 75
+    RSHIFT  shift, and go to state 76
 
     $default  reduce using rule 48 (relational_expression)
 
@@ -2094,8 +2087,8 @@ State 110
    43                 | shift_expression . RSHIFT additive_expression
    46 relational_expression: relational_expression LOGICAL_MORE shift_expression .
 
-    LSHIFT  shift, and go to state 74
-    RSHIFT  shift, and go to state 75
+    LSHIFT  shift, and go to state 75
+    RSHIFT  shift, and go to state 76
 
     $default  reduce using rule 46 (relational_expression)
 
@@ -2106,8 +2099,8 @@ State 111
    43                 | shift_expression . RSHIFT additive_expression
    45 relational_expression: relational_expression LOGICAL_LESS shift_expression .
 
-    LSHIFT  shift, and go to state 74
-    RSHIFT  shift, and go to state 75
+    LSHIFT  shift, and go to state 75
+    RSHIFT  shift, and go to state 76
 
     $default  reduce using rule 45 (relational_expression)
 
@@ -2120,10 +2113,10 @@ State 112
    48                      | relational_expression . MORE_OR_EQUAL shift_expression
    50 equality_expression: equality_expression LOGICAL_EQUALITY relational_expression .
 
-    LESS_OR_EQUAL  shift, and go to state 76
-    MORE_OR_EQUAL  shift, and go to state 77
-    LOGICAL_MORE   shift, and go to state 78
-    LOGICAL_LESS   shift, and go to state 79
+    LESS_OR_EQUAL  shift, and go to state 77
+    MORE_OR_EQUAL  shift, and go to state 78
+    LOGICAL_MORE   shift, and go to state 79
+    LOGICAL_LESS   shift, and go to state 80
 
     $default  reduce using rule 50 (equality_expression)
 
@@ -2136,10 +2129,10 @@ State 113
    48                      | relational_expression . MORE_OR_EQUAL shift_expression
    51 equality_expression: equality_expression LOGICAL_INEQUALITY relational_expression .
 
-    LESS_OR_EQUAL  shift, and go to state 76
-    MORE_OR_EQUAL  shift, and go to state 77
-    LOGICAL_MORE   shift, and go to state 78
-    LOGICAL_LESS   shift, and go to state 79
+    LESS_OR_EQUAL  shift, and go to state 77
+    MORE_OR_EQUAL  shift, and go to state 78
+    LOGICAL_MORE   shift, and go to state 79
+    LOGICAL_LESS   shift, and go to state 80
 
     $default  reduce using rule 51 (equality_expression)
 
@@ -2150,8 +2143,8 @@ State 114
    51                    | equality_expression . LOGICAL_INEQUALITY relational_expression
    53 and_expression: and_expression BITWISE_AND equality_expression .
 
-    LOGICAL_EQUALITY    shift, and go to state 80
-    LOGICAL_INEQUALITY  shift, and go to state 81
+    LOGICAL_EQUALITY    shift, and go to state 81
+    LOGICAL_INEQUALITY  shift, and go to state 82
 
     $default  reduce using rule 53 (and_expression)
 
@@ -2161,7 +2154,7 @@ State 115
    53 and_expression: and_expression . BITWISE_AND equality_expression
    55 exclusive_or_expression: exclusive_or_expression BITWISE_XOR and_expression .
 
-    BITWISE_AND  shift, and go to state 82
+    BITWISE_AND  shift, and go to state 83
 
     $default  reduce using rule 55 (exclusive_or_expression)
 
@@ -2171,7 +2164,7 @@ State 116
    55 exclusive_or_expression: exclusive_or_expression . BITWISE_XOR and_expression
    57 inclusive_or_expression: inclusive_or_expression BITWISE_OR exclusive_or_expression .
 
-    BITWISE_XOR  shift, and go to state 83
+    BITWISE_XOR  shift, and go to state 84
 
     $default  reduce using rule 57 (inclusive_or_expression)
 
@@ -2181,7 +2174,7 @@ State 117
    57 inclusive_or_expression: inclusive_or_expression . BITWISE_OR exclusive_or_expression
    59 logical_and_expression: logical_and_expression LOGICAL_AND inclusive_or_expression .
 
-    BITWISE_OR  shift, and go to state 84
+    BITWISE_OR  shift, and go to state 85
 
     $default  reduce using rule 59 (logical_and_expression)
 
@@ -2191,7 +2184,7 @@ State 118
    59 logical_and_expression: logical_and_expression . LOGICAL_AND inclusive_or_expression
    61 logical_or_expression: logical_or_expression LOGICAL_OR logical_and_expression .
 
-    LOGICAL_AND  shift, and go to state 85
+    LOGICAL_AND  shift, and go to state 86
 
     $default  reduce using rule 61 (logical_or_expression)
 
@@ -2300,8 +2293,8 @@ State 126
 
     CONSTANT                   go to state 17
     primary_expression         go to state 18
-    postfix_expression         go to state 43
-    unary_expression           go to state 20
+    postfix_expression         go to state 19
+    unary_expression           go to state 68
     UNARY_OPERATOR             go to state 21
     cast_expression            go to state 22
     multiplicative_expression  go to state 23

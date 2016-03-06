@@ -17,23 +17,25 @@ using std::string;
 */
 
 enum StatementT{
-	stat_fn_def = 1,
-	stat_loop = 2,
-	stat_fn_call = 3,
+	// Block Statements
+	ST_fn_def = 1,
+	ST_loop = 2,
+	ST_fn_call = 3,
 	// function_prototype = 4; // maybe??
-	stat_conditional = 5,
-	stat_conditional_case = 6,
-	stat_expression = 7,
-	stat_var_declaration = 8,
-	stat_constant = 9,
-	stat_exprstat = 10
-};
-
-enum VarT{
-	int_type 	= 248,
-	double_type = 247,
-	char_type	= 246,
-	void_type	= 245
+	ST_conditional = 5,
+	ST_conditional_case = 6,
+	ST_var_declaration_container = 7,
+	
+	// Expressions
+	ST_expression = 20,
+	ST_expr_statement = 21,
+	ST_constant = 22,
+	ST_var_declaration = 23,
+	ST_var_expr = 24,
+	ST_var_return = 25,
+	ST_var_fn_param = 26,
+	ST_base_expr = 27,
+	ST_ternery_expr = 28
 };
 
 union NumT{

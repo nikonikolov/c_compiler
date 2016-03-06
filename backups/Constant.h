@@ -3,11 +3,11 @@
 
 #include <cstdint>
 #include <string.h>
-#include "BaseExpression.h"
+#include "Expression.h"
 
 
 template<class Type>
-class Constant : public BaseExpression{
+class Constant : public Expression{
 
 public:
 	Constant(const Type& num_val);
@@ -29,7 +29,7 @@ private:
 
 template<class Type>
 Constant<Type>::Constant(const Type& num_val_in) :
-	BaseExpression(ST_constant), num_val(num_val_in){}
+	Expression(ST_constant), num_val(num_val_in){}
 
 template<class Type>
 Constant<Type>::~Constant(){}

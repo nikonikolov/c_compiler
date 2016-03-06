@@ -137,37 +137,37 @@ Preprocessor 			^#[ ].+$
 %%
 [\n]				{ input_file_line++; source_file_line++; }
 [ ]|[\t]			{ }
-auto				{ return AUTO; }
-double				{ return DOUBLE; }
-int					{ return INT; }
-struct				{ return STRUCT; }
-break				{ return BREAK; }
-else				{ return ELSE; }
-long				{ return LONG; }
-switch				{ return SWITCH; }
-case				{ return CASE; }
-enum				{ return ENUM; }
-register			{ return REGISTER; }
-typedef				{ return TYPEDEF; }
-char				{ return CHAR; }
-extern				{ return EXTERN; }
-return				{ return RETURN; }
-union				{ return UNION; }
-const				{ return CONST; }
-float				{ return FLOAT; }
-short				{ return SHORT; }
-unsigned			{ return UNSIGNED; }
-continue			{ return CONTINUE; }
-for					{ return FOR; }
-signed				{ return SIGNED; }
-void				{ return VOID; }
-default				{ return DEFAULT; }
-goto				{ return GOTO; }
-volatile			{ return VOLATILE; }
-do					{ return DO; }
-if					{ return IF; }
-static				{ return STATIC; }
-while				{ return WHILE; }
+auto				{ yylval.strval = strdup(yytext); return AUTO; }
+double				{ yylval.strval = strdup(yytext); return DOUBLE; }
+int					{ yylval.strval = strdup(yytext); return INT; }
+struct				{ yylval.strval = strdup(yytext); return STRUCT; }
+break				{ yylval.strval = strdup(yytext); return BREAK; }
+else				{ yylval.strval = strdup(yytext); return ELSE; }
+long				{ yylval.strval = strdup(yytext); return LONG; }
+switch				{ yylval.strval = strdup(yytext); return SWITCH; }
+case				{ yylval.strval = strdup(yytext); return CASE; }
+enum				{ yylval.strval = strdup(yytext); return ENUM; }
+register			{ yylval.strval = strdup(yytext); return REGISTER; }
+typedef				{ yylval.strval = strdup(yytext); return TYPEDEF; }
+char				{ yylval.strval = strdup(yytext); return CHAR; }
+extern				{ yylval.strval = strdup(yytext); return EXTERN; }
+return				{ yylval.strval = strdup(yytext); return RETURN; }
+union				{ yylval.strval = strdup(yytext); return UNION; }
+const				{ yylval.strval = strdup(yytext); return CONST; }
+float				{ yylval.strval = strdup(yytext); return FLOAT; }
+short				{ yylval.strval = strdup(yytext); return SHORT; }
+unsigned			{ yylval.strval = strdup(yytext); return UNSIGNED; }
+continue			{ yylval.strval = strdup(yytext); return CONTINUE; }
+for					{ yylval.strval = strdup(yytext); return FOR; }
+signed				{ yylval.strval = strdup(yytext); return SIGNED; }
+void				{ yylval.strval = strdup(yytext); return VOID; }
+default				{ yylval.strval = strdup(yytext); return DEFAULT; }
+goto				{ yylval.strval = strdup(yytext); return GOTO; }
+volatile			{ yylval.strval = strdup(yytext); return VOLATILE; }
+do					{ yylval.strval = strdup(yytext); return DO; }
+if					{ yylval.strval = strdup(yytext); return IF; }
+static				{ yylval.strval = strdup(yytext); return STATIC; }
+while				{ yylval.strval = strdup(yytext); return WHILE; }
 sizeof				{ yylval.strval = strdup(yytext); return SIZEOF; }
 {Identifier}		{ yylval.strval = strdup(yytext); return IDENTIFIER; }
 {Floating_const}	{ yylval.floatval = to_double64(yytext); return FLOATING_CONST; }

@@ -1,0 +1,24 @@
+int zz(int a, int b, int c){
+	a;
+	a+b;
+	a*b-c;
+	a*b-c/g*g%h-b+(a|b);
+	b%=a*b-c/g*g%h-b+(a|b);
+	b/=a*b-c/g*g%h-b+(a|b);
+	b*=a*b-c/g*g%h-b+(a|b);
+	b+=a*b-c/g*g%h-b+(a|b);
+	b-=a*b-c/g*g%h-b+(a|b);
+	b&=a*b-c/g*g%h-b+(a|b);
+	b|=a*b-c/g*g%h-b+(a|b);
+	b<<=a*b-c/g*g%h-b+(a|b);
+	b>>=a*b-c/g*g%h-b+(a|b);
+	b^=a*b-c/g*g%h-b+(a|b);
+	b=a*b-c/g*g%h-b+(a|b);
+	a=-b;
+	a=+b;
+	b=a*b-c/g*g%h-b+(a++);
+	b=a*b-c/g*g%h-b+(a--);
+	b=a*b-c/g*g%h-b+(--a);
+	b=a*b-c/g*g%h-b+(++a);
+}
+

@@ -2,10 +2,10 @@
 
 
 ConditionalCase::ConditionalCase(vector<Statement*>* statements_in, Statement* condition_in /*= NULL*/) :
-	Statement(stat_conditional_case), single_statement(NULL), statements(statements_in), condition(condition_in) {}
+	Statement(ST_conditional_case), single_statement(NULL), statements(statements_in), condition(condition_in) {}
 
 ConditionalCase::ConditionalCase(Statement* single_statement_in, Statement* condition_in /*= NULL*/) :
-	Statement(stat_conditional_case), single_statement(single_statement_in), statements(NULL), condition(condition_in){}
+	Statement(ST_conditional_case), single_statement(single_statement_in), statements(NULL), condition(condition_in){}
 
 
 ConditionalCase::~ConditionalCase(){
@@ -41,7 +41,7 @@ void ConditionalCase::pretty_print(const int& indent) const{
 
 
 
-Conditional::Conditional(vector<ConditionalCase*>* conditions_in) : Statement(stat_conditional), conditions(conditions_in) {}
+Conditional::Conditional(vector<ConditionalCase*>* conditions_in) : Statement(ST_conditional), conditions(conditions_in) {}
 
 Conditional::~Conditional(){
 	//if(conditions!=NULL) delete conditions;

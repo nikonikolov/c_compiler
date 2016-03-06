@@ -1,7 +1,7 @@
 #include "Loop.h"
 
-Loop::Loop(vector<Statement*>* statements_in) : Statement(stat_loop), statements(statements_in), single_statement(NULL) {}
-Loop::Loop(Statement* single_statement_in) : Statement(stat_loop), statements(NULL), single_statement(single_statement_in) {}
+Loop::Loop(vector<Statement*>* statements_in) : Statement(ST_loop), statements(statements_in), single_statement(NULL) {}
+Loop::Loop(Statement* single_statement_in) : Statement(ST_loop), statements(NULL), single_statement(single_statement_in) {}
 
 Loop::~Loop(){
 	if(single_statement!=NULL) delete single_statement;

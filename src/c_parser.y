@@ -76,10 +76,10 @@
 
 /* ---------------------------------------------- DECALRATION TYPES -------------------------------------------- */
 
-%type <vector_vars_ptrs_ptr> fn_params_list initialization_list init_declarator_list
+%type <vector_vars_ptrs_ptr> fn_params_list init_declarator_list
 
 %type <var_ptr> init_declarator direct_declarator declarator
-%type <base_expr_ptr> initializer
+%type <base_expr_ptr> initializer initializer_list
 
 /* ---------------------------------------------- STATEMENT TYPES -------------------------------------------- */
 
@@ -210,6 +210,9 @@ type_name : INT                                       { $$ = $1; }
 
 /* ===================================================================================================================== */
 
+
+/* -------------------------------------------- VARIABLE DECLARATIONS ------------------------------------------ */
+
 // Declaration of a variable
 /* Original Version
 declaration : declaration_type init_declarator_list SEMI_COLON              { $$ = new VarDeclaration('int', $2); }
@@ -220,7 +223,7 @@ declaration : declaration_type init_declarator_list SEMI_COLON              { $$
 
 declaration : INT init_declarator_list SEMI_COLON              { $$ = new VarDeclaration($1, $2); }
             // Allowed but not sensible. Simply ignore
-            | INT SEMI_COLON   { cerr<<"Useless definition in file "<<source_file<<", Line: "<<input_file_line<<endl;}
+            | INT SEMI_COLON   { cerr<<"Warning: Useless definition in file "<<source_file<<", Line: "<<input_file_line<<endl;}
             ;
 
 // Any combination of type specifier(int, struct, etc), storage specifier(register, auto, etc) and type qualifier (const, volatile)
@@ -269,7 +272,7 @@ direct_declarator : IDENTIFIER                                      { $$ = new V
 
 // RHS of variable initialization
 initializer // Expression value for a variable              
-            : assignment_expression                                 { $$= $1;}
+            : assignment_expression                                 { $$ = $1;}
 
             /* Options are to make a function that appends the lists properly, or to use the lhs pointers only of the first column
               Note this means you can probably use TerneryExpressions only for the first column, but not obligatory. Some
@@ -281,35 +284,9 @@ initializer // Expression value for a variable
             ;
 
 // List for array elements initialization
-initializer_list  : initializer
-                  | initializer_list COMMA initializer
+initializer_list  : initializer                                     { /*$$ = new TerneryExpression(NULL,$1,NULL);*/}
+                  | initializer_list COMMA initializer              { /*$$ = $1; $$->push_back_rhs($3);*/}
                   ;
-
-/* -------------------------------------------- VARIABLE DECLARATIONS ------------------------------------------ */
-/* You need to define declaration here so that compound statement works. For the final version add other types as well 
-    e.g. double, float, char, arrays, pointers, function pointers. You should also try to make structs work. Remember that
-    arrays can be defined at initialization. You can try long and const as well. Question - can you cast variables on declaration? */
-
-// Currently only INTs covered
-/*declaration   : INT initialization_list SEMI_COLON                              { $$ = new VarDeclaration(int_type, $2);}
-              ;
-
-// arrays and pointers not currently accounted for
-initialization_list : bracketed_identifier                              { $$ = new vector<Variable>; $$->push_back(Variable($1));}
-                    | assignment_expression                             { $$ = new vector<Variable>; $$->push_back(Variable($1));}
-                    | initialization_list COMMA assignment_expression   { $$->push_back(Variable($3));}
-                    | initialization_list COMMA bracketed_identifier    { $$->push_back(Variable($3));}
-                    ;
-
-
-
-
-
-assignment_expression_list  : assignment_expression              
-                            | assignment_expression_list COMMA assignment_expression        
-                            ;
-*/
-// Repair
 
 
 /* ===================================================================================================================== */

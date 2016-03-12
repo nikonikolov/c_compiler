@@ -9,12 +9,12 @@ public:
 	Expression(BaseExpression* lhs_in, char* oper_in, BaseExpression* rhs_in);
 	~Expression();
 
-	NumT eval();
-	void pretty_print(const int& indent) const;
-
 	void set_lhs(Expression* lhs_in);	
 	void set_rhs(Expression* rhs_in);
 
+	NumT eval();
+	void pretty_print(const int& indent) const;
+	void renderasm();
 private:
 	char* oper;
 	BaseExpression* lhs;

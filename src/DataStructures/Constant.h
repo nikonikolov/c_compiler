@@ -12,9 +12,9 @@ class Constant : public BaseExpression{
 public:
 	Constant(const Type& num_val);
 	~Constant();
+
 	void pretty_print(const int& indent) const;
-
-
+	void renderasm();
 
 private:
 	// Note: you can extract the exact type from the name of the Temaplate Type
@@ -40,3 +40,7 @@ void Constant<Type>::pretty_print(const int& indent) const{
 	cout<<num_val;
 }
 
+template<class Type>
+void Constant<Type>::renderasm(){
+	return;
+}

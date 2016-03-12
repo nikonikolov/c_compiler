@@ -41,3 +41,6 @@ void VarDeclaration::pretty_print(const int& indent) const{
 }
 
 
+void VarDeclaration::renderasm(){
+	return;
+}

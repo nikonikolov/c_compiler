@@ -15,6 +15,7 @@ public:
 	~ConditionalCase();
 
 	void pretty_print(const int& indent) const;
+	void renderasm();
 private:
 	/* 
 	NOTE: All vector pointers point to dynamically allocated vectors. In case of vector of Statement* 
@@ -40,6 +41,7 @@ public:
 	~Conditional();
 
 	void pretty_print(const int& indent) const;
+	void renderasm();
 private:
 	/* 
 	NOTE: All vector pointers point to dynamically allocated vectors. In case of vector of Statement* 

@@ -10,7 +10,7 @@ CONSTANT_EXPRESSION : CONDITIONAL_EXPRESSION ;
 
 declaration : declaration_type init_declarator_list
             // Allowed but not sensible. Simply ignore
-            | declaration_type        { cerr<<"Useless definition in file "<<source_file<<", Line: "<<input_file_line<<endl;}
+            | declaration_type     { cerr<<"Warning: Useless definition in file "<<source_file<<", Line: "<<input_file_line<<endl;}
             ;
 
 // Any combination of type specifier(int, struct, etc), storage specifier(register, auto, etc) and type qualifier (const, volatile)

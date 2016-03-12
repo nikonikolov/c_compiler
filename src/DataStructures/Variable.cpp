@@ -57,11 +57,6 @@ const char* Variable::get_name() const{
 	return name;
 }
 
-void Variable::pretty_print(const int& indent) const{
-	string white_space;
-	white_space.resize(indent, ' ');
-	cout<<white_space<<name;
-}
 
 // You should probably use a tuple of 3 rather than a pair. 
 //The third code should tell you how to deduce the size. Do it when pointers come up
@@ -74,5 +69,19 @@ void Variable::dereference_front(BaseExpression* expr_in, const int& size/*=INTN
 	if(dereferencer==NULL) dereferencer = new list<PtrDeref>;
 	dereferencer->push_front(PtrDeref(expr_in,size));
 }
+
+
+void Variable::pretty_print(const int& indent) const{
+	string white_space;
+	white_space.resize(indent, ' ');
+	cout<<white_space<<name;
+}
+
+
+void Variable::renderasm(){
+	return;
+}
+
+
 
 

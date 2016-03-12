@@ -12,6 +12,7 @@ public:
 	Function(Variable* return_type_in, char* name_in, vector<Variable*>* params_in, vector<Statement*>* statements_in);
 	~Function();
 
+	void renderasm();
 	void pretty_print(const int& indent) const;
 private:
 	

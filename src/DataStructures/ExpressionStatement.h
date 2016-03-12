@@ -14,6 +14,7 @@ public:
 	void push_back(BaseExpression* expr_in);
 
 	void pretty_print(const int& indent) const;
+	void renderasm();
 private:
 	
 	vector<BaseExpression*>* expr_list;

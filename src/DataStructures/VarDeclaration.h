@@ -19,6 +19,8 @@ public:
 	void set_types(char* type_name_in);
 
 	void pretty_print(const int& indent) const;
+	void renderasm();
+	
 private:
 
 	vector<Variable*>* variables;			// Pointer to a vector of the variables defined

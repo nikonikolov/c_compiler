@@ -40,6 +40,10 @@ void ConditionalCase::pretty_print(const int& indent) const{
 }
 
 
+void ConditionalCase::renderasm(){
+}
+
+
 
 Conditional::Conditional(vector<ConditionalCase*>* conditions_in) : Statement(ST_conditional), conditions(conditions_in) {}
 
@@ -63,4 +67,8 @@ void Conditional::pretty_print(const int& indent) const{
 		if(*it!=NULL) (*it)->pretty_print(indent);
 	}
 
+}
+
+
+void Conditional::renderasm(){
 }

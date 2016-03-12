@@ -33,13 +33,15 @@ public:
 	void set_init_val(BaseExpression* init_val_in);
 	const char* get_name() const;
 	
-	void pretty_print(const int& indent) const;
-	
 	// You should probably use a tuple of 3 rather than a pair. 
 	//The third code should tell you how to deduce the size. Do it when pointers come up
 	void dereference_back(BaseExpression* expr_in, const int& size=INTNAN);
 	void dereference_front(BaseExpression* expr_in, const int& size=INTNAN);
 
+
+	void pretty_print(const int& indent) const;
+	void renderasm();
+	
 private:
 	/* 	Template version instead of using var_type would not be a good idea since you would not know the types of Variables
 		appearing in BaseExpressions. Enum type instead of string would not be useful as well because you won't be able to

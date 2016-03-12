@@ -48,3 +48,18 @@ void Function::pretty_print(const int& indent) const{
 }
 
 
+void Function::renderasm(){
+	/* Function header assembly */
+	cout<<"\t.align	2"<<endl;
+	cout<<"\t.globl "<<name<<endl;		// This has to be ommitted for functions declared static
+	cout<<"\t.ent "<<name<<endl;
+	cout<<"\t.type "<<name<<", @function"<<endl;
+
+
+
+	/* Function end assembly */
+	cout<<endl<<"\t.end "<<name<<endl<<endl;
+}
+
+
+

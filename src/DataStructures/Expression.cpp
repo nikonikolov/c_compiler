@@ -44,3 +44,9 @@ void Expression::pretty_print(const int& indent) const{
 
 	//if(indent!=0) cout<<endl;
 }
+
+
+
+
+void Expression::renderasm(){
+}

@@ -8,3 +8,6 @@ ctest
 syntaxtest.c
 tmp
 tmp/*
+test_asm/*
+test_asm
+mips-iv.pdf

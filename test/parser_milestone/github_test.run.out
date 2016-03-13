@@ -1,9 +1,8 @@
-FUNCTION : x
-SCOPE
 VARIABLE : g
 VARIABLE : b
 VARIABLE : d
 VARIABLE : f
+FUNCTION : x
 FUNCTION : zz
     PARAM : a
     PARAM : b
@@ -12,7 +11,9 @@ SCOPE
     (a)=(b)
     SCOPE
         VARIABLE : fsdfsdfs
+        RETURN (a)==(b)
     SCOPE
         (a)=(b)
     SCOPE
         (a)=(b)
+    RETURN (a)==(b)

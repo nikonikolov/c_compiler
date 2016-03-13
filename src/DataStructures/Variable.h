@@ -50,11 +50,9 @@ private:
 	*/
 	
 	char* type_name;				// Contains the typename of the variable, i.e. int, double, etc. No * or []
-	NumT num_val;					// Contains the numerical value of token_val cast to the specified type
+	snum_t num_val;					// Contains the numerical value of token_val cast to the specified type
 	char* name;						// Name given to the variable in the program
-	char* assembler_name;			// Name associated with the assembler code
-	uint32_t address;				// Contains the address of the variable 
-	BaseExpression* init_val;			// Contains the value to be assigned to the variable at initialization
+	BaseExpression* init_val;		// Contains the value to be assigned to the variable at initialization
 	
 	
 	/* 	The following structure allows for describing Variables appearing both in declarations or in BaseExpressions.

@@ -25,6 +25,8 @@ enum StatementT{
 	ST_conditional = 5,
 	ST_conditional_case = 6,
 	ST_var_declaration_container = 7,
+	ST_return = 7,
+	ST_compound = 8,
 	
 	// Expressions
 	ST_expression = 20,
@@ -38,10 +40,26 @@ enum StatementT{
 	ST_ternery_expr = 28
 };
 
-union NumT{
-	int 	intval;
-	double 	doubleval;
 
+
+union unum_t{
+	long double ldoubleval;
+	double 	doubleval;
+	float 	floatval;
+	int 	intval;
+};
+
+// NOTE: Order by precedence
+enum enumt{
+	tldouble = 100,
+	tdouble = 98,
+	tfloat = 96,
+	tint = 80
+};
+
+struct snum_t{
+	enumt tname;	// identifies which member the union currently employs
+	unum_t number;	// the union itself
 };
 
 class Statement{

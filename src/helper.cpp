@@ -2,7 +2,7 @@
 
 int input_file_line=1;
 int source_file_line=1;
-std::string source_file="program input file";
+std::string source_file="input source file";
 
 void process_prep_include(const std::string& content){
   stringstream ss;

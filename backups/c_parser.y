@@ -8,6 +8,9 @@
   #include "DataStructures/Constant.h"
   #include "DataStructures/Conditional.h"
   #include "DataStructures/VarDeclaration.h"
+  #include "DataStructures/ReturnStatement.h"
+  #include "DataStructures/BaseExpression.h"
+  #include "DataStructures/TerneryExpression.h"
   #include "DataStructures/Expression.h"
   #include "DataStructures/ExpressionStatement.h"
   
@@ -37,7 +40,7 @@
   
   Function* fn_ptr;
   Statement* statement_ptr;
-  Expression* expr_ptr;
+  BaseExpression* base_expr_ptr;
   ExpressionStatement* expr_statement_ptr;
 }
 
@@ -74,16 +77,17 @@
 
 /* ---------------------------------------------- DECALRATION TYPES -------------------------------------------- */
 
-%type <vector_vars_ptrs_ptr> fn_params_list initialization_list init_declarator_list
+%type <vector_vars_ptrs_ptr> fn_params_list init_declarator_list
 
 %type <var_ptr> init_declarator direct_declarator declarator
-%type <expr_ptr> initializer
+%type <base_expr_ptr> initializer initializer_list
 
 /* ---------------------------------------------- STATEMENT TYPES -------------------------------------------- */
 
 %type <strval> bracketed_identifier
 
 %type <statement_ptr> loop for_loop while_loop do_while_loop if_block_statement fn_declaration declaration statement 
+%type <statement_ptr> semi_colon_statement return_statement 
 
 %type <vector_statement_pointers_ptr> compound_statement declaration_list statement_list
 
@@ -93,10 +97,10 @@
 
 /* ---------------------------------------------- EXPRESSION TYPES -------------------------------------------- */
 
-%type <expr_ptr> CONSTANT primary_expression postfix_expression unary_expression cast_expression expression
-%type <expr_ptr> multiplicative_expression additive_expression shift_expression relational_expression equality_expression
-%type <expr_ptr> and_expression inclusive_or_expression exclusive_or_expression logical_and_expression logical_or_expression
-%type <expr_ptr> conditional_expression assignment_expression 
+%type <base_expr_ptr> CONSTANT primary_expression postfix_expression unary_expression cast_expression expression
+%type <base_expr_ptr> multiplicative_expression additive_expression shift_expression relational_expression equality_expression
+%type <base_expr_ptr> and_expression inclusive_or_expression exclusive_or_expression logical_and_expression logical_or_expression
+%type <base_expr_ptr> conditional_expression assignment_expression 
 %type <expr_statement_ptr> expression_list 
 
 %type <statement_ptr> expression_statement 
@@ -194,20 +198,38 @@ enumerator  : ENUMERATION_CONSTANT
 ENUMERATION_CONSTANT : IDENTIFIER ;           
 */
 
+
+/* -------------------------------------------- TYPE NAMES AND SPECIFIERS ------------------------------------------ */
+
+type_name : INT                                       { $$ = $1; }
+          | DOUBLE                                    { $$ = $1; }
+          | CHAR                                      { $$ = $1; }
+          ;
+
 /* ===================================================================================================================== */
 
 /* ============================================== 3.5 DECLARATIONS ============================================== */
 
 /* ===================================================================================================================== */
 
+
+/* -------------------------------------------- VARIABLE DECLARATIONS ------------------------------------------ */
+
 // Declaration of a variable
+/* Original Version
 declaration : declaration_type init_declarator_list SEMI_COLON              { $$ = new VarDeclaration('int', $2); }
             // Allowed but not sensible. Simply ignore
             | declaration_type SEMI_COLON   { cerr<<"Useless definition in file "<<source_file<<", Line: "<<input_file_line<<endl;}
             ;
+*/
+
+declaration : INT init_declarator_list SEMI_COLON              { $$ = new VarDeclaration($1, $2); }
+            // Allowed but not sensible. Simply ignore
+            | INT SEMI_COLON   { cerr<<"Warning: Useless definition in file "<<source_file<<", Line: "<<input_file_line<<endl;}
+            ;
 
 // Any combination of type specifier(int, struct, etc), storage specifier(register, auto, etc) and type qualifier (const, volatile)
-declaration_type  : TYPE_SPECIFIER
+/*declaration_type  : TYPE_SPECIFIER
                   | TYPE_SPECIFIER declaration_type
                   // Can try making constants work at some point
                   //| TYPE_QUALIFIER
@@ -216,10 +238,10 @@ declaration_type  : TYPE_SPECIFIER
                   //| STORAGE_SPECIFIER 
                   //| STORAGE_SPECIFIER declaration_type
                   ;
-
+*/
 // Initialization list (List of variable declarations)
-init_declarator_list  : init_declarator
-                      | init_declarator_list COMMA init_declarator 
+init_declarator_list  : init_declarator                                   { $$ = new vector<Variable*>; $$->push_back($1); }
+                      | init_declarator_list COMMA init_declarator        { $$->push_back($3); }
                       ;
                       
 // Variable name and initialization/value (if provided) at declaration
@@ -237,10 +259,11 @@ declarator  : direct_declarator                                     { $$ = $1; }
 // NB make a separate grammmar for function declarations and prototypes - they are definitely not the same as variables
 // Variable name, Array cell or function
 direct_declarator : IDENTIFIER                                      { $$ = new Variable($1, ST_var_declaration); }
-                  | LBRACKET declarator RBRACKET                    { $$ = $1; }
+                  | LBRACKET declarator RBRACKET                    { $$ = $2; }
                   // Array cell
-                  | direct_declarator LSQUARE constant_expression RSQUARE     { $$= $1; $$->dereference_back($3); }
-                  | direct_declarator LSQUARE RSQUARE               { $$= $1; $$->dereference_back(new Constant<int>(0));}
+                  //| direct_declarator LSQUARE constant_expression RSQUARE     { $$= $1; $$->dereference_back($3); }
+                  //| direct_declarator LSQUARE RSQUARE               { $$= $1; $$->dereference_back(new Constant<int>(0));}
+                  
                   // Function declaration: name and arguments
                   //| direct_declarator LBRACKET parameter_type_list RBRACKET
                   //| direct_declarator LBRACKET identifier_list RBRACKET
@@ -251,47 +274,21 @@ direct_declarator : IDENTIFIER                                      { $$ = new V
 
 // RHS of variable initialization
 initializer // Expression value for a variable              
-            : assignment_expression                                     { $$= $1;}
+            : assignment_expression                                 { $$ = $1;}
+
+            /* Options are to make a function that appends the lists properly, or to use the lhs pointers only of the first column
+              Note this means you can probably use TerneryExpressions only for the first column, but not obligatory. Some
+              additional functions will be needed in Ternery Expression. You will also need to repair it's pretty print */
             // 1D array initialization
-            | LCURLY initializer_list RCURLY
+            | LCURLY initializer_list RCURLY    
             // 2D array initialization
             | LCURLY initializer_list COMMA RCURLY
             ;
 
 // List for array elements initialization
-initializer_list  : initializer
-                  | initializer_list COMMA initializer
+initializer_list  : initializer                                     { /*$$ = new TerneryExpression(NULL,$1,NULL);*/}
+                  | initializer_list COMMA initializer              { /*$$ = $1; $$->push_back_rhs($3);*/}
                   ;
-
-/* -------------------------------------------- VARIABLE DECLARATIONS ------------------------------------------ */
-/* You need to define declaration here so that compound statement works. For the final version add other types as well 
-    e.g. double, float, char, arrays, pointers, function pointers. You should also try to make structs work. Remember that
-    arrays can be defined at initialization. You can try long and const as well. Question - can you cast variables on declaration? */
-
-// Currently only INTs covered
-declaration   : INT initialization_list SEMI_COLON                              { $$ = new VarDeclaration(int_type, $2);}
-              ;
-
-// arrays and pointers not currently accounted for
-initialization_list : bracketed_identifier                              { $$ = new vector<Variable>; $$->push_back(Variable($1));}
-                    | assignment_expression                             { $$ = new vector<Variable>; $$->push_back(Variable($1));}
-                    | initialization_list COMMA assignment_expression   { $$->push_back(Variable($3));}
-                    | initialization_list COMMA bracketed_identifier    { $$->push_back(Variable($3));}
-                    ;
-
-
-
-
-
-assignment_expression_list  : assignment_expression              
-                            | assignment_expression_list COMMA assignment_expression        
-                            ;
-
-// Repair
-type_name : INT                                       { $$ = $1; }
-          | DOUBLE                                    { $$ = $1; }
-          | CHAR                                      { $$ = $1; }
-          ;
 
 
 /* ===================================================================================================================== */
@@ -356,7 +353,8 @@ unary_expression  // Reduction to Level 1
                   // Sizeof 
                   | SIZEOF unary_expression                                             { $$ = new Expression(NULL, $1, $2);}
                   // Sizeof type
-                  | SIZEOF LBRACKET type_name RBRACKET                                  //{ $$ = new Expression(NULL, $1, $3);}
+                  //| SIZEOF LBRACKET type_name RBRACKET                                  //{ $$ = new Expression(NULL, $1, $3);}
+                  | SIZEOF LBRACKET INT RBRACKET                                        { $$ = new Constant<int>(sizeof(int));}
                   ;
 
 UNARY_OPERATOR  // Address-of
@@ -554,13 +552,12 @@ expression_list // Reduction to Level 14
 
 // You need to modify the grammar for return type and Variable* to be returned from the reduction of the rule
 fn_declaration  : INT IDENTIFIER LBRACKET fn_params_list RBRACKET compound_statement          
-                                                      { $$ = new Function(new Variable('int', ST_var_return), $2, $4, $6); }
+                                                      { $$ = new Function(new Variable($1, ST_var_return), $2, $4, $6); }
                 ;
 
 fn_params_list  : INT bracketed_identifier                      { $$ = new vector<Variable*>; 
-                                                                  $$->push_back(new Variable('int', $2, ST_var_fn_param));}
-
-                | fn_params_list COMMA INT bracketed_identifier { $$->push_back(new Variable('int', $4, ST_var_fn_param)); }
+                                                                  $$->push_back(new Variable($1, $2, ST_var_fn_param));}
+                | fn_params_list COMMA INT bracketed_identifier { /*$$=$1; */$$->push_back(new Variable($3, $4, ST_var_fn_param)); }
                 |                                               { $$ = NULL; }
                 ;   
 
@@ -695,7 +692,7 @@ statement_list  : statement                                         { $$ = new v
 statement : loop                                                    { $$=$1; }
           | if_block_statement                                      { $$=$1; }
           | expression_statement                                    { $$=$1; }
-          | semi_colon_statement                                    { $$=NULL; }
+          | semi_colon_statement                                    { $$=$1; }
           ;
 
 
@@ -704,8 +701,8 @@ expression_statement  : expression_list SEMI_COLON                  { $$ = $1;}
                       ;
 
 /* ---------------------------------------------- SEMI COLON STATEMENTS -------------------------------------------- */
-semi_colon_statement  : return_statement
-                      | SEMI_COLON
+semi_colon_statement  : return_statement                            { $$=$1;}
+                      | SEMI_COLON                                  { $$=NULL;}
                       ;
 
 /* --------------------------------------------- 3.6.6 JUMP STATEMENTS ------------------------------------------- */
@@ -716,8 +713,8 @@ semi_colon_statement  : return_statement
                 | RETURN SEMI_COLON
                 ;
 */
-return_statement  : RETURN equality_expression SEMI_COLON
-                  | RETURN SEMI_COLON
+return_statement  : RETURN expression SEMI_COLON                    { $$ = new ReturnStatement($2);}
+                  | RETURN SEMI_COLON                               { $$ = new ReturnStatement();}
                   ;
 
 

@@ -41,7 +41,7 @@ private:
 	*/
 	
 	char* type_name;				// Contains the typename of the variable, i.e. int, double, etc. No * or []
-	NumT num_val;					// Contains the numerical value of token_val cast to the specified type
+	snum_t num_val;					// Contains the numerical value of token_val cast to the specified type
 	char* name;						// Name given to the variable in the program
 	char* assembler_name;			// Name associated with the assembler code
 	uint32_t address;				// Contains the address of the variable 
@@ -57,6 +57,11 @@ private:
 		If you encounter a simple * in the parser, then push back a Constant equal to 0. 
 		The size of the list specifies how many times you need to dereference the variable
 	*/
+
+
+	/* Fields for assembly */
+	string location;				// Holds the location of the variable, e.g. 4($sp) or $t0
+
 };
 
 

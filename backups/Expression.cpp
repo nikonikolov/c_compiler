@@ -10,7 +10,7 @@ Expression::~Expression(){
 	if(rhs!=NULL) delete rhs;
 }
 
-NumT Expression::eval(){
+snum_t Expression::eval(){
 	// use recursion
 	// return type might be a memory location as well??
 }

@@ -22,7 +22,7 @@ TerneryExpression::~TerneryExpression(){
 	if(mid!=NULL) delete mid;
 }
 
-NumT TerneryExpression::eval(){
+snum_t TerneryExpression::eval(){
 	//return mid->eval();
 }
 

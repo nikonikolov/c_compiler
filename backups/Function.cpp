@@ -1,12 +1,9 @@
 #include "Function.h"
 
-
-Function::Function(Variable* return_type_in, char* name_in, vector<Variable*>* params_in, CompoundStatement* fn_body_in) :
-	return_type(return_type_in), params(params_in), fn_body(fn_body_in){
+Function::Function(Variable* return_type_in, char* name_in, vector<Variable*>* params_in, vector<Statement*>* statements_in) :
+	Statement(ST_fn_def), return_type(return_type_in), params(params_in), statements(statements_in) {
 	name=strdup(name_in);
 }
-
-
 
 Function::~Function(){
 	if(params!=NULL){
@@ -18,7 +15,14 @@ Function::~Function(){
 		delete params;
 	}
 
-	if(fn_body!=NULL) delete fn_body;
+	if(statements!=NULL){
+		vector<Statement*>::iterator it;
+		for(it=statements->begin(); it!=statements->end(); ++it){
+			delete *it;
+		}
+
+		delete statements;
+	}
 }
 
 void Function::pretty_print(const int& indent) const{
@@ -32,9 +36,15 @@ void Function::pretty_print(const int& indent) const{
 			cout<<white_space<<new_scope_indent<<"PARAM : "<<(*it)->get_name()<<endl;
 		}
 	} 
+	cout<<white_space<<"SCOPE"<<endl;
 
-	if(fn_body!=NULL) fn_body->pretty_print(indent);
+	if(statements==NULL) return;
 
+	// Print variables and statements defined inside the function
+	vector<Statement*>::iterator it;
+	for(it=statements->begin(); it!=statements->end(); ++it){
+		if(*it!=NULL) (*it)->pretty_print(indent+4);
+	}
 }
 
 
@@ -52,11 +62,11 @@ void Function::renderasm(){
 }
 
 
-/*
+
 void Function::prep_for_asm(){
 
 	vector<Statement*>::iterator it;
 	for(it=statements->begin(); it!=statements->end() || (*it)->get_stat_type==var_declaration_container ; ++it){
 		
 	}
-}*/
+}

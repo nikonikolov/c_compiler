@@ -91,7 +91,7 @@ Grammar
    41                 | MINUS_MINUS unary_expression
    42                 | UNARY_OPERATOR cast_expression
    43                 | SIZEOF unary_expression
-   44                 | SIZEOF LBRACKET type_name RBRACKET
+   44                 | SIZEOF LBRACKET INT RBRACKET
 
    45 UNARY_OPERATOR: BITWISE_AND
    46               | MULT
@@ -201,8 +201,8 @@ Grammar
   124 else_statement_list: else_statement
   125                    | else_statement_list else_statement
 
-  126 if_statement: IF LBRACKET equality_expression RBRACKET compound_statement
-  127             | IF LBRACKET equality_expression RBRACKET statement
+  126 if_statement: IF LBRACKET expression RBRACKET compound_statement
+  127             | IF LBRACKET expression RBRACKET statement
 
   128 else_statement: ELSE compound_statement
   129               | ELSE statement
@@ -228,7 +228,7 @@ Grammar
   143 semi_colon_statement: return_statement
   144                     | SEMI_COLON
 
-  145 return_statement: RETURN equality_expression SEMI_COLON
+  145 return_statement: RETURN expression SEMI_COLON
   146                 | RETURN SEMI_COLON
 
 
@@ -238,7 +238,7 @@ $end (0) 0
 error (256)
 AUTO (258)
 DOUBLE (259) 9
-INT (260) 8 11 12 99 100 101
+INT (260) 8 11 12 44 99 100 101
 STRUCT (261)
 BREAK (262)
 ELSE (263) 128 129
@@ -335,7 +335,7 @@ program (89)
 CONSTANT (90)
     on left: 5 6 7, on right: 26
 type_name (91)
-    on left: 8 9 10, on right: 44 52
+    on left: 8 9 10, on right: 52
 declaration (92)
     on left: 11 12, on right: 2 4 134 135
 init_declarator_list (93)
@@ -372,7 +372,7 @@ shift_expression (107)
 relational_expression (108)
     on left: 63 64 65 66 67, on right: 64 65 66 67 68 69 70
 equality_expression (109)
-    on left: 68 69 70, on right: 69 70 71 72 126 127 145
+    on left: 68 69 70, on right: 69 70 71 72
 and_expression (110)
     on left: 71 72, on right: 72 73 74
 exclusive_or_expression (111)
@@ -390,7 +390,7 @@ assignment_expression (116)
 ASSIGNMENT_OPERATOR (117)
     on left: 85 86 87 88 89 90 91 92 93 94 95, on right: 84
 expression (118)
-    on left: 96, on right: 28 30 82 97 98
+    on left: 96, on right: 28 30 82 97 98 126 127 145
 expression_list (119)
     on left: 97 98, on right: 108 109 112 113 114 115 116 117 118 120
     121 142
@@ -836,7 +836,7 @@ State 28
 State 29
 
    43 unary_expression: SIZEOF . unary_expression
-   44                 | SIZEOF . LBRACKET type_name RBRACKET
+   44                 | SIZEOF . LBRACKET INT RBRACKET
 
     LBRACKET        shift, and go to state 76
     PLUS_PLUS       shift, and go to state 27
@@ -1326,11 +1326,9 @@ State 75
 State 76
 
    28 primary_expression: LBRACKET . expression RBRACKET
-   44 unary_expression: SIZEOF LBRACKET . type_name RBRACKET
+   44 unary_expression: SIZEOF LBRACKET . INT RBRACKET
 
-    DOUBLE          shift, and go to state 65
-    INT             shift, and go to state 66
-    CHAR            shift, and go to state 67
+    INT             shift, and go to state 125
     LBRACKET        shift, and go to state 25
     PLUS_PLUS       shift, and go to state 27
     MINUS_MINUS     shift, and go to state 28
@@ -1348,7 +1346,6 @@ State 76
     STRING_LITERAL  shift, and go to state 40
 
     CONSTANT                   go to state 41
-    type_name                  go to state 125
     primary_expression         go to state 43
     postfix_expression         go to state 44
     unary_expression           go to state 45
@@ -2403,7 +2400,7 @@ State 124
 
 State 125
 
-   44 unary_expression: SIZEOF LBRACKET type_name . RBRACKET
+   44 unary_expression: SIZEOF LBRACKET INT . RBRACKET
 
     RBRACKET  shift, and go to state 180
 
@@ -2695,7 +2692,7 @@ State 153
 
 State 154
 
-  145 return_statement: RETURN . equality_expression SEMI_COLON
+  145 return_statement: RETURN . expression SEMI_COLON
   146                 | RETURN . SEMI_COLON
 
     LBRACKET        shift, and go to state 25
@@ -2718,14 +2715,22 @@ State 154
     CONSTANT                   go to state 41
     primary_expression         go to state 43
     postfix_expression         go to state 44
-    unary_expression           go to state 96
+    unary_expression           go to state 45
     UNARY_OPERATOR             go to state 46
     cast_expression            go to state 47
     multiplicative_expression  go to state 48
     additive_expression        go to state 49
     shift_expression           go to state 50
     relational_expression      go to state 51
-    equality_expression        go to state 186
+    equality_expression        go to state 52
+    and_expression             go to state 53
+    exclusive_or_expression    go to state 54
+    inclusive_or_expression    go to state 55
+    logical_and_expression     go to state 56
+    logical_or_expression      go to state 57
+    conditional_expression     go to state 58
+    assignment_expression      go to state 69
+    expression                 go to state 186
 
 
 State 155
@@ -2799,8 +2804,8 @@ State 156
 
 State 157
 
-  126 if_statement: IF . LBRACKET equality_expression RBRACKET compound_statement
-  127             | IF . LBRACKET equality_expression RBRACKET statement
+  126 if_statement: IF . LBRACKET expression RBRACKET compound_statement
+  127             | IF . LBRACKET expression RBRACKET statement
 
     LBRACKET  shift, and go to state 190
 
@@ -3082,7 +3087,7 @@ State 179
 
 State 180
 
-   44 unary_expression: SIZEOF LBRACKET type_name RBRACKET .
+   44 unary_expression: SIZEOF LBRACKET INT RBRACKET .
 
     $default  reduce using rule 44 (unary_expression)
 
@@ -3189,13 +3194,9 @@ State 185
 
 State 186
 
-   69 equality_expression: equality_expression . LOGICAL_EQUALITY relational_expression
-   70                    | equality_expression . LOGICAL_INEQUALITY relational_expression
-  145 return_statement: RETURN equality_expression . SEMI_COLON
+  145 return_statement: RETURN expression . SEMI_COLON
 
-    LOGICAL_EQUALITY    shift, and go to state 109
-    LOGICAL_INEQUALITY  shift, and go to state 110
-    SEMI_COLON          shift, and go to state 204
+    SEMI_COLON  shift, and go to state 204
 
 
 State 187
@@ -3259,8 +3260,8 @@ State 189
 
 State 190
 
-  126 if_statement: IF LBRACKET . equality_expression RBRACKET compound_statement
-  127             | IF LBRACKET . equality_expression RBRACKET statement
+  126 if_statement: IF LBRACKET . expression RBRACKET compound_statement
+  127             | IF LBRACKET . expression RBRACKET statement
 
     LBRACKET        shift, and go to state 25
     PLUS_PLUS       shift, and go to state 27
@@ -3281,14 +3282,22 @@ State 190
     CONSTANT                   go to state 41
     primary_expression         go to state 43
     postfix_expression         go to state 44
-    unary_expression           go to state 96
+    unary_expression           go to state 45
     UNARY_OPERATOR             go to state 46
     cast_expression            go to state 47
     multiplicative_expression  go to state 48
     additive_expression        go to state 49
     shift_expression           go to state 50
     relational_expression      go to state 51
-    equality_expression        go to state 210
+    equality_expression        go to state 52
+    and_expression             go to state 53
+    exclusive_or_expression    go to state 54
+    inclusive_or_expression    go to state 55
+    logical_and_expression     go to state 56
+    logical_or_expression      go to state 57
+    conditional_expression     go to state 58
+    assignment_expression      go to state 69
+    expression                 go to state 210
 
 
 State 191
@@ -3566,7 +3575,7 @@ State 203
 
 State 204
 
-  145 return_statement: RETURN equality_expression SEMI_COLON .
+  145 return_statement: RETURN expression SEMI_COLON .
 
     $default  reduce using rule 145 (return_statement)
 
@@ -3651,14 +3660,10 @@ State 209
 
 State 210
 
-   69 equality_expression: equality_expression . LOGICAL_EQUALITY relational_expression
-   70                    | equality_expression . LOGICAL_INEQUALITY relational_expression
-  126 if_statement: IF LBRACKET equality_expression . RBRACKET compound_statement
-  127             | IF LBRACKET equality_expression . RBRACKET statement
+  126 if_statement: IF LBRACKET expression . RBRACKET compound_statement
+  127             | IF LBRACKET expression . RBRACKET statement
 
-    RBRACKET            shift, and go to state 223
-    LOGICAL_EQUALITY    shift, and go to state 109
-    LOGICAL_INEQUALITY  shift, and go to state 110
+    RBRACKET  shift, and go to state 223
 
 
 State 211
@@ -3950,8 +3955,8 @@ State 222
 
 State 223
 
-  126 if_statement: IF LBRACKET equality_expression RBRACKET . compound_statement
-  127             | IF LBRACKET equality_expression RBRACKET . statement
+  126 if_statement: IF LBRACKET expression RBRACKET . compound_statement
+  127             | IF LBRACKET expression RBRACKET . statement
 
     RETURN          shift, and go to state 154
     FOR             shift, and go to state 155
@@ -4205,14 +4210,14 @@ State 232
 
 State 233
 
-  126 if_statement: IF LBRACKET equality_expression RBRACKET compound_statement .
+  126 if_statement: IF LBRACKET expression RBRACKET compound_statement .
 
     $default  reduce using rule 126 (if_statement)
 
 
 State 234
 
-  127 if_statement: IF LBRACKET equality_expression RBRACKET statement .
+  127 if_statement: IF LBRACKET expression RBRACKET statement .
 
     $default  reduce using rule 127 (if_statement)
 

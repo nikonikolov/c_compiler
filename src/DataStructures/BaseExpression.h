@@ -12,7 +12,7 @@ public:
 
 	// Not const =0 because at evaluation, there might be optimizations and reductions to be done
 	// Uncomment for Codegen
-	//virtual NumT eval()=0;
+	//virtual snum_t eval()=0;
 };
 
 

@@ -16,7 +16,7 @@ public:
 	void set_lhs(Expression* lhs_in);
 	void set_rhs(Expression* rhs_in);
 
-	virtual NumT eval();
+	virtual snum_t eval();
 	virtual void pretty_print(const int& indent) const;
 
 protected:

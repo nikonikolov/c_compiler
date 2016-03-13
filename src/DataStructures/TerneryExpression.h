@@ -16,7 +16,7 @@ public:
 	void push_back_lhs(BaseExpression* expr_in);
 	void push_back_rhs(BaseExpression* expr_in);
 
-	NumT eval();
+	snum_t eval();
 	void pretty_print(const int& indent) const;
 	void renderasm();
 

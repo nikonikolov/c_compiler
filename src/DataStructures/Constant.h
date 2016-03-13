@@ -19,13 +19,10 @@ public:
 private:
 	// Note: you can extract the exact type from the name of the Temaplate Type
 	Type num_val;					// Contains the numerical value of the constant
-	//char* assembler_name;			// Name associated with the assembler code
-	uint32_t address;				// Contains the address of the Constant 
 };
 
 
 
-#endif
 
 template<class Type>
 Constant<Type>::Constant(const Type& num_val_in) :
@@ -44,3 +41,5 @@ template<class Type>
 void Constant<Type>::renderasm(){
 	return;
 }
+
+#endif

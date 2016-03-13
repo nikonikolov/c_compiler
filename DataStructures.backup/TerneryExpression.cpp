@@ -1,7 +1,7 @@
 #include "TerneryExpression.h"
 
 TerneryExpression::TerneryExpression(vector<BaseExpression*>* lhs_in, BaseExpression* mid_in, vector<BaseExpression*>* rhs_in) :
-	BaseExpression(ST_ternery_expr), lhs(lhs_in), mid(mid_in), rhs(rhs_in) {}
+	BaseExpression(EXPR_ternery_expr), lhs(lhs_in), mid(mid_in), rhs(rhs_in) {}
 
 TerneryExpression::~TerneryExpression(){
 	if(lhs!=NULL){

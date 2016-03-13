@@ -2,12 +2,12 @@
 
 
 Expression::Expression(BaseExpression* lhs_in, char* oper_in, BaseExpression* rhs_in) : 
-	BaseExpression(ST_expression), lhs(lhs_in), rhs(rhs_in) {
+	BaseExpression(EXPR_expression), lhs(lhs_in), rhs(rhs_in) {
 	oper = strdup(oper_in);
 }
 
 Expression::Expression(const int& line_in, char* src_file_in, BaseExpression* lhs_in, char* oper_in, BaseExpression* rhs_in) :
-	BaseExpression(ST_expression), lhs(lhs_in), rhs(rhs_in), line(line_in), src_file(src_file_in) {
+	BaseExpression(EXPR_expression), lhs(lhs_in), rhs(rhs_in), line(line_in), src_file(src_file_in) {
 	oper = strdup(oper_in);
 }
 

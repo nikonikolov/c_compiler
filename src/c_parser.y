@@ -9,6 +9,7 @@
   #include "DataStructures/Constant.h"
   #include "DataStructures/Conditional.h"
   #include "DataStructures/VarDeclaration.h"
+  #include "DataStructures/VarExpr.h"
   #include "DataStructures/ReturnStatement.h"
   #include "DataStructures/CompoundStatement.h"
   #include "DataStructures/BaseExpression.h"
@@ -271,7 +272,7 @@ declarator  : direct_declarator                                     { $$ = $1; }
 
 // NB make a separate grammmar for function declarations and prototypes - they are definitely not the same as variables
 // Variable name, Array cell or function
-direct_declarator : IDENTIFIER                                      { $$ = new Variable($1, ST_var_declaration); }
+direct_declarator : IDENTIFIER                                      { $$ = new Variable($1); }
                   | LBRACKET declarator RBRACKET                    { $$ = $2; }
                   // Array cell
                   //| direct_declarator LSQUARE constant_expression RSQUARE     { $$= $1; $$->dereference_back($3); }
@@ -315,7 +316,7 @@ initializer_list  : initializer                                     { /*$$ = new
 
 // Basic structure: Level 0 Precedence; corressponds to factor
 primary_expression  // Identifier
-                    : IDENTIFIER                            { $$ = new Variable($1);}
+                    : IDENTIFIER                            { $$ = new VarExpr($1);}
                     // Constant
                     | CONSTANT                              { $$ = $1;}
                     // string_literal
@@ -336,10 +337,10 @@ postfix_expression  // Reduction to Level 0
                     // Function call with no arguments
                     | postfix_expression LBRACKET RBRACKET
                     // Structs and Unions member access
-                    | postfix_expression DOT IDENTIFIER                                 //{ Expression* tmp = new Variable($3);
+                    | postfix_expression DOT IDENTIFIER                                 //{ Expression* tmp = new VarExpr($3);
                                                                                         //  $$ = new Expression($1, $2, tmp);}
                     // Structs and Unions member access via pointers
-                    | postfix_expression PTR_OP IDENTIFIER                              //{ Expression* tmp = new Variable($3);
+                    | postfix_expression PTR_OP IDENTIFIER                              //{ Expression* tmp = new VarExpr($3);
                                                                                         //  $$ = new Expression($1, $2, tmp);}
                     // Post increment
                     | postfix_expression PLUS_PLUS                                      { $$ = new Expression($1, $2, NULL);}
@@ -565,12 +566,12 @@ expression_list // Reduction to Level 14
 
 // You need to modify the grammar for return type and Variable* to be returned from the reduction of the rule
 fn_declaration  : INT IDENTIFIER LBRACKET fn_params_list RBRACKET compound_statement          
-                                                      { $$ = new Function(new Variable($1, ST_var_return), $2, $4, $6); }
+                                                      { $$ = new Function(new Variable($1, NULL), $2, $4, $6); }
                 ;
 
 fn_params_list  : INT bracketed_identifier                      { $$ = new vector<Variable*>; 
-                                                                  $$->push_back(new Variable($1, $2, ST_var_fn_param));}
-                | fn_params_list COMMA INT bracketed_identifier { /*$$=$1; */$$->push_back(new Variable($3, $4, ST_var_fn_param)); }
+                                                                  $$->push_back(new Variable($1, $2));}
+                | fn_params_list COMMA INT bracketed_identifier { $$->push_back(new Variable($3, $4)); }
                 |                                               { $$ = NULL; }
                 ;   
 

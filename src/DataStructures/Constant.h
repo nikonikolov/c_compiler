@@ -14,7 +14,7 @@ public:
 	~Constant();
 
 	void pretty_print(const int& indent) const;
-	void renderasm();
+	void renderasm(ASMhandle* context);
 
 private:
 	// Note: you can extract the exact type from the name of the Temaplate Type
@@ -38,7 +38,7 @@ void Constant<Type>::pretty_print(const int& indent) const{
 }
 
 template<class Type>
-void Constant<Type>::renderasm(){
+void Constant<Type>::renderasm(ASMhandle* context){
 	return;
 }
 

@@ -43,27 +43,6 @@ enum StatementT{
 	ST_ternery_expr = 28
 };
 
-union unum_t{
-	long double ldoubleval;
-	double 	doubleval;
-	float 	floatval;
-	int 	intval;
-};
-
-// NOTE: Order by precedence
-enum enumt{
-	tldouble = 100,
-	tdouble = 98,
-	tfloat = 96,
-	tint = 80
-};
-
-struct snum_t{
-	enumt tname;	// identifies which member the union currently employs
-	unum_t number;	// the union itself
-};
-
-
 class Variable;
 
 struct ASMhandle{

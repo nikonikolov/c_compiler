@@ -52,6 +52,7 @@ extern int yydebug;
   #include "DataStructures/Constant.h"
   #include "DataStructures/Conditional.h"
   #include "DataStructures/VarDeclaration.h"
+  #include "DataStructures/VarExpr.h"
   #include "DataStructures/ReturnStatement.h"
   #include "DataStructures/CompoundStatement.h"
   #include "DataStructures/BaseExpression.h"
@@ -68,7 +69,7 @@ extern int yydebug;
   //extern Function* root;
   
 
-#line 72 "src/c_parser.tab.hpp" /* yacc.c:1909  */
+#line 73 "src/c_parser.tab.hpp" /* yacc.c:1909  */
 
 /* Token type.  */
 #ifndef YYTOKENTYPE
@@ -168,7 +169,7 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 29 "src/c_parser.y" /* yacc.c:1909  */
+#line 30 "src/c_parser.y" /* yacc.c:1909  */
 
   char* strval;
   uint64_t intval;
@@ -191,7 +192,7 @@ union YYSTYPE
   ExpressionStatement* expr_statement_ptr;
   VarDeclaration* var_declaration_ptr;
 
-#line 195 "src/c_parser.tab.hpp" /* yacc.c:1909  */
+#line 196 "src/c_parser.tab.hpp" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;

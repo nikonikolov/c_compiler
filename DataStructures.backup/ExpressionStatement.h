@@ -7,16 +7,17 @@
 class ExpressionStatement : public Statement{
 
 public:
-	ExpressionStatement(vector<Expression*>* expr_list_in);
-	ExpressionStatement(Expression* expr_in);
+	ExpressionStatement(vector<BaseExpression*>* expr_list_in);
+	ExpressionStatement(BaseExpression* expr_in);
 	~ExpressionStatement();
 
-	void push_back(Expression* expr_in);
+	void push_back(BaseExpression* expr_in);
 
 	void pretty_print(const int& indent) const;
+	void renderasm(ASMhandle* context);
 private:
 	
-	vector<Expression*>* expr_list;
+	vector<BaseExpression*>* expr_list;
 };
 
 

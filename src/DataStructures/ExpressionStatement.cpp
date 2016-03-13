@@ -40,6 +40,6 @@ void ExpressionStatement::pretty_print(const int& indent) const{
 }
 
 
-void ExpressionStatement::renderasm(){
+void ExpressionStatement::renderasm(ASMhandle* context){
 }
 

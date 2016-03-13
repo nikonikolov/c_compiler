@@ -11,6 +11,7 @@ public:
 	~CompoundStatement();
 
 	void renderasm(ASMhandle* context);
+	void renderasm(vector<Variable*>* vars_in, int& stack_offset);
 	void pretty_print(const int& indent) const;
 private:
 	

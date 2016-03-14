@@ -8,6 +8,9 @@ FUNCTION : zz
     PARAM : b
     PARAM : c
 SCOPE
+    SCOPE
+        VARIABLE : abcd
+        (abcd)=((a)+(b))
     (a)=(b)
     SCOPE
         VARIABLE : fsdfsdfs

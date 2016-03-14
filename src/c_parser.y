@@ -707,6 +707,7 @@ statement : loop                                                    { $$=$1; }
           | if_block_statement                                      { $$=$1; }
           | expression_statement                                    { $$=$1; }
           | semi_colon_statement                                    { $$=$1; }
+          | compound_statement                                      { $$=$1; }
           ;
 
 

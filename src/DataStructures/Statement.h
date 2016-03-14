@@ -5,7 +5,7 @@
 #include <list>
 #include <iomanip>
 #include <iostream>
-//#include "ASMhandle.h"
+#include "ASMhandle.h"
 
 
 using std::list;
@@ -35,7 +35,6 @@ enum StatementT{
 	ST_expression = 20,
 	ST_expr_statement = 21,
 	ST_constant = 22,
-	ST_var_declaration = 23,
 	ST_var_expr = 24,
 	ST_var_return = 25,
 	ST_var_fn_param = 26,
@@ -63,13 +62,18 @@ struct snum_t{
 	unum_t number;	// the union itself
 };
 
-
 class Variable;
 
-struct ASMhandle{
+class ASMhandle{
+public:
+	ASMhandle(ASMhandle* orig);
+	~ASMhandle();
+
+	void redefinition_check();
 	int stack_offset;
 	vector<Variable*>* vars;	
 };
+
 
 
 class Statement{

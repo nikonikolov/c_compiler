@@ -53,22 +53,25 @@ void CompoundStatement::pretty_print(const int& indent) const{
 
 
 void CompoundStatement::renderasm(ASMhandle* context){
-	vector<Variable*>* local_vars;
+
+	ASMhandle new_context(context);
 
 	if(declarations!=NULL){
-		local_vars = new vector<Variable*>;
-
 		vector<VarDeclaration*>::iterator it;
 		for(it=declarations->begin(); it!=declarations->end(); ++it){
-			(*it)->renderasm(local_vars);
+			(*it)->renderasm(&new_context);
 		}
 	}
 
+	new_context.redefinition_check();
 
-	// At this point local_vars contains a vector of all locally declared variables
-	// vars_in contains the parameters of the function or variables visible from the parent scope
+	if(declarations!=NULL){
+		vector<VarDeclaration*>::iterator it;
+		for(it=declarations->begin(); it!=declarations->end(); ++it){
+			(*it)->renderasm(&new_context);
+		}
+	}
 
-	// This will be a good point to make sure no redefinition occurs
 
 
 

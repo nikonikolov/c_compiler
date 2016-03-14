@@ -6,7 +6,7 @@
 #include "Variable.h"
 
 /*	FIX:
-		1. Currently only 4 arguments assumed for assebmly generation
+		1. Currently only 32bit wide arguments assumed as function parameters
 */
 
 

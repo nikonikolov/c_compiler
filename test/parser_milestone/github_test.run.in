@@ -8,6 +8,16 @@ int g, b, d, f=a;
 
 int zz(int a, int b, int c)
 {
+  {
+
+  }
+
+  {
+      int abcd;
+      abcd=a+b;
+
+  }
+
   if(a==b)
     a=b;
   else if(a==c) ;

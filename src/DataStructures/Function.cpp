@@ -46,10 +46,17 @@ void Function::renderasm(ASMhandle* context){
 	cout<<"\t.type "<<name<<", @function"<<endl;
 	cout<<name<<":"<<endl;
 
-	//int stack_offset=0;
-	//prep_for_asm(stack_offset);
-	prep_for_asm(context);
-	//fn_body->renderasm(params, stack_offset);
+	ASMhandle new_context(context);
+	//copy_ASMhandle(context, &new_context);
+	new_context.stack_offset=0;
+
+	prep_for_asm(&new_context);
+
+	new_context.redefinition_check();
+		
+	fn_body->renderasm(&new_context);
+
+
 
 	/* Function end assembly */
 	cout<<endl<<"\t.end "<<name<<endl<<endl;
@@ -62,11 +69,13 @@ void Function::prep_for_asm(ASMhandle* context){
 
 	for(int i=0; i<params->size() && i<4; i++){
 		(*params)[i]->set_asm_location("$a"+std::to_string(i));
+		(context->vars)->push_back((*params)[i]);
 	}
 
 	for(int i=4; i<params->size(); i++){
 		(*params)[i]->set_asm_location(std::to_string((i-3)*4)+"($sp)");
 		context->stack_offset+=4;
+		(context->vars)->push_back((*params)[i]);
 	}
 
 }

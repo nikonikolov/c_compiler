@@ -20,7 +20,6 @@ public:
 
 	void pretty_print(const int& indent) const;
 	void renderasm(ASMhandle* context);
-	void renderasm(vector<Variable*>* vars_in);
 
 private:
 

@@ -23,8 +23,9 @@
   int yylex();
   int yyerror(const char* s);
 
-  //extern Function* root;
-  
+  extern Program* root;
+
+
 }
 
 %union{
@@ -142,7 +143,6 @@
 
 %{
   /* put additional C++ code here */
-  // Probably a better idea to make root pointer to Program in the end as function will not inherit from statement
   Program* root=NULL;
 %}
 
@@ -742,7 +742,7 @@ int yyerror(const char* s){
   std::cerr <<"File: "<< source_file<<", Line: "<<input_file_line << std::endl;
   return -1;
 }
-
+/*
 int main(){
 
   yydebug=1;
@@ -761,7 +761,7 @@ int main(){
 
   return 0;
 }
-
+*/
 
 
 

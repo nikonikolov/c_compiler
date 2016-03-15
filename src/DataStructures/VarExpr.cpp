@@ -25,3 +25,8 @@ void VarExpr::pretty_print(const int& indent) const{
 void VarExpr::renderasm(ASMhandle& context){
 	return;
 }
+
+
+snum_t VarExpr::simplify(){
+	throw 1;
+}

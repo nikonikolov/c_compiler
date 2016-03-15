@@ -23,7 +23,7 @@ public:
 	void set_lhs(Expression* lhs_in);	
 	void set_rhs(Expression* rhs_in);
 
-	//snum_t eval();
+	snum_t simplify();
 	void pretty_print(const int& indent) const;
 	void renderasm(ASMhandle& context);
 

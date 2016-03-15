@@ -119,10 +119,11 @@ extern int yydebug;
   int yylex();
   int yyerror(const char* s);
 
-  //extern Function* root;
-  
+  extern Program* root;
 
-#line 126 "src/c_parser.tab.cpp" /* yacc.c:355  */
+
+
+#line 127 "src/c_parser.tab.cpp" /* yacc.c:355  */
 
 /* Token type.  */
 #ifndef YYTOKENTYPE
@@ -222,7 +223,7 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 30 "src/c_parser.y" /* yacc.c:355  */
+#line 31 "src/c_parser.y" /* yacc.c:355  */
 
   char* strval;
   uint64_t intval;
@@ -245,7 +246,7 @@ union YYSTYPE
   ExpressionStatement* expr_statement_ptr;
   VarDeclaration* var_declaration_ptr;
 
-#line 249 "src/c_parser.tab.cpp" /* yacc.c:355  */
+#line 250 "src/c_parser.tab.cpp" /* yacc.c:355  */
 };
 
 typedef union YYSTYPE YYSTYPE;
@@ -261,10 +262,9 @@ int yyparse (void);
 #endif /* !YY_YY_SRC_C_PARSER_TAB_HPP_INCLUDED  */
 
 /* Copy the second part of user declarations.  */
-#line 143 "src/c_parser.y" /* yacc.c:358  */
+#line 144 "src/c_parser.y" /* yacc.c:358  */
 
   /* put additional C++ code here */
-  // Probably a better idea to make root pointer to Program in the end as function will not inherit from statement
   Program* root=NULL;
 
 #line 271 "src/c_parser.tab.cpp" /* yacc.c:358  */
@@ -2625,7 +2625,7 @@ int yyerror(const char* s){
   std::cerr <<"File: "<< source_file<<", Line: "<<input_file_line << std::endl;
   return -1;
 }
-
+/*
 int main(){
 
   yydebug=1;
@@ -2644,7 +2644,7 @@ int main(){
 
   return 0;
 }
-
+*/
 
 
 

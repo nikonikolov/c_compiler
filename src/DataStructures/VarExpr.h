@@ -19,6 +19,7 @@ public:
 	
 	void pretty_print(const int& indent) const;
 	void renderasm(ASMhandle& context);
+	snum_t simplify();
 
 private:
 	char* name;

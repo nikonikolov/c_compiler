@@ -52,10 +52,103 @@ void Expression::renderasm(ASMhandle& context){
 
 // Add support for other types later
 void Expression::init_subexpr(BaseExpression* expr_ptr, const snum_t& result){
-	if(result.tname==tint) expr_ptr = new Constant<int>(result.number.intval);
-	if(result.tname==tdouble) expr_ptr = new Constant<double>(result.number.doubleval);
-	if(result.tname==tldouble) expr_ptr = new Constant<float>(result.number.ldoubleval);
-	if(result.tname==tfloat) expr_ptr = new Constant<float>(result.number.floatval);
+	if(result.tname==tint) expr_ptr = new Constant<int>(result.numval.intmem);
+	if(result.tname==tdouble) expr_ptr = new Constant<double>(result.numval.doublemem);
+	if(result.tname==tldouble) expr_ptr = new Constant<float>(result.numval.ldoublemem);
+	if(result.tname==tfloat) expr_ptr = new Constant<float>(result.numval.floatmem);
+}
+
+
+
+string Expression::gen_error() const{
+	string result = "Error in file " + src_file +" at line " + std::to_string(line) + " around symbol " + oper;
+	return result;
+}
+
+
+/* 	Note the caller to simplify has to handle the exception. Usually that would be renderasm(ASMhandle& context) member method
+	of a BaseExpression implementation. Note you cannot have Constant as return type as this is a pure virtual function 
+ 	defined in BaseExpression which cannot have visibility of the Constant class
+*/
+snum_t Expression::simplify(){
+	snum_t lhs_result, rhs_result;
+	int exception = 0;
+	
+	// Optimize LHS
+	try{
+		if(lhs!=NULL){
+			lhs_result = lhs->simplify();
+			if(lhs->get_stat_type()!=ST_constant){
+				delete lhs;
+				init_subexpr(lhs, lhs_result);		// In case RHS cannot be simplified
+			}
+		} 
+	}
+	catch(const int& exception_in){
+		exception = exception_in;
+	}
+	// Optimize RHS
+	try{
+		if(rhs!=NULL){
+			rhs_result = rhs->simplify();
+			if(rhs->get_stat_type()!=ST_constant){
+				delete rhs;
+				init_subexpr(rhs, rhs_result); 		// In case LHS was not simplified
+			}
+		} 
+	}
+	catch(const int& exception_in){
+		exception = exception_in;
+	}
+
+	if(exception) throw exception;
+
+	/* 	Do the casting here: Find the higher precedence, deallocate old Constant and create a new one cast to the required type.
+	 	Note you will need to perform semantics checks before making the operation as well. E.g. - you cannot shift by a double 
+		value, you cannot assign integer to a struct, etc.
+	*/
+	
+	snum_t returnval;
+	returnval.tname = tint;
+	returnval.numval.intmem = INTNAN;
+	/* ----------------------------------- TWO OPERANDS ----------------------------------- */
+	if(lhs!=NULL && rhs!=NULL){
+		if(oper=="+") 	returnval.numval.intmem=(lhs_result.numval.intmem + rhs_result.numval.intmem); 	
+		if(oper=="-") 	returnval.numval.intmem=(lhs_result.numval.intmem - rhs_result.numval.intmem); 	
+		if(oper=="*") 	returnval.numval.intmem=(lhs_result.numval.intmem * rhs_result.numval.intmem); 	
+		if(oper=="%") 	returnval.numval.intmem=(lhs_result.numval.intmem % rhs_result.numval.intmem); 	
+		if(oper=="/") 	returnval.numval.intmem=(lhs_result.numval.intmem / rhs_result.numval.intmem); 	
+		if(oper=="|") 	returnval.numval.intmem=(lhs_result.numval.intmem | rhs_result.numval.intmem); 	
+		if(oper=="&") 	returnval.numval.intmem=(lhs_result.numval.intmem & rhs_result.numval.intmem); 	
+		if(oper=="^") 	returnval.numval.intmem=(lhs_result.numval.intmem ^ rhs_result.numval.intmem); 	
+		if(oper=="||") 	returnval.numval.intmem=(lhs_result.numval.intmem || rhs_result.numval.intmem); 	
+		if(oper=="&&") 	returnval.numval.intmem=(lhs_result.numval.intmem && rhs_result.numval.intmem); 	
+		if(oper=="<<") 	returnval.numval.intmem=(lhs_result.numval.intmem << rhs_result.numval.intmem); 	
+		if(oper==">>") 	returnval.numval.intmem=(lhs_result.numval.intmem >> rhs_result.numval.intmem); 	
+		if(oper=="<=") 	returnval.numval.intmem=(lhs_result.numval.intmem <= rhs_result.numval.intmem); 	
+		if(oper==">=") 	returnval.numval.intmem=(lhs_result.numval.intmem >= rhs_result.numval.intmem); 	
+		if(oper==">") 	returnval.numval.intmem=(lhs_result.numval.intmem > rhs_result.numval.intmem); 	
+		if(oper=="<") 	returnval.numval.intmem=(lhs_result.numval.intmem < rhs_result.numval.intmem); 	
+		if(oper=="==") 	returnval.numval.intmem=(lhs_result.numval.intmem == rhs_result.numval.intmem); 	
+		if(oper=="!=") 	returnval.numval.intmem=(lhs_result.numval.intmem != rhs_result.numval.intmem); 
+	}
+	/* ----------------------------------- SINGLE OPERAND ----------------------------------- */
+	if(lhs==NULL && rhs!=NULL){
+		if(oper=="+")	returnval.numval.intmem=(+(rhs_result.numval.intmem));
+		if(oper=="-")	returnval.numval.intmem=(-(rhs_result.numval.intmem));
+		if(oper=="++") 	returnval.numval.intmem=(++(rhs_result.numval.intmem));
+		if(oper=="--") 	returnval.numval.intmem=(--(rhs_result.numval.intmem));
+		if(oper=="!") 	returnval.numval.intmem=(!(rhs_result.numval.intmem));
+		if(oper=="~") 	returnval.numval.intmem=(~(rhs_result.numval.intmem));
+		if(oper=="sizeof") 	returnval.numval.intmem=(sizeof(rhs_result.numval.intmem));
+	}
+	if(lhs!=NULL && rhs==NULL){
+		if(oper=="++") 	returnval.numval.intmem=((lhs_result.numval.intmem)++);
+		if(oper=="--") 	returnval.numval.intmem=((lhs_result.numval.intmem)--);
+	}
+	/* ----------------------------------- RETURN DECISION ----------------------------------- */
+	if(returnval.numval.intmem != INTNAN) return returnval;
+	throw gen_error();			// Invalid semantics of the expression
 }
 
 /*	First, if either operand has type long double, the other operand is converted to long double . Otherwise, if either operand 
@@ -67,238 +160,4 @@ void Expression::init_subexpr(BaseExpression* expr_ptr, const snum_t& result){
 	operands are converted to unsigned long int. Otherwise, if either operand has type long int, the other operand is converted to 
 	long int. Otherwise, if either operand has type unsigned int, the other operand is converted to unsigned int. Otherwise, both 
 	operands have type int.
-*/
-
-string Expression::gen_error() const{
-	string result = "Error in file " + src_file +" at line " + std::to_string(line) + " around symbol " + oper;
-	return result;
-}
-
-
-// Note the top level is the caller to eval and the caller has to handle the exception. Usually that would be renderasm(ASMhandle& context)
-// Note you cannot have Constant as return type as this is a pure virtual function defined in BaseExpression which cannot have
-// visibility of the Constant class
-/*snum_t Expression::eval(){
-	snum_t lhs_result, rhs_result;
-	int exception = 0;
-	
-	// Optimize LHS
-	try{
-		if(lhs!=NULL){
-			lhs_result = lhs->eval();
-			delete lhs;
-			init_subexpr(lhs, lhs_result);
-		} 
-	}
-	catch(const int& exception_in){
-		exception = exception_in;
-	}
-
-	// Optimize RHS
-	try{
-		if(rhs!=NULL){
-			rhs_result = rhs->eval();
-			delete rhs;
-			init_subexpr(rhs, rhs_result);
-		} 
-	}
-	catch(const int& exception_in){
-		exception = exception_in;
-	}
-
-	if(exception) throw exception;
-
-	/* 	Do the casting: Find the higher precedence, deallocate old Constant and create a new one cast to the required type.
-	 	Note you will need to perform semantics checks before making the operation as well. E.g. - you cannot shift by a double 
-		value, you cannot assign integer to a struct, etc.
-	
-	
-	snum_t returnval;
-	returnval.tname = tint;
-	if(oper=="+"){
-		if(lhs==NULL && rhs!=NULL){
-			returnval.number.intval=(+(rhs->eval())); 
-			return returnval;
-		}
-		if(lhs!=NULL && rhs!=NULL){
-			returnval.number.intval=(lhs->eval() + rhs->eval()); 
-			return returnval;
-		}
-		throw gen_error();
-	}	
-	if(oper=="-"){
-		if(lhs==NULL && rhs!=NULL){
-			returnval.number.intval=(-(rhs->eval())); 
-			return returnval;
-		}
-		if(lhs!=NULL && rhs!=NULL){
-			returnval.number.intval=(lhs->eval() - rhs->eval()); 
-			return returnval;
-		}
-		throw gen_error();
-	}	
-	if(oper=="*"){
-		if(lhs==NULL && rhs!=NULL){
-			returnval.number.intval=(*(rhs->eval())); 
-			return returnval;
-		}
-		if(lhs!=NULL && rhs!=NULL){
-			returnval.number.intval=(lhs->eval() * rhs->eval()); 
-			return returnval;
-		}
-		throw gen_error();
-	}	
-	if(oper=="%"){
-		if(lhs!=NULL && rhs!=NULL){
-			returnval.number.intval=(lhs->eval() % rhs->eval()); 
-			return returnval;
-		}
-		throw gen_error();	
-	}	
-	if(oper=="/"){
-		if(lhs!=NULL && rhs!=NULL){
-			returnval.number.intval=(lhs->eval() / rhs->eval()); 
-			return returnval;
-		}
-		throw gen_error();	
-	}	
-	if(oper=="|"){
-		if(lhs!=NULL && rhs!=NULL){
-			returnval.number.intval=(lhs->eval() | rhs->eval()); 
-			return returnval;
-		}
-		throw gen_error();	
-	}	
-	if(oper=="&"){
-		if(lhs!=NULL && rhs!=NULL){
-			returnval.number.intval=(lhs->eval() & rhs->eval()); 
-			return returnval;
-		}
-		throw gen_error();	
-	}	
-	if(oper=="^"){
-		if(lhs!=NULL && rhs!=NULL){
-			returnval.number.intval=(lhs->eval() ^ rhs->eval()); 
-			return returnval;
-		}
-		throw gen_error();	
-	}	
-	if(oper=="||"){
-		if(lhs!=NULL && rhs!=NULL){
-			returnval.number.intval=(lhs->eval() || rhs->eval()); 
-			return returnval;
-		}
-		throw gen_error();	
-	}	
-	if(oper=="&&"){
-		if(lhs!=NULL && rhs!=NULL){
-			returnval.number.intval=(lhs->eval() && rhs->eval()); 
-			return returnval;
-		}
-		throw gen_error();	
-	}	
-	if(oper=="<<"){
-		if(lhs!=NULL && rhs!=NULL){
-			returnval.number.intval=(lhs->eval() << rhs->eval()); 
-			return returnval;
-		}
-		throw gen_error();	
-	}	
-	if(oper==">>"){
-		if(lhs!=NULL && rhs!=NULL){
-			returnval.number.intval=(lhs->eval() >> rhs->eval()); 
-			return returnval;
-		}
-		throw gen_error();	
-	}	
-	if(oper=="<="){
-		if(lhs!=NULL && rhs!=NULL){
-			returnval.number.intval=(lhs->eval() <= rhs->eval()); 
-			return returnval;
-		}
-		throw gen_error();	
-	}	
-	if(oper==">="){
-		if(lhs!=NULL && rhs!=NULL){
-			returnval.number.intval=(lhs->eval() >= rhs->eval()); 
-			return returnval;
-		}
-		throw gen_error();	
-	}	
-	if(oper==">"){
-		if(lhs!=NULL && rhs!=NULL){
-			returnval.number.intval=(lhs->eval() > rhs->eval()); 
-			return returnval;
-		}
-		throw gen_error();	
-	}	
-	if(oper=="<"){
-		if(lhs!=NULL && rhs!=NULL){
-			returnval.number.intval=(lhs->eval() < rhs->eval()); 
-			return returnval;
-		}
-		throw gen_error();	
-	}	
-	if(oper=="=="){
-		if(lhs!=NULL && rhs!=NULL){
-			returnval.number.intval=(lhs->eval() == rhs->eval()); 
-			return returnval;
-		}
-		throw gen_error();	
-	}	
-	if(oper=="!="){
-		if(lhs!=NULL && rhs!=NULL){
-			returnval.number.intval=(lhs->eval() != rhs->eval()); 
-			return returnval;
-		}
-		throw gen_error();	
-	}
-
-	// SINGLE OPERAND EXPRESSIONS
-	if(oper=="++"){
-		if((lhs==NULL && rhs==NULL) || (lhs!=NULL && rhs!=NULL)) throw gen_error();
-		if(lhs!=NULL){
-			returnval.number.intval=((lhs->eval())++); 
-			return returnval;
-		}
-		if(rhs!=NULL){ 
-			returnval.number.intval=(++(rhs->eval())); 
-			return returnval;
-		}
-	}	
-	if(oper=="--"){
-		if((lhs==NULL && rhs==NULL) || (lhs!=NULL && rhs!=NULL)) throw gen_error();
-		if(lhs!=NULL){ 
-			returnval.number.intval=((lhs->eval())--); 
-			return returnval;
-		}
-		if(rhs!=NULL){ 
-			returnval.number.intval=(++(rhs->eval())); 
-			return returnval;
-		}
-	}	
-	if(oper=="!"){
-		if(lhs==NULL && rhs!=NULL){
-			returnval.number.intval=(!(rhs->eval())); 
-			return returnval;
-		}
-		throw gen_error();
-	}	
-	if(oper=="~"){
-		if(lhs==NULL && rhs!=NULL){
-			returnval.number.intval=(~(rhs->eval())); 
-			return returnval;
-		}
-		throw gen_error();
-	}	
-	if(oper=="sizeof"){
-		if(lhs==NULL && rhs!=NULL){
-			returnval.number.intval=(sizeof(rhs->eval())); 
-			return returnval;
-		}
-		throw gen_error();
-	}	
-
-	throw gen_error();
-}
 */

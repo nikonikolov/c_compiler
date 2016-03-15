@@ -8,16 +8,13 @@ MAKEFILE="Makefile"
 #bin/c_parser: src/c_parser.tab.cpp src/c_parser.tab.hpp src/c_lexer.yy.cpp
 #	g++ $(CPPFLAGS) src/c_parser.tab.cpp src/c_parser.tab.hpp src/c_lexer.yy.cpp -o bin/c_parser
 
-# For testing functionality of expressions
-bin/parser_expr: src_tmp/parser_expr.tab.cpp src_tmp/parser_expr.tab.hpp src/c_lexer.yy.cpp src/helper.cpp src/helper.hpp $(DATA_STRUCTURE_OBJS)
-	g++ $(CPPFLAGS) src_tmp/parser_expr.tab.cpp src/helper.cpp src/c_lexer.yy.cpp $(DATA_STRUCTURE_OBJS) -o bin/parser_expr
-
-src_tmp/parser_expr.tab.cpp src_tmp/parser_expr.tab.hpp: src_tmp/parser_expr.y
-	bison -d src_tmp/parser_expr.y -o src_tmp/parser_expr.tab.cpp
+# Build Codegen and dependencies
+bin/c_codegen: src/c_codegen.main.cpp src/c_parser.tab.cpp src/c_parser.tab.hpp src/c_lexer.yy.cpp src/helper.cpp src/helper.hpp $(DATA_STRUCTURE_OBJS)
+	g++ $(CPPFLAGS) src/c_codegen.main.cpp src/c_parser.tab.cpp src/helper.cpp src/c_lexer.yy.cpp $(DATA_STRUCTURE_OBJS) -o bin/c_parser
 
 # Build Parser and dependencies
-bin/c_parser: src/c_parser.tab.cpp src/c_parser.tab.hpp src/c_lexer.yy.cpp src/helper.cpp src/helper.hpp $(DATA_STRUCTURE_OBJS)
-	g++ $(CPPFLAGS) src/c_parser.tab.cpp src/helper.cpp src/c_lexer.yy.cpp $(DATA_STRUCTURE_OBJS) -o bin/c_parser
+bin/c_parser: src/c_parser.main.cpp src/c_parser.tab.cpp src/c_parser.tab.hpp src/c_lexer.yy.cpp src/helper.cpp src/helper.hpp $(DATA_STRUCTURE_OBJS)
+	g++ $(CPPFLAGS) src/c_parser.main.cpp src/c_parser.tab.cpp src/helper.cpp src/c_lexer.yy.cpp $(DATA_STRUCTURE_OBJS) -o bin/c_parser
 
 src/c_parser.tab.cpp src/c_parser.tab.hpp: src/c_parser.y
 	bison -d src/c_parser.y -o src/c_parser.tab.cpp
@@ -37,6 +34,12 @@ ctest: syntaxtest.c
 $(DATA_STRUCTURE_OBJS): src/DataStructures/%.o : src/DataStructures/%.cpp
 	g++ $(CPPFLAGS) -c $< -o $@
 
+# For testing functionality of expressions
+#bin/parser_expr: src_tmp/parser_expr.tab.cpp src_tmp/parser_expr.tab.hpp src/c_lexer.yy.cpp src/helper.cpp src/helper.hpp $(DATA_STRUCTURE_OBJS)
+#	g++ $(CPPFLAGS) src_tmp/parser_expr.tab.cpp src/helper.cpp src/c_lexer.yy.cpp $(DATA_STRUCTURE_OBJS) -o bin/parser_expr
+
+#src_tmp/parser_expr.tab.cpp src_tmp/parser_expr.tab.hpp: src_tmp/parser_expr.y
+#	bison -d src_tmp/parser_expr.y -o src_tmp/parser_expr.tab.cpp
 
 clean:
 #	if [ -e src/c_lexer.yy.cpp ]; then 

@@ -3,10 +3,8 @@
 
 #include <cstdint>
 #include <string.h>
-#include <limits>
 #include "BaseExpression.h"
-
-#define INTNAN std::numeric_limits<int>::quiet_NaN()
+#include "include.h"
 
 typedef std::pair<BaseExpression*,int> PtrDeref;
 

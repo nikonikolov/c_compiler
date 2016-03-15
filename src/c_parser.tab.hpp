@@ -66,10 +66,11 @@ extern int yydebug;
   int yylex();
   int yyerror(const char* s);
 
-  //extern Function* root;
-  
+  extern Program* root;
 
-#line 73 "src/c_parser.tab.hpp" /* yacc.c:1909  */
+
+
+#line 74 "src/c_parser.tab.hpp" /* yacc.c:1909  */
 
 /* Token type.  */
 #ifndef YYTOKENTYPE
@@ -169,7 +170,7 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 30 "src/c_parser.y" /* yacc.c:1909  */
+#line 31 "src/c_parser.y" /* yacc.c:1909  */
 
   char* strval;
   uint64_t intval;
@@ -192,7 +193,7 @@ union YYSTYPE
   ExpressionStatement* expr_statement_ptr;
   VarDeclaration* var_declaration_ptr;
 
-#line 196 "src/c_parser.tab.hpp" /* yacc.c:1909  */
+#line 197 "src/c_parser.tab.hpp" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;

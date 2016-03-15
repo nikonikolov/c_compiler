@@ -15,6 +15,7 @@ public:
 
 	void pretty_print(const int& indent) const;
 	void renderasm(ASMhandle& context);
+	snum_t simplify();
 
 private:
 	// Note: you can extract the exact type from the name of the Temaplate Type
@@ -41,5 +42,14 @@ template<class Type>
 void Constant<Type>::renderasm(ASMhandle& context){
 	return;
 }
+
+template<class Type>
+snum_t Constant<Type>::simplify(){
+	snum_t returnval;
+	returnval.tname = tint;
+	returnval.numval.intmem = (int)num_val;
+	return returnval;
+}
+
 
 #endif

@@ -5,8 +5,9 @@
 #include <list>
 #include <iomanip>
 #include <iostream>
-#include "ASMhandle.h"
 #include <iomanip>
+#include <limits>
+//#include "ASMhandle.h"
 
 using std::list;
 using std::vector;
@@ -17,6 +18,7 @@ using std::string;
 using std::pair;
 
 //#define MOD "\t"<<left<<setfill(' ')<< setw(8)
+#define INTNAN std::numeric_limits<int>::quiet_NaN()
 
 std::ostream& pad(std::ostream& os);
 
@@ -45,10 +47,10 @@ enum StatementT{
 };
 
 union unum_t{
-	long double ldoubleval;
-	double 	doubleval;
-	float 	floatval;
-	int 	intval;
+	long double ldoublemem;
+	double 	doublemem;
+	float 	floatmem;
+	int 	intmem;
 };
 
 // NOTE: Order by precedence
@@ -59,9 +61,11 @@ enum enumt{
 	tint = 80
 };
 
-struct snum_t{
+class snum_t{
+public:
 	enumt tname;	// identifies which member the union currently employs
-	unum_t number;	// the union itself
+	unum_t numval;	// the union itself
+	void operator=(const snum_t& obj_in);
 };
 
 

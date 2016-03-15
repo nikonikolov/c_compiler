@@ -10,9 +10,7 @@ public:
 	//BaseExpression(BaseExpression* expr_ptr_in);
 	virtual ~BaseExpression();
 
-	// Not const =0 because at evaluation, there might be optimizations and reductions to be done
-	// Uncomment for Codegen
-	//virtual snum_t eval()=0;
+	virtual snum_t simplify() =0;
 };
 
 

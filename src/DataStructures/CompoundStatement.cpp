@@ -52,27 +52,31 @@ void CompoundStatement::pretty_print(const int& indent) const{
 
 
 
-void CompoundStatement::renderasm(ASMhandle* context){
+void CompoundStatement::renderasm(ASMhandle& context){
 
 	ASMhandle new_context(context);
 
 	if(declarations!=NULL){
 		vector<VarDeclaration*>::iterator it;
 		for(it=declarations->begin(); it!=declarations->end(); ++it){
-			(*it)->renderasm(&new_context);
+			(*it)->renderasm(new_context);
 		}
 	}
 
 	new_context.redefinition_check();
 
-	if(declarations!=NULL){
-		vector<VarDeclaration*>::iterator it;
-		for(it=declarations->begin(); it!=declarations->end(); ++it){
-			(*it)->renderasm(&new_context);
+	if(new_context.local_vars!=NULL){
+		// Initialize uninitialized variables	
+		vector<Variable*>::iterator it;
+		for(it=(new_context.local_vars)->begin(); it!=(new_context.local_vars)->end(); ++it){
+			if(!((*it)->get_initialized())) (*it)->renderasm(new_context);
 		}
 	}
 
-
-
-
+	if(declarations!=NULL){
+		vector<VarDeclaration*>::iterator it;
+		for(it=declarations->begin(); it!=declarations->end(); ++it){
+			(*it)->renderasm(new_context);
+		}
+	}
 }

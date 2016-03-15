@@ -14,7 +14,7 @@ public:
 	void push_back(BaseExpression* expr_in);
 
 	void pretty_print(const int& indent) const;
-	void renderasm(ASMhandle* context);
+	void renderasm(ASMhandle& context);
 private:
 	
 	vector<BaseExpression*>* expr_list;

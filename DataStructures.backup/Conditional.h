@@ -18,7 +18,7 @@ public:
 	~ConditionalCase();
 
 	void pretty_print(const int& indent) const;
-	void renderasm(ASMhandle* context);
+	void renderasm(ASMhandle& context);
 private:
 
 	BaseExpression* condition;				// Condition for the block to be executed. If NULL, then the you have else statement
@@ -40,7 +40,7 @@ public:
 	~Conditional();
 
 	void pretty_print(const int& indent) const;
-	void renderasm(ASMhandle* context);
+	void renderasm(ASMhandle& context);
 private:
 
 	vector<ConditionalCase*>* conditions;			// Pointer to a vector that keeps the order of the conditions checked

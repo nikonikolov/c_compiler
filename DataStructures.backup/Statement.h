@@ -58,7 +58,7 @@ public:
 	virtual ~Statement();
 
 	virtual void pretty_print(const int& indent) const =0;		// parameter specifies the starting column for the printing
-	virtual void renderasm(ASMhandle* context)=0;
+	virtual void renderasm(ASMhandle& context)=0;
 	void set_stat_type(const StatementT& stat_type_in); 
 	StatementT get_stat_type() const ;
 protected:

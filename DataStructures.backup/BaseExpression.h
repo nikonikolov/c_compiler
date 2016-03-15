@@ -56,7 +56,7 @@ public:
 	virtual ~BaseExpression();
 
 	virtual void pretty_print(const int& indent) const =0;		// parameter specifies the starting column for the printing
-	virtual void renderasm(ASMhandle* context)=0;
+	virtual void renderasm(ASMhandle& context)=0;
 
 	// Not const =0 because at evaluation, there might be optimizations and reductions to be done
 	// Uncomment for Codegen

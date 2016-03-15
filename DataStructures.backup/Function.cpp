@@ -38,7 +38,7 @@ void Function::pretty_print(const int& indent) const{
 }
 
 
-void Function::renderasm(ASMhandle* context){
+void Function::renderasm(ASMhandle& context){
 	/* Function header assembly */
 	cout<<"\t.align	2"<<endl;
 	cout<<"\t.globl "<<name<<endl;		// This has to be ommitted for functions declared static

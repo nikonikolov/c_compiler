@@ -57,7 +57,7 @@ void Variable::pretty_print(const int& indent) const{
 }
 
 
-void Variable::renderasm(ASMhandle* context){
+void Variable::renderasm(ASMhandle& context){
 	return;
 }
 

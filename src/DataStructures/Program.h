@@ -20,6 +20,8 @@ public:
 private:
 	vector<Function*>* functions;					// Pointer to a vector of all the functions defined. The MAIN is included here
 	vector<VarDeclaration*>* global_vars;			// Pointer to a vector of all global variables defined in the scope of the program
+
+	ASMhandle* context;
 };
 
 

@@ -41,9 +41,9 @@ void VarDeclaration::pretty_print(const int& indent) const{
 }
 
 
-void VarDeclaration::renderasm(ASMhandle* context){
+void VarDeclaration::renderasm(ASMhandle& context){
 	vector<Variable*>::iterator it;
 	for(it=variables->begin(); it!=variables->end(); ++it){
-		(context->vars)->push_back(*it);
+		context.allocate_var(*it);
 	}
 }

@@ -17,7 +17,7 @@ public:
 	const char* VarExpr::get_name() const;
 	
 	void pretty_print(const int& indent) const;
-	void renderasm(ASMhandle* context);
+	void renderasm(ASMhandle& context);
 
 private:
 	char* name;

@@ -23,13 +23,14 @@ public:
 	void set_type_name(char* type_name_in);
 	void set_init_val(BaseExpression* init_val_in);
 	const char* get_name() const;
+	bool get_initialized() const;
 
 	void set_asm_location(const string& str_in);
 	
 
 
 	void pretty_print(const int& indent) const;
-	void renderasm(ASMhandle* context);
+	void renderasm(ASMhandle& context);
 
 	/* ------------------------------------------------- POINTER RELATED ------------------------------------------------- */
 
@@ -66,8 +67,8 @@ private:
 
 
 	/* Fields for assembly */
-	string location;				// Holds the location of the variable, e.g. 4($sp) or $t0
-
+	char* location;				// Holds the location of the variable, e.g. 4($sp) or $t0
+	bool initialized;
 };
 
 

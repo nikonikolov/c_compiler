@@ -10,7 +10,7 @@ public:
 	CompoundStatement(vector<VarDeclaration*>* declarations_in, vector<Statement*>* statements_in);
 	~CompoundStatement();
 
-	void renderasm(ASMhandle* context);
+	void renderasm(ASMhandle& context);
 	void renderasm(vector<Variable*>* vars_in, int& stack_offset);
 	void pretty_print(const int& indent) const;
 private:

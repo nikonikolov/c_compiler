@@ -25,7 +25,7 @@ public:
 
 	//snum_t eval();
 	void pretty_print(const int& indent) const;
-	void renderasm(ASMhandle* context);
+	void renderasm(ASMhandle& context);
 
 private:
 	string gen_error() const;
@@ -38,7 +38,6 @@ private:
 	int line;
 	string src_file;
 };
-
 
 
 #endif

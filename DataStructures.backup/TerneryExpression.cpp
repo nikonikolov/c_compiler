@@ -76,5 +76,5 @@ void TerneryExpression::pretty_print(const int& indent) const{
 }
 
 
-void TerneryExpression::renderasm(ASMhandle* context){
+void TerneryExpression::renderasm(ASMhandle& context){
 }

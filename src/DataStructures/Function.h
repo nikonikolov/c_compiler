@@ -1,12 +1,13 @@
 #ifndef FUNCTION_H
 #define FUNCTION_H
 
-#include "Statement.h"
 #include "CompoundStatement.h"
 #include "Variable.h"
 
+
 /*	FIX:
 		1. Currently only 32bit wide arguments assumed as function parameters
+		2. Move function arguments on the stack
 */
 
 
@@ -16,11 +17,11 @@ public:
 	Function(Variable* return_type_in, char* name_in, vector<Variable*>* params_in, CompoundStatement* fn_body_in);
 	~Function();
 
-	void renderasm(ASMhandle* context);
+	void renderasm(ASMhandle& context);
 	void pretty_print(const int& indent) const;
 private:
 	
-	void prep_for_asm(ASMhandle* context);
+	void prep_for_asm(ASMhandle& context);
 
 	
 	/* 	return_type specifies what type the return value should be. This structure allows for handling pointers as well. 

@@ -13,7 +13,7 @@ public:
 	~Loop();
 
 	void pretty_print(const int& indent) const;
-	void renderasm(ASMhandle* context);
+	void renderasm(ASMhandle& context);
 private:
 
 	// Note: only one can be initialized to a non-NULL value

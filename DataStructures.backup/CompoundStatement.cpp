@@ -51,7 +51,7 @@ void CompoundStatement::pretty_print(const int& indent) const{
 }
 
 
-void CompoundStatement::renderasm(ASMhandle* context){
+void CompoundStatement::renderasm(ASMhandle& context){
 }
 
 void CompoundStatement::renderasm(vector<Variable*>* vars_in, int& stack_offset){

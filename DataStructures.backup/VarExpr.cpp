@@ -22,6 +22,6 @@ void VarExpr::pretty_print(const int& indent) const{
 }
 
 
-void VarExpr::renderasm(ASMhandle* context){
+void VarExpr::renderasm(ASMhandle& context){
 	return;
 }

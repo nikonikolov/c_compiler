@@ -22,7 +22,7 @@ void ConditionalCase::pretty_print(const int& indent) const{
 }
 
 
-void ConditionalCase::renderasm(ASMhandle* context){
+void ConditionalCase::renderasm(ASMhandle& context){
 }
 
 
@@ -52,5 +52,5 @@ void Conditional::pretty_print(const int& indent) const{
 }
 
 
-void Conditional::renderasm(ASMhandle* context){
+void Conditional::renderasm(ASMhandle& context){
 }

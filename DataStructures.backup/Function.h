@@ -16,7 +16,7 @@ public:
 	Function(Variable* return_type_in, char* name_in, vector<Variable*>* params_in, CompoundStatement* fn_body_in);
 	~Function();
 
-	void renderasm(ASMhandle* context);
+	void renderasm(ASMhandle& context);
 	void pretty_print(const int& indent) const;
 private:
 	

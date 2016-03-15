@@ -47,7 +47,7 @@ void Expression::pretty_print(const int& indent) const{
 }
 
 
-void Expression::renderasm(ASMhandle* context){
+void Expression::renderasm(ASMhandle& context){
 }
 
 // Add support for other types later
@@ -74,7 +74,7 @@ string Expression::gen_error() const{
 	return result;
 }
 
-// Note the top level is the caller to eval and the caller has to handle the exception. Usually that would be renderasm(ASMhandle* context)
+// Note the top level is the caller to eval and the caller has to handle the exception. Usually that would be renderasm(ASMhandle& context)
 // Note you cannot have Constant as return type as this is a pure virtual function defined in BaseExpression which cannot have
 // visibility of the Constant class
 /*snum_t Expression::eval(){

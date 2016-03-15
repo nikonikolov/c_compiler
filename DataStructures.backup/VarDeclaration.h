@@ -19,7 +19,7 @@ public:
 	void set_types(char* type_name_in);
 
 	void pretty_print(const int& indent) const;
-	void renderasm(ASMhandle* context);
+	void renderasm(ASMhandle& context);
 	void renderasm(vector<Variable*>* vars_in);
 
 private:

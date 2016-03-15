@@ -2,12 +2,12 @@
 
 
 Variable::Variable(char* name_in) :
-	type_name(NULL), init_val(NULL), dereferencer(NULL) {
+	type_name(NULL), init_val(NULL), dereferencer(NULL), initialized(false), location(NULL) {
 		name = strdup(name_in);
 }
 
 Variable::Variable(char* type_name_in, char* name_in, list<PtrDeref>* dereferencer_in/*=NULL*/) :
-	init_val(NULL), dereferencer(dereferencer_in){
+	init_val(NULL), dereferencer(dereferencer_in), initialized(false), location(NULL) {
 	type_name = strdup(type_name_in);
 	if(name_in!=NULL) name = strdup(name_in);
 }
@@ -41,10 +41,12 @@ const char* Variable::get_name() const{
 }
 
 void Variable::set_asm_location(const string& str_in){
-	location=str_in;
+	location=strdup(str_in.c_str());
 }
 
-
+bool Variable::get_initialized() const{
+	return initialized;
+}
 
 
 /* ================================================== VIRTUAL OVERRIDE ================================================== */
@@ -57,8 +59,14 @@ void Variable::pretty_print(const int& indent) const{
 }
 
 
-void Variable::renderasm(ASMhandle* context){
-	return;
+void Variable::renderasm(ASMhandle& context){
+	if(initialized) return;
+	initialized = true;
+	if(init_val==NULL) return;/*{
+		context->stack_offset+=4;
+		cout<<"\taddiu $sp, $sp, 4"<<endl;
+		location = stack_offset+"($sp)";
+	} */
 }
 
 

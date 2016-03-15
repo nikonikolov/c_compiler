@@ -1,80 +1,51 @@
 #ifndef STATEMENT_H
 #define STATEMENT_H
 
-#include <vector>
-#include <list>
-#include <iomanip>
-#include <iostream>
-#include "ASMhandle.h"
+#include "include.h"
+//#include "Variable.h"
 
-
-using std::list;
-using std::vector;
-using std::cout;
-using std::cerr;
-using std::endl;
-using std::string;
-/*	
-	An abstract class that can cover expressions, function declarations and calls, if statements, loops
-*/
-
-
-enum StatementT{
-	// Block Statements
-	ST_fn_def = 1,
-	ST_loop = 2,
-	ST_fn_call = 3,
-	// function_prototype = 4; // maybe??
-	ST_conditional = 5,
-	ST_conditional_case = 6,
-	ST_var_declaration_container = 7,
-	ST_return = 7,
-	ST_compound = 8,
-	
-	// Expressions
-	ST_expression = 20,
-	ST_expr_statement = 21,
-	ST_constant = 22,
-	ST_var_expr = 24,
-	ST_var_return = 25,
-	ST_var_fn_param = 26,
-	ST_base_expr = 27,
-	ST_ternery_expr = 28
-};
-
-union unum_t{
-	long double ldoubleval;
-	double 	doubleval;
-	float 	floatval;
-	int 	intval;
-};
-
-// NOTE: Order by precedence
-enum enumt{
-	tldouble = 100,
-	tdouble = 98,
-	tfloat = 96,
-	tint = 80
-};
-
-struct snum_t{
-	enumt tname;	// identifies which member the union currently employs
-	unum_t number;	// the union itself
-};
+/* =============================================== ASMHANDLE CLASS =============================================== */
 
 class Variable;
+class Function;
+
+//extern void Variable::set_asm_location(const string& str_in);
 
 class ASMhandle{
+
 public:
-	ASMhandle(ASMhandle* orig);
+	ASMhandle(const ASMhandle& orig);
+	ASMhandle(vector<Function*>* functions_in, vector<Variable*>* global_vars_in);
 	~ASMhandle();
 
 	void redefinition_check();
-	int stack_offset;
-	vector<Variable*>* vars;	
+	void subroutine_enter(const int& mem_amount = 24);
+	void subroutine_exit();
+	void allocate_mem(const int& mem_amount = 24);
+	string allocate_var(Variable* var_in, const int& mem_amount = 4);
+	//void allocate_var(Variable* var_in, const int& mem_amount = 4);
+	string allocate_var(const int& mem_amount = 4);
+	void deallocate_var(const int& mem_amount = 4);
+
+	int sp_offset; 					// Indicates by how much of the stack pointer needs to be incremented on subroutine exit
+	// Indicates how much memory is allocated for the current subroutine. Needs to be incremented when frame_offset becomes equal
+	int allocated_mem;					
+	int fp_offset; 					// Indicates how much of the currently allocated stack memory is used
+
+	vector<Variable*>* local_vars;
+	vector<Variable*>* global_vars;	
+	
+	// Probably a function prototype class will be better when it is ready
+	vector<Function*>* functions;		
+private:
 };
 
 
+/* =============================================== STATEMENT CLASS =============================================== */
+
+/*	
+	An abstract class that can cover expressions, function declarations and calls, if statements, loops
+*/
 
 class Statement{
 
@@ -83,7 +54,7 @@ public:
 	virtual ~Statement();
 
 	virtual void pretty_print(const int& indent) const =0;		// parameter specifies the starting column for the printing
-	virtual void renderasm(ASMhandle* context)=0;
+	virtual void renderasm(ASMhandle& context)=0;
 	void set_stat_type(const StatementT& stat_type_in); 
 	StatementT get_stat_type() const ;
 protected:

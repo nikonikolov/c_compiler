@@ -17,7 +17,7 @@ void ReturnStatement::pretty_print(const int& indent) const{
 }
 
 
-void ReturnStatement::renderasm(ASMhandle* context){
+void ReturnStatement::renderasm(ASMhandle& context){
 }
 
 

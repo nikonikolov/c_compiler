@@ -18,7 +18,7 @@ void Loop::pretty_print(const int& indent) const{
 }
 
 
-void Loop::renderasm(ASMhandle* context){
+void Loop::renderasm(ASMhandle& context){
 }
 
 

@@ -1,10 +1,10 @@
 #include "Program.h"
 
 Program::Program() :
-	global_vars(NULL), functions(NULL) {}
+	global_vars(NULL), functions(NULL), context(NULL) {}
 
 Program::Program(vector<VarDeclaration*>* global_vars_in, vector<Function*>* functions_in) :
-	global_vars(global_vars_in), functions(functions_in) {}
+	global_vars(global_vars_in), functions(functions_in), context(NULL) {}
 
 
 Program::~Program(){

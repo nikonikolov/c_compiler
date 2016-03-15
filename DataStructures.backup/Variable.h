@@ -29,7 +29,7 @@ public:
 
 
 	void pretty_print(const int& indent) const;
-	//void renderasm(ASMhandle* context);
+	//void renderasm(ASMhandle& context);
 
 	/* ------------------------------------------------- POINTER RELATED ------------------------------------------------- */
 

@@ -16,9 +16,9 @@ public:
 	void push_back_lhs(BaseExpression* expr_in);
 	void push_back_rhs(BaseExpression* expr_in);
 
-	snum_t eval();
-	void pretty_print(const int& indent) const;
-	void renderasm(ASMhandle& context);
+	BaseExpression* simplify(snum_t& value);
+	void pretty_print(const int& indent);
+	void renderasm(ASMhandle& context, char** destination=NULL);
 
 private:
 	vector<BaseExpression*>* lhs;			// Bottom nodes

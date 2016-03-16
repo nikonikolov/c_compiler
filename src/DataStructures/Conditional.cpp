@@ -16,7 +16,7 @@ ConditionalCase::~ConditionalCase(){
 
 }
 
-void ConditionalCase::pretty_print(const int& indent) const{
+void ConditionalCase::pretty_print(const int& indent){
 	if(single_statement!=NULL)	single_statement->pretty_print(indent);
 	if(block_statement!=NULL)	block_statement->pretty_print(indent);
 }
@@ -43,7 +43,7 @@ Conditional::~Conditional(){
 }
 
 
-void Conditional::pretty_print(const int& indent) const{
+void Conditional::pretty_print(const int& indent){
 	vector<ConditionalCase*>::iterator it;
 	for(it=conditions->begin(); it!=conditions->end(); ++it){
 		if(*it!=NULL) (*it)->pretty_print(indent);

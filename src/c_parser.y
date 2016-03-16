@@ -15,6 +15,7 @@
   #include "DataStructures/BaseExpression.h"
   #include "DataStructures/TerneryExpression.h"
   #include "DataStructures/Expression.h"
+  #include "DataStructures/AssignmentExpression.h"
   #include "DataStructures/ExpressionStatement.h"
   
   using namespace std;
@@ -168,9 +169,9 @@
 /* ============================================== PROGRAM START ELEMENTS ============================================== */
 
 
-program : fn_declaration                                   { root = new Program(); root->push_fn_back($1);}
+program : fn_declaration                                   { root = new Program(); root->insert_fn($1);}
         | declaration                                      { root = new Program(); root->push_var_back($1);}
-        | program fn_declaration                           { root->push_fn_back($2); }
+        | program fn_declaration                           { root->insert_fn($2); }
         | program declaration                              { root->push_var_back($2); }
         ;
         
@@ -343,9 +344,9 @@ postfix_expression  // Reduction to Level 0
                     | postfix_expression PTR_OP IDENTIFIER                              //{ Expression* tmp = new VarExpr($3);
                                                                                         //  $$ = new Expression($1, $2, tmp);}
                     // Post increment
-                    | postfix_expression PLUS_PLUS                                      { $$ = new Expression($1, $2, NULL);}
+                    | postfix_expression PLUS_PLUS                      { $$ = new AssignmentExpression($1, $2, NULL);}
                     // Post decrement
-                    | postfix_expression MINUS_MINUS                                    { $$ = new Expression($1, $2, NULL);}
+                    | postfix_expression MINUS_MINUS                    { $$ = new AssignmentExpression($1, $2, NULL);}
                     ;
 
 // Note: Arguments to functions can be expressions. If so, the evaluation is executed
@@ -359,11 +360,11 @@ argument_expression_list  : assignment_expression
 unary_expression  // Reduction to Level 1 
                   : postfix_expression                                                  { $$ = $1;}
                   // Pre increment
-                  | PLUS_PLUS unary_expression                                          { $$ = new Expression(NULL, $1, $2);}
+                  | PLUS_PLUS unary_expression                            { $$ = new AssignmentExpression(NULL, $1, $2);}
                   // Pre decrement
-                  | MINUS_MINUS unary_expression                                        { $$ = new Expression(NULL, $1, $2);}
+                  | MINUS_MINUS unary_expression                          { $$ = new AssignmentExpression(NULL, $1, $2);}
                   // Type cast, see UNARY_OPERATOR
-                  | UNARY_OPERATOR cast_expression                                      { $$ = new Expression(NULL, $1, $2);}
+                  | UNARY_OPERATOR cast_expression                        { $$ = new Expression(NULL, $1, $2);}
                   // Sizeof 
                   | SIZEOF unary_expression                                             { $$ = new Expression(NULL, $1, $2);}
                   // Sizeof type
@@ -510,9 +511,9 @@ conditional_expression  // Reduction to Level 12
 
 // Level 14 Precedence
 assignment_expression // Reduction to Level 13
-                      : conditional_expression                                          { $$ = $1; }
+                      : conditional_expression                                      { $$ = $1; }
                       // Assignment
-                      | unary_expression ASSIGNMENT_OPERATOR assignment_expression      { $$ = new Expression($1, $2, $3);}
+                      | unary_expression ASSIGNMENT_OPERATOR assignment_expression  { $$ = new AssignmentExpression($1, $2, $3);}
                       ;
 
 ASSIGNMENT_OPERATOR : EQUALS                      { $$ = $1;}
@@ -540,7 +541,7 @@ expression  : assignment_expression               { $$ = $1;}
 expression_list // Reduction to Level 14
                 : expression                                        { $$ = new ExpressionStatement($1);}                                    
                 // List of expressions
-                | expression COMMA assignment_expression            { $$->push_back($3);}
+                | expression_list COMMA expression                  { $$->push_back($3);}
                 ;
 
 

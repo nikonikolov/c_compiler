@@ -10,7 +10,7 @@ MAKEFILE="Makefile"
 
 # Build Codegen and dependencies
 bin/c_codegen: src/c_codegen.main.cpp src/c_parser.tab.cpp src/c_parser.tab.hpp src/c_lexer.yy.cpp src/helper.cpp src/helper.hpp $(DATA_STRUCTURE_OBJS)
-	g++ $(CPPFLAGS) src/c_codegen.main.cpp src/c_parser.tab.cpp src/helper.cpp src/c_lexer.yy.cpp $(DATA_STRUCTURE_OBJS) -o bin/c_parser
+	g++ $(CPPFLAGS) src/c_codegen.main.cpp src/c_parser.tab.cpp src/helper.cpp src/c_lexer.yy.cpp $(DATA_STRUCTURE_OBJS) -o bin/c_codegen
 
 # Build Parser and dependencies
 bin/c_parser: src/c_parser.main.cpp src/c_parser.tab.cpp src/c_parser.tab.hpp src/c_lexer.yy.cpp src/helper.cpp src/helper.hpp $(DATA_STRUCTURE_OBJS)

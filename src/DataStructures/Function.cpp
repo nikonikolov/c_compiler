@@ -21,7 +21,16 @@ Function::~Function(){
 	if(fn_body!=NULL) delete fn_body;
 }
 
-void Function::pretty_print(const int& indent) const{
+string Function::get_name() const{
+	return string(name);
+}
+
+void Function::generate_error() const{
+	
+}
+
+
+void Function::pretty_print(const int& indent){
 	string white_space, new_scope_indent="    ";
 	white_space.resize(indent, ' ');
 
@@ -37,14 +46,18 @@ void Function::pretty_print(const int& indent) const{
 
 }
 
+void Function::init_asm_name(){
+	strcpy(asm_name, "abcdefg");
+	strcat(asm_name, name);
+}
 
 void Function::renderasm(ASMhandle& context){
 	/* Function header assembly */
 	cout<<"\t.align	2"<<endl;
-	cout<<"\t.globl "<<name<<endl;		// This has to be ommitted for functions declared static
-	cout<<"\t.ent "<<name<<endl;
-	cout<<"\t.type "<<name<<", @function"<<endl;
-	cout<<name<<":"<<endl;
+	cout<<"\t.globl "<<asm_name<<endl;		// This has to be ommitted for functions declared static
+	cout<<"\t.ent "<<asm_name<<endl;
+	cout<<"\t.type "<<asm_name<<", @function"<<endl;
+	cout<<asm_name<<":"<<endl;
 
 	ASMhandle new_context(context);
 
@@ -58,7 +71,7 @@ void Function::renderasm(ASMhandle& context){
 
 
 	/* Function end assembly */
-	cout<<endl<<"\t.end "<<name<<endl<<endl;
+	cout<<endl<<"\t.end "<<asm_name<<endl<<endl;
 }
 
 
@@ -69,16 +82,22 @@ void Function::prep_for_asm(ASMhandle& context){
 	// Repair - put arguments on the stack and account for arguments bigger than 32bits
 	for(int i=0; i<params->size() && i<4; i++){
 		(*params)[i]->set_asm_location("$a"+std::to_string(i));
-		(context.local_vars)->push_back((*params)[i]);
+		pair<string, Variable*> tmp((*params)[i]->get_name_str() ,(*params)[i]);
+		try{
+			context.insert_local_var(tmp);
+		}
+		catch(const ErrorgenT& error_in){
+			(*params)[i]->generate_error();
+		}
 	}
 
 	for(int i=4; i<params->size(); i++){
-		//(*params)[i]->set_asm_location(context.allocate_var());
-		//(context->local_vars)->push_back((*params)[i]);
-		
-		(*params)[i]->set_asm_location(context.allocate_var((*params)[i]));
-		
-		//context.allocate_var((*params)[i]);
+		pair<string, Variable*> tmp((*params)[i]->get_name_str() ,(*params)[i]);
+		try{
+			(*params)[i]->set_asm_location(context.allocate_var(tmp));
+		}
+		catch(const ErrorgenT& error_in){
+			(*params)[i]->generate_error();
+		}
 	}
-
 }

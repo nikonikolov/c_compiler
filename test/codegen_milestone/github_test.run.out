@@ -1,0 +1,22 @@
+VARIABLE : g
+VARIABLE : b
+VARIABLE : d
+VARIABLE : f
+FUNCTION : x
+FUNCTION : zz
+    PARAM : a
+    PARAM : b
+    PARAM : c
+SCOPE
+    SCOPE
+        VARIABLE : abcd
+        (abcd)=((a)+(b))
+    (a)=(b)
+    SCOPE
+        VARIABLE : fsdfsdfs
+        RETURN (a)==(b)
+    SCOPE
+        (a)=(b)
+    SCOPE
+        (a)=(b)
+    RETURN (a)==(b)

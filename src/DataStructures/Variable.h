@@ -4,30 +4,33 @@
 #include <cstdint>
 #include <string.h>
 #include "BaseExpression.h"
-#include "include.h"
 
 typedef std::pair<BaseExpression*,int> PtrDeref;
 
 class Variable{
 
 public:
-	// NOTE: you need to overload constructor to build dereferencer
+	// NOTE: you need to overload constructor to build dereferencepretty_print(const int& indent)r
 
 	Variable(char* name_in);
 	Variable(char* type_name_in, char* name_in, list<PtrDeref>* dereferencer_in=NULL);
 
 	~Variable();
 
-	void set_type_name(char* type_name_in);
-	void set_init_val(BaseExpression* init_val_in);
 	const char* get_name() const;
+	string get_name_str() const;
 	bool get_initialized() const;
 
+	void set_type_name(char* type_name_in);
+	void set_init_val(BaseExpression* init_val_in);
 	void set_asm_location(const string& str_in);
-	
+	void set_asm_location(char* str_in);
+	char* get_asm_location();
+	void init_asm_name();
 
+	void generate_error();
 
-	void pretty_print(const int& indent) const;
+	void pretty_print(const int& indent);
 	void renderasm(ASMhandle& context);
 
 	/* ------------------------------------------------- POINTER RELATED ------------------------------------------------- */
@@ -39,6 +42,8 @@ public:
 
 
 private:
+	void simplify_init_val();
+
 	/* 	Template version instead of using var_type would not be a good idea since you would not know the types of Variables
 		appearing in BaseExpressions. Enum type instead of string would not be useful as well because you won't be able to
 		describe structs and unions. Note that the string contains only type-names such as int, double, etc and no * or [].
@@ -67,6 +72,10 @@ private:
 	/* Fields for assembly */
 	char* location;				// Holds the location of the variable, e.g. 4($sp) or $t0
 	bool initialized;
+	char* asm_name;
+
+	int line;
+	string src_file;
 };
 
 

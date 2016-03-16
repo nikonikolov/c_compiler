@@ -18,7 +18,7 @@ public:
 
 	void set_types(char* type_name_in);
 
-	void pretty_print(const int& indent) const;
+	void pretty_print(const int& indent);
 	void renderasm(ASMhandle& context);
 
 private:

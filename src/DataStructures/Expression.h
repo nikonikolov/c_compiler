@@ -3,7 +3,7 @@
 
 #include "BaseExpression.h"
 #include "Constant.h"
-#include <string>
+#include <string.h>
 
 
 /*	REQUIRED FIXES:
@@ -16,27 +16,39 @@
 class Expression : public BaseExpression{
 
 public:
+	Expression(BaseExpression* lhs_in, char* oper_in, BaseExpression* rhs_in, const ExprT& expr_type_in);
+	Expression(BaseExpression* lhs_in, char* oper_in, BaseExpression* rhs_in, const ExprT& expr_type_in, 
+																			const int& line_in, const string& src_file_in);
+	
 	Expression(BaseExpression* lhs_in, char* oper_in, BaseExpression* rhs_in);
-	Expression(const int& line_in, char* src_file_in, BaseExpression* lhs_in, char* oper_in, BaseExpression* rhs_in);
-	~Expression();
+	Expression(BaseExpression* lhs_in, char* oper_in, BaseExpression* rhs_in, const int& line_in, const string& src_file_in);
+	virtual ~Expression();
 
 	void set_lhs(Expression* lhs_in);	
 	void set_rhs(Expression* rhs_in);
 
-	snum_t simplify();
-	void pretty_print(const int& indent) const;
-	void renderasm(ASMhandle& context);
+	virtual BaseExpression* simplify(snum_t& value);
+	void pretty_print(const int& indent);
+	virtual void renderasm(ASMhandle& context, char** destination=NULL);
 
-private:
+protected:
 	string gen_error() const;
-	void init_subexpr(BaseExpression* expr_ptr, const snum_t& result);
-	
+	/*void arithmetic_ins(char* instruction, char* destination, char* arg1, char* arg2);
+	void logical_or_ins(char* destination, char* arg1, char* arg2);
+	void logical_comparison_ins(char* instruction, char* destination, char* arg1,
+																			char* arg2, const bool& subtract=true);
+	*/
+	void arithmetic_ins(char* destination, char* arg1, char* arg2, const string& instruction);
+	void logical_or_ins(ASMhandle& context, char* destination, char* arg1, char* arg2);
+	void logical_and_ins(ASMhandle& context, char* destination, char* arg1, char* arg2);
+	void logical_not_ins(ASMhandle& context, char* destination, char* arg);
+	void logical_comparison_ins(ASMhandle& context, char* destination, char* arg1, char* arg2, const string& instruction, const bool& subtract=true);
+	void sign_ins(char* destination, char* arg, const bool& get_negative);
+
+
 	char* oper;
 	BaseExpression* lhs;
 	BaseExpression* rhs;
-
-	int line;
-	string src_file;
 };
 
 

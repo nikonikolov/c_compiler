@@ -58,6 +58,7 @@ extern int yydebug;
   #include "DataStructures/BaseExpression.h"
   #include "DataStructures/TerneryExpression.h"
   #include "DataStructures/Expression.h"
+  #include "DataStructures/AssignmentExpression.h"
   #include "DataStructures/ExpressionStatement.h"
   
   using namespace std;
@@ -70,7 +71,7 @@ extern int yydebug;
 
 
 
-#line 74 "src/c_parser.tab.hpp" /* yacc.c:1909  */
+#line 75 "src/c_parser.tab.hpp" /* yacc.c:1909  */
 
 /* Token type.  */
 #ifndef YYTOKENTYPE
@@ -170,7 +171,7 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 31 "src/c_parser.y" /* yacc.c:1909  */
+#line 32 "src/c_parser.y" /* yacc.c:1909  */
 
   char* strval;
   uint64_t intval;
@@ -193,7 +194,7 @@ union YYSTYPE
   ExpressionStatement* expr_statement_ptr;
   VarDeclaration* var_declaration_ptr;
 
-#line 197 "src/c_parser.tab.hpp" /* yacc.c:1909  */
+#line 198 "src/c_parser.tab.hpp" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;

@@ -12,7 +12,7 @@ public:
 	Loop(Statement* loop_statement_in);
 	~Loop();
 
-	void pretty_print(const int& indent) const;
+	void pretty_print(const int& indent);
 	void renderasm(ASMhandle& context);
 private:
 

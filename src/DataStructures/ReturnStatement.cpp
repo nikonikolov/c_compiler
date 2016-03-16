@@ -7,7 +7,7 @@ ReturnStatement::~ReturnStatement(){
 }
 
 
-void ReturnStatement::pretty_print(const int& indent) const{
+void ReturnStatement::pretty_print(const int& indent){
 	string white_space, new_scope_indent="    ";
 	white_space.resize(indent, ' ');
 

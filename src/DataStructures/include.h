@@ -3,14 +3,18 @@
 
 #include <vector>
 #include <list>
+#include <map>
 #include <iomanip>
 #include <iostream>
 #include <iomanip>
 #include <limits>
+#include <string>
+#include <string.h>
 //#include "ASMhandle.h"
 
 using std::list;
 using std::vector;
+using std::map;
 using std::cout;
 using std::cerr;
 using std::endl;
@@ -22,6 +26,7 @@ using std::pair;
 
 std::ostream& pad(std::ostream& os);
 
+/* =============================================== STATEMENT TYPES =============================================== */
 
 enum StatementT{
 	// Block Statements
@@ -45,6 +50,28 @@ enum StatementT{
 	ST_base_expr = 27,
 	ST_ternery_expr = 28
 };
+
+/* =============================================== EXPRESSION TYPES =============================================== */
+
+
+enum ExprT{
+	//EXPR_fn_call = 3,
+	
+	EXPR_expression = 20,
+	EXPR_expr_statement = 21,
+	EXPR_constant = 22,
+	EXPR_assignment_expr = 23,
+	EXPR_tmp_var = 24,
+	EXPR_ternery_expr = 28
+};
+
+/* =============================================== ERROR TYPES =============================================== */
+
+enum ErrorgenT{
+	ERROR_redefinition = 1 
+};
+
+/* =============================================== VARIOUS EXPRESSION RETURN TYPE =============================================== */
 
 union unum_t{
 	long double ldoublemem;

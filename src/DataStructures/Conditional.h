@@ -17,7 +17,7 @@ public:
 	ConditionalCase(CompoundStatement* block_statement_in, BaseExpression* condition_in = NULL);
 	~ConditionalCase();
 
-	void pretty_print(const int& indent) const;
+	void pretty_print(const int& indent);
 	void renderasm(ASMhandle& context);
 private:
 
@@ -39,7 +39,7 @@ public:
 	Conditional(vector<ConditionalCase*>* conditions_in);
 	~Conditional();
 
-	void pretty_print(const int& indent) const;
+	void pretty_print(const int& indent);
 	void renderasm(ASMhandle& context);
 private:
 

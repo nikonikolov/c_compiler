@@ -10,7 +10,7 @@ public:
 	ReturnStatement(BaseExpression* return_expr_in=NULL);
 	~ReturnStatement();
 
-	void pretty_print(const int& indent) const;
+	void pretty_print(const int& indent);
 	void renderasm(ASMhandle& context);
 private:
 

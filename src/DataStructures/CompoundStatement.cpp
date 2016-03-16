@@ -25,7 +25,7 @@ CompoundStatement::~CompoundStatement(){
 	}
 }
 
-void CompoundStatement::pretty_print(const int& indent) const{
+void CompoundStatement::pretty_print(const int& indent){
 	string white_space, new_scope_indent="    ";
 	white_space.resize(indent, ' ');
 
@@ -65,17 +65,18 @@ void CompoundStatement::renderasm(ASMhandle& context){
 
 	new_context.redefinition_check();
 
+	// Initialize uninitialized variables	
 	if(new_context.local_vars!=NULL){
-		// Initialize uninitialized variables	
-		vector<Variable*>::iterator it;
+		map<string, Variable*>::iterator it;
 		for(it=(new_context.local_vars)->begin(); it!=(new_context.local_vars)->end(); ++it){
-			if(!((*it)->get_initialized())) (*it)->renderasm(new_context);
+			if(!((*it).second->get_initialized())) (*it).second->renderasm(new_context);
 		}
 	}
 
-	if(declarations!=NULL){
-		vector<VarDeclaration*>::iterator it;
-		for(it=declarations->begin(); it!=declarations->end(); ++it){
+	// Execute the statements
+	if(statements!=NULL){
+		vector<Statement*>::iterator it;
+		for(it=statements->begin(); it!=statements->end(); ++it){
 			(*it)->renderasm(new_context);
 		}
 	}

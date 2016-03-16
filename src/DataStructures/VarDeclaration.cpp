@@ -28,7 +28,7 @@ void VarDeclaration::set_types(char* type_name_in){
 }
 
 
-void VarDeclaration::pretty_print(const int& indent) const{
+void VarDeclaration::pretty_print(const int& indent){
 	string white_space;
 	white_space.resize(indent, ' ');
 	if(variables==NULL) return;
@@ -44,6 +44,7 @@ void VarDeclaration::pretty_print(const int& indent) const{
 void VarDeclaration::renderasm(ASMhandle& context){
 	vector<Variable*>::iterator it;
 	for(it=variables->begin(); it!=variables->end(); ++it){
-		context.allocate_var(*it);
+		pair<string, Variable*> tmp((*it)->get_name_str(), (*it));
+		(*it)->set_asm_location(context.allocate_var(tmp));
 	}
 }

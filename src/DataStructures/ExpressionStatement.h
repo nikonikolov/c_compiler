@@ -13,9 +13,11 @@ public:
 
 	void push_back(BaseExpression* expr_in);
 
-	void pretty_print(const int& indent) const;
+	void pretty_print(const int& indent);
 	void renderasm(ASMhandle& context);
+
 private:
+	void simplify();
 	
 	vector<BaseExpression*>* expr_list;
 };

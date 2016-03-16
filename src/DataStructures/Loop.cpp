@@ -12,7 +12,7 @@ Loop::~Loop(){
 }
 
 
-void Loop::pretty_print(const int& indent) const{
+void Loop::pretty_print(const int& indent){
 	if(loop_body!=NULL)	loop_body->pretty_print(indent);
 	if(loop_statement!=NULL)	loop_statement->pretty_print(indent);
 }

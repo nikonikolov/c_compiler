@@ -40,29 +40,60 @@ const char* Variable::get_name() const{
 	return name;
 }
 
+string Variable::get_name_str() const{
+	return string(name);
+}
+
+
 void Variable::set_asm_location(const string& str_in){
 	location=strdup(str_in.c_str());
+}
+
+void Variable::set_asm_location(char* str_in){
+	location=strdup(str_in);
+}
+char* Variable::get_asm_location(){
+	return location;
 }
 
 bool Variable::get_initialized() const{
 	return initialized;
 }
 
+void Variable::init_asm_name(){
+	strcpy(asm_name, "abcdefg");
+	strcat(asm_name, name);
+}
+
+void Variable::generate_error(){
+	if(src_file.empty()) 	cerr<<"Error in source file at line ";
+	else 					cerr<<"Error in file "<<src_file<<" at line ";
+	cerr<<line<<" : Redefinition of variable \""<<name<<"\""<<endl;
+}
+
+
 
 /* ================================================== VIRTUAL OVERRIDE ================================================== */
 
 
-void Variable::pretty_print(const int& indent) const{
+void Variable::pretty_print(const int& indent){
 	string white_space;
 	white_space.resize(indent, ' ');
 	cout<<white_space<<name;
+
+	if(init_val!=NULL){
+		cout<<" = ";
+		init_val->pretty_print(0);
+	}
 }
 
 
 void Variable::renderasm(ASMhandle& context){
 	if(initialized) return;
 	initialized = true;
-	if(init_val==NULL) return;/*{
+	if(init_val==NULL) return;
+	simplify_init_val();
+	/*{
 		context->stack_offset+=4;
 		cout<<"\taddiu $sp, $sp, 4"<<endl;
 		location = stack_offset+"($sp)";
@@ -86,7 +117,22 @@ void Variable::dereference_front(BaseExpression* expr_in, const int& size/*=INTN
 }
 
 
+/* ================================================== PRIVATE ================================================== */
 
+void Variable::simplify_init_val(){
+	BaseExpression* tmp_expr=NULL;
+	try{
+		if(init_val!=NULL){
+			snum_t tmp;
+			tmp_expr = init_val->simplify(tmp);
+			if(tmp_expr!=NULL){
+				delete init_val;
+				init_val = tmp_expr; 		// In case LHS was not simplified
+			}
+		} 
+	}
+	catch(const int& exception_in){}
+}
 
 
 

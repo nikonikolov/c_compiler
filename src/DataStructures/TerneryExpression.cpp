@@ -1,7 +1,7 @@
 #include "TerneryExpression.h"
 
 TerneryExpression::TerneryExpression(vector<BaseExpression*>* lhs_in, BaseExpression* mid_in, vector<BaseExpression*>* rhs_in) :
-	BaseExpression(ST_ternery_expr), lhs(lhs_in), mid(mid_in), rhs(rhs_in) {}
+	BaseExpression(EXPR_ternery_expr), lhs(lhs_in), mid(mid_in), rhs(rhs_in) {}
 
 TerneryExpression::~TerneryExpression(){
 	if(lhs!=NULL){
@@ -22,9 +22,7 @@ TerneryExpression::~TerneryExpression(){
 	if(mid!=NULL) delete mid;
 }
 
-snum_t TerneryExpression::eval(){
-	//return mid->eval();
-}
+
 
 void TerneryExpression::set_lhs(vector<BaseExpression*>* lhs_in){
 	if(lhs!=NULL) return;
@@ -51,7 +49,7 @@ void TerneryExpression::push_back_lhs(BaseExpression* expr_in){
 	lhs->push_back(expr_in);
 }
 
-void TerneryExpression::pretty_print(const int& indent) const{
+void TerneryExpression::pretty_print(const int& indent){
 	string white_space;
 	white_space.resize(indent, ' ');
 	if(mid!=NULL){
@@ -76,5 +74,9 @@ void TerneryExpression::pretty_print(const int& indent) const{
 }
 
 
-void TerneryExpression::renderasm(ASMhandle& context){
+void TerneryExpression::renderasm(ASMhandle& context, char** destination /*=NULL*/){
+}
+
+BaseExpression* TerneryExpression::simplify(snum_t& value){
+	//return mid->eval();
 }

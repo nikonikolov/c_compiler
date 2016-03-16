@@ -3,6 +3,7 @@
 
 #include "CompoundStatement.h"
 #include "Variable.h"
+#include "include.h"
 
 
 /*	FIX:
@@ -17,8 +18,13 @@ public:
 	Function(Variable* return_type_in, char* name_in, vector<Variable*>* params_in, CompoundStatement* fn_body_in);
 	~Function();
 
+	string get_name() const;
+	void generate_error() const;
+
 	void renderasm(ASMhandle& context);
-	void pretty_print(const int& indent) const;
+	void pretty_print(const int& indent);
+
+	void init_asm_name();
 private:
 	
 	void prep_for_asm(ASMhandle& context);
@@ -36,6 +42,8 @@ private:
 	vector<Statement*>* statements;			// Pointer to a vector of the statements appearing in the scope of the function
 
 	CompoundStatement* fn_body;				// CompoundStatement corresponding to function body
+
+	char* asm_name;
 };
 
 

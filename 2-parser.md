@@ -76,7 +76,7 @@ This code:
     int zz(int a, int b, int c)
     {
       if(a==b)
-        return z
+        return z;
       else{
         int fsdfsdfs;
         return c;
@@ -103,7 +103,7 @@ From your top-level directory, doing:
 
     make bin/c_parser
 
-should create a programe called... `bin/c_parser`.
+should create a programme called... `bin/c_parser`.
 
 
 

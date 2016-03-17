@@ -1,17 +1,18 @@
 #!/bin/bash
 
-COMPILER_MIPS=mips-gcc
-COMPILER_MIPS=mips-gcc
+COMPILER_MIPS=mips-linux-gnu-gcc
 EMULATOR_MIPS=qemu-mips
 #TEST_DIR=test/codegen_milestone
 TEST_DIR=.
 EXECUTABLE=./bin/c_codegen
 
+GCC_BUILD=${TEST_DIR}/tmpexec
+
 if [ $# -eq 0 ]; then
     for INFILE in ${TEST_DIR}/*.c
 	do
-		OUTFILE=${INFILE/.c/.s}
-		ERRFILE=${INFILE/.c/.err}
+		ASSEMBLY=${INFILE/.c/.s}
+		gcc
 		cat ${INFILE} | ${EXECUTABLE} > ${OUTFILE}
 		#echo $FILENAME	
 	done

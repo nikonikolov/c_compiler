@@ -30,13 +30,11 @@ void VarExpr::renderasm(ASMhandle& context, char** destination /*=NULL*/){
 	catch(const int& error){
 		generate_error();
 	}
+	//char* var_location = result->get_asm_location();
+	//cout<<pad<<"lw"<<"$t0, "<<var_location<<endl;
+	//cout<<pad<<"sw"<<"$t0, "<<*destination<<endl;
 
-	
-	//char* var_location = new char*(result->get_asm_location());
-	char* var_location = result->get_asm_location();
-	cout<<pad<<"lw"<<"$t0, "<<var_location<<endl;
-	cout<<pad<<"sw"<<"$t0, "<<*destination<<endl;
-	//result->get_asm_location(destination);
+	*destination=result->get_asm_location();
 }
 
 

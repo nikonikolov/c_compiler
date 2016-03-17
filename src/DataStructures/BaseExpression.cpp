@@ -7,6 +7,10 @@ BaseExpression::BaseExpression(const ExprT& expr_type_in, const int& line_in, co
 
 BaseExpression::~BaseExpression(){}
 
+ExprT BaseExpression::get_expr_type() const {
+	return expr_type;
+}
+
 
 void BaseExpression::generate_error(){
 	if(src_file.empty()) 	cerr<<"Error in source file at line ";

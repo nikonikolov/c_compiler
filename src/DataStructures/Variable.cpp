@@ -54,10 +54,6 @@ void Variable::set_asm_location(char* str_in){
 	initialized = true;			// Called by function parameters
 }
 
-/*void Variable::get_asm_location(char** location_in){
-	location_in = &location;
-}
-*/
 char* Variable::get_asm_location(){
 	return location;
 }

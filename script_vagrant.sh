@@ -1,6 +1,10 @@
 #!/bin/bash
 
-TEST_DIR=test/codegen_milestone
+COMPILER_MIPS=mips-gcc
+COMPILER_MIPS=mips-gcc
+EMULATOR_MIPS=qemu-mips
+#TEST_DIR=test/codegen_milestone
+TEST_DIR=.
 EXECUTABLE=./bin/c_codegen
 
 if [ $# -eq 0 ]; then
@@ -20,7 +24,7 @@ else
 	cat ${INFILE} | ${EXECUTABLE} > ${OUTFILE}
 fi
 
-scp -P 2222 ${TEST_DIR}/* vagrant@127.0.0.1:/home/vagrant/tests/
+scp -P 2222 ${TEST_DIR}/*.s vagrant@127.0.0.1:/home/vagrant/tests/
 
 
 

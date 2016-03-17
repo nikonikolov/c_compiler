@@ -11,6 +11,8 @@ public:
 	BaseExpression(const ExprT& expr_type_in, const int& line_in, const string& src_file_in);
 	virtual ~BaseExpression();
 
+	ExprT get_expr_type() const ;
+
 	virtual void pretty_print(const int& indent) =0;		// parameter specifies the starting column for the printing
 	virtual void renderasm(ASMhandle& context, char** destination=NULL)=0;
 	virtual BaseExpression* simplify(snum_t& value) =0;

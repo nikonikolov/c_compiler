@@ -63,7 +63,6 @@ void CompoundStatement::renderasm(ASMhandle& context){
 			(*it)->renderasm(new_context, true);
 		}
 	}
-	cerr<<"VarDeclaration done"<<endl;
 
 	new_context.redefinition_check();
 

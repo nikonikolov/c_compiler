@@ -69,11 +69,13 @@ void Expression::renderasm(ASMhandle& context, char** destination /*=NULL*/){
 
 	char **lhs_dest, **rhs_dest;
 	if(lhs!=NULL){
-		lhs_dest = new char*(context.allocate_var());
+		if(lhs->get_expr_type()!=EXPR_tmp_var) lhs_dest = new char*(context.allocate_var());
+		else lhs_dest=new char*;
 		lhs->renderasm(context, lhs_dest);
 	} 
 	if(rhs!=NULL){
-		rhs_dest = new char*(context.allocate_var());
+		if(rhs->get_expr_type()!=EXPR_tmp_var) rhs_dest = new char*(context.allocate_var());
+		else rhs_dest=new char*;
 		rhs->renderasm(context, rhs_dest);
 	} 
 
@@ -99,7 +101,6 @@ void Expression::renderasm(ASMhandle& context, char** destination /*=NULL*/){
 		if(!strcmp(oper,">")) 	logical_comparison_ins(context, *destination, *lhs_dest, *rhs_dest, "bgtz"); 	
 		if(!strcmp(oper,"==")) 	logical_comparison_ins(context, *destination, *lhs_dest, *rhs_dest, "beq", true); 	
 		if(!strcmp(oper,"!=")) 	logical_comparison_ins(context, *destination, *lhs_dest, *rhs_dest, "bne", true); 
-	cerr<<"Expression 12"<<endl;
 	}
 	/* ----------------------------------- SINGLE OPERAND ----------------------------------- */
 	if(lhs==NULL && rhs!=NULL){
@@ -237,16 +238,11 @@ void Expression::generate_error(){
 
 
 void Expression::arithmetic_ins(char* destination, char* arg1, char* arg2, const string& instruction){
-	cerr<<"Expression arithmetic 0"<<endl;
 	
 	cout<<pad<<"lw"<<"$t0, "<<arg1<<endl;
-	cerr<<"Expression arithmetic 1"<<endl;
 	cout<<pad<<"lw"<<"$t1, "<<arg2<<endl;
-	cerr<<"Expression arithmetic 2"<<endl;
 	cout<<pad<<instruction<<"$t2, $t0, $t1"<<endl;
-	cerr<<"Expression arithmetic 3"<<endl;
 	cout<<pad<<"sw"<<"$t2, "<<destination<<endl;
-	cerr<<"Expression arithmetic 4"<<endl;
 }
 
 

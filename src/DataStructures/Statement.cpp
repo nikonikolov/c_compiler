@@ -130,7 +130,7 @@ void ASMhandle::subroutine_exit(char* return_val){
 
 	// Restore frame pointer. This should be load and should be -4
 	//cout<<pad<<"move"<<"$fp, 4($fp)"<<"\t\t# Restore the value of the frame pointer"<<endl; 								
-	cout<<pad<<"lw"<<"$fp, -4($fp)"<<"\t\t# Restore the value of the frame pointer"<<endl; 								
+	cout<<pad<<"lw"<<"$fp, 4($fp)"<<"\t\t# Restore the value of the frame pointer"<<endl; 								
 	
 	// Restore stack pointer		
 	cout<<pad<<"addiu"<<"$sp, $sp, "<<sp_offset<<"\t\t# Restore the value of the stack pointer"<<endl; 						
@@ -150,7 +150,7 @@ char* ASMhandle::allocate_var(pair<string, Variable*>& var_in, const int& mem_am
 	if( (fp_offset+mem_amount)>allocated_mem ) 
 		allocate_mem(fp_offset + mem_amount - allocated_mem + 24);			// Allocate memory if necessary
 	insert_local_var(var_in);
-	char* address=strdup(string(std::to_string(fp_offset)+"($fp)").c_str());				// Get the location of the temporary
+	char* address=strdup(string(std::to_string(-fp_offset)+"($fp)").c_str());				// Get the location of the temporary
 	fp_offset+=mem_amount;													// Increment fp_offset
 	return address;
 }
@@ -159,7 +159,7 @@ char* ASMhandle::allocate_var(pair<string, Variable*>& var_in, const int& mem_am
 char* ASMhandle::allocate_var(const int& mem_amount /*= 4*/){
 	if( (fp_offset+mem_amount)>allocated_mem ) 
 		allocate_mem(fp_offset + mem_amount - allocated_mem + 24);			// Allocate memory if necessary
-	char* address=strdup(string(std::to_string(fp_offset)+"($fp)").c_str());				// Get the location of the temporary
+	char* address=strdup(string(std::to_string(-fp_offset)+"($fp)").c_str());				// Get the location of the temporary
 	fp_offset+=mem_amount;													// Increment fp_offset
 	return address;
 }
@@ -168,7 +168,7 @@ string ASMhandle::allocate_str_var(pair<string, Variable*>& var_in, const int& m
 	if( (fp_offset+mem_amount)>allocated_mem ) 
 		allocate_mem(fp_offset + mem_amount - allocated_mem + 24);			// Allocate memory if necessary
 	insert_local_var(var_in);
-	string address(std::to_string(fp_offset)+"($fp)");										// Get the location of the temporary
+	string address(std::to_string(-fp_offset)+"($fp)");										// Get the location of the temporary
 	fp_offset+=mem_amount;													// Increment fp_offset
 	return address;
 }
@@ -177,7 +177,7 @@ string ASMhandle::allocate_str_var(pair<string, Variable*>& var_in, const int& m
 string ASMhandle::allocate_str_var(const int& mem_amount /*= 4*/){
 	if( (fp_offset+mem_amount)>allocated_mem ) 
 		allocate_mem(fp_offset + mem_amount - allocated_mem + 24);			// Allocate memory if necessary
-	string address(std::to_string(fp_offset)+"($fp)");										// Get the location of the temporary
+	string address(std::to_string(-fp_offset)+"($fp)");										// Get the location of the temporary
 	fp_offset+=mem_amount;													// Increment fp_offset
 	return address;
 }

@@ -44,7 +44,6 @@ void VarDeclaration::pretty_print(const int& indent){
 void VarDeclaration::renderasm(ASMhandle& context, const bool& local /*=true*/){
 	vector<Variable*>::iterator it;
 	for(it=variables->begin(); it!=variables->end(); ++it){
-		cerr<<"VarDeclaration"<<endl;
 		(*it)->renderasm(context, local);
 	}
 }

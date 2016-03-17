@@ -47,11 +47,13 @@ void Function::pretty_print(const int& indent){
 }
 
 void Function::init_asm_name(){
-	if(strcmp(name,"main")){
+	/*if(strcmp(name,"main")){
 		asm_name=strdup("abcdefg");
 		strcat(asm_name, name);
 	} 
 	else asm_name=name;
+	*/
+	asm_name=name;
 }
 
 void Function::renderasm(ASMhandle& context){
@@ -87,10 +89,14 @@ void Function::prep_for_asm(ASMhandle& context){
 
 	// Repair - put arguments on the stack and account for arguments bigger than 32bits
 	for(int i=0; i<params->size() && i<4; i++){
-		(*params)[i]->set_asm_location("$a"+std::to_string(i));
-		pair<string, Variable*> tmp((*params)[i]->get_name_str() ,(*params)[i]);
+		//(*params)[i]->set_asm_location("$a"+std::to_string(i));
+		//pair<string, Variable*> tmp((*params)[i]->get_name_str() ,(*params)[i]);
 		try{
-			context.insert_local_var(tmp);
+			//context.insert_local_var(tmp);
+			pair<string, Variable*> tmp((*params)[i]->get_name_str() ,(*params)[i]);
+			char* asm_location = context.allocate_var(tmp);
+			(*params)[i]->set_asm_location(asm_location);
+			cout<<pad<<"sw"<<"$a"<<i<<", "<<asm_location<<endl;
 		}
 		catch(const ErrorgenT& error_in){
 			(*params)[i]->generate_error();
@@ -98,13 +104,13 @@ void Function::prep_for_asm(ASMhandle& context){
 	}
 
 	for(int i=4; i<params->size(); i++){
-		pair<string, Variable*> tmp((*params)[i]->get_name_str() ,(*params)[i]);
+		/*pair<string, Variable*> tmp((*params)[i]->get_name_str() ,(*params)[i]);
 		try{
 			char* tmp_location=context.allocate_var(tmp);
 			(*params)[i]->set_asm_location(tmp_location);
 		}
 		catch(const ErrorgenT& error_in){
 			(*params)[i]->generate_error();
-		}
+		}*/
 	}
 }

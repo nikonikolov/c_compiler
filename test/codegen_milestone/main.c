@@ -5,7 +5,7 @@ int f(int a, int b);
 
 int main()
 {
-   int vs[]={0,-1,+1,-2,+2,78686, -454, 0xFFFF, -0xFFFF  };
+   /*int vs[]={0,-1,+1,-2,+2,78686, -454, 0xFFFF, -0xFFFF  };
    int ns=sizeof(vs)/sizeof(vs[0]);
 
    for(int i=0;i<ns;i++){
@@ -14,5 +14,10 @@ int main()
        fprintf(stdout, "%d,%d,%d\n", vs[i],vs[j],r);
      }
    }
+   */
+    int r=f(15,10);
+    //fprintf(stdout, "%d\n", r);
+    printf("%d\n", r);
+
    return 0;
 }

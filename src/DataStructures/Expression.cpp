@@ -99,8 +99,8 @@ void Expression::renderasm(ASMhandle& context, char** destination /*=NULL*/){
 		if(!strcmp(oper,">=")) 	logical_comparison_ins(context, *destination, *lhs_dest, *rhs_dest, "bgez"); 	
 		if(!strcmp(oper,"<")) 	logical_comparison_ins(context, *destination, *lhs_dest, *rhs_dest, "bltz"); 	
 		if(!strcmp(oper,">")) 	logical_comparison_ins(context, *destination, *lhs_dest, *rhs_dest, "bgtz"); 	
-		if(!strcmp(oper,"==")) 	logical_comparison_ins(context, *destination, *lhs_dest, *rhs_dest, "beq", true); 	
-		if(!strcmp(oper,"!=")) 	logical_comparison_ins(context, *destination, *lhs_dest, *rhs_dest, "bne", true); 
+		if(!strcmp(oper,"==")) 	logical_comparison_ins(context, *destination, *lhs_dest, *rhs_dest, "beq", false); 	
+		if(!strcmp(oper,"!=")) 	logical_comparison_ins(context, *destination, *lhs_dest, *rhs_dest, "bne", false); 
 	}
 	/* ----------------------------------- SINGLE OPERAND ----------------------------------- */
 	if(lhs==NULL && rhs!=NULL){
@@ -118,7 +118,7 @@ void Expression::renderasm(ASMhandle& context, char** destination /*=NULL*/){
 
 /* 	Note the caller to simplify has to handle the exception. Usually that would be renderasm(ASMhandle& context) member method
 	of a BaseExpression implementation. Note you cannot have Constant as return type as this is a pure virtual function 
- 	defined in BaseExpression which cannot have visibility of the Constant class
+ 	defined in BaseExpression which,"<< cannot have visibility of the Constant class
 
 	Returns:
 		1. NULL means a Constant => no need to change the pointer
@@ -238,7 +238,6 @@ void Expression::generate_error(){
 
 
 void Expression::arithmetic_ins(char* destination, char* arg1, char* arg2, const string& instruction){
-	
 	cout<<pad<<"lw"<<"$t0, "<<arg1<<endl;
 	cout<<pad<<"lw"<<"$t1, "<<arg2<<endl;
 	cout<<pad<<instruction<<"$t2, $t0, $t1"<<endl;
@@ -261,7 +260,7 @@ void Expression::logical_or_ins(ASMhandle& context, char* destination, char* arg
 	cout<<pad<<"b"<<continued_exec<<endl;
 	cout<<pad<<"nop"<<endl;
 	cout<<non_default_action<<":"<<endl;
-	cout<<"li"<<"$t2, 1"<<endl; 								// non-default action reached, result is 1
+	cout<<pad<<"li"<<"$t2, 1"<<endl; 								// non-default action reached, result is 1
 	cout<<pad<<"sw"<<"$t2, "<<destination<<endl;
 	cout<<pad<<"b"<<continued_exec<<endl;
 	cout<<pad<<"nop"<<endl;
@@ -279,7 +278,7 @@ void Expression::logical_and_ins(ASMhandle& context, char* destination, char* ar
 	cout<<pad<<"lw"<<"$t1, "<<arg2<<endl;
 	cout<<pad<<"beq"<<"$0, $t1, "<<non_default_action<<endl; 	// If arg2 is 0, go to non_default action
 	cout<<pad<<"nop"<<endl;
-	cout<<"li"<<"$t2, 1"<<endl; 								// Default action reached, result is 1
+	cout<<pad<<"li"<<"$t2, 1"<<endl; 								// Default action reached, result is 1
 	cout<<pad<<"sw"<<"$t2, "<<destination<<endl;
 	cout<<pad<<"b"<<continued_exec<<endl;
 	cout<<pad<<"nop"<<endl;
@@ -299,13 +298,12 @@ void Expression::logical_not_ins(ASMhandle& context, char* destination, char* ar
 	cout<<pad<<"lw"<<"$t0, "<<arg<<endl;
 	cout<<pad<<"bne"<<"$0, $t0, "<<non_default_action<<endl;	// If arg1 is not 0, go to non_default action
 	cout<<pad<<"nop"<<endl;
-	cout<<pad<<"move"<<"$t2"<<", $0"<<endl; 					// Default action reached, result is 0
+	cout<<pad<<"li"<<"$t2, 1"<<endl; 							// non-default action reached, result is 1
 	cout<<pad<<"sw"<<"$t2, "<<destination<<endl;
 	cout<<pad<<"b"<<continued_exec<<endl;
 	cout<<pad<<"nop"<<endl;
 	cout<<non_default_action<<":"<<endl;
-	cout<<"li"<<"$t2, 1"<<endl; 								// non-default action reached, result is 1
-	cout<<pad<<"sw"<<"$t2, "<<destination<<endl;
+	cout<<pad<<"sw"<<"$0, "<<destination<<endl;					// non-default action reached, result is 0
 	cout<<pad<<"b"<<continued_exec<<endl;
 	cout<<pad<<"nop"<<endl;
 	cout<<continued_exec<<":"<<endl; 							// continue execution of the program
@@ -320,10 +318,12 @@ void Expression::logical_comparison_ins(ASMhandle& context, char* destination, c
 	cout<<pad<<"lw"<<"$t0, "<<arg1<<endl;
 	cout<<pad<<"lw"<<"$t1, "<<arg2<<endl;
 	
-	if(subtract) 	cout<<pad<<"subu"<<"$t2, $t0, $t1"<<endl;
-	if(subtract) 	cout<<pad<<instruction<<"$t2, "<<non_default_action<<endl;		// Branch if comparison is true
+	if(subtract){
+	 	cout<<pad<<"subu"<<"$t2, $t0, $t1"<<endl;
+		cout<<pad<<instruction<<"$t2, "<<non_default_action<<endl;		// Branch if comparison is true
+	}
 	
-	if(!subtract) 	cout<<pad<<instruction<<"$t0, $t1, "<<non_default_action<<endl; // Branch if comparison is true
+	else 	cout<<pad<<instruction<<"$t0, $t1, "<<non_default_action<<endl; // Branch if comparison is true
 	cout<<pad<<"nop"<<endl;
 
 	cout<<pad<<"move"<<"$t2"<<", $0"<<endl; 						// Default action reached, result is 0
@@ -331,7 +331,7 @@ void Expression::logical_comparison_ins(ASMhandle& context, char* destination, c
 	cout<<pad<<"b"<<continued_exec<<endl;
 	cout<<pad<<"nop"<<endl;
 	cout<<non_default_action<<":"<<endl;
-	cout<<"li"<<"$t2, 1"<<endl; 									// non-default action reached, result is 1
+	cout<<pad<<"li"<<"$t2, 1"<<endl; 								// non-default action reached, result is 1
 	cout<<pad<<"sw"<<"$t2, "<<destination<<endl;
 	cout<<pad<<"b"<<continued_exec<<endl;
 	cout<<pad<<"nop"<<endl;

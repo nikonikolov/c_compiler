@@ -47,6 +47,7 @@ string Variable::get_name_str() const{
 
 void Variable::set_asm_location(const string& str_in){
 	location=strdup(str_in.c_str());
+	initialized = true;			// Called by function parameters
 }
 
 void Variable::set_asm_location(char* str_in){

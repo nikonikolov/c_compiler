@@ -8,40 +8,6 @@
 
 uint32_t ASMhandle::label_idx = 3;
 
-/*
-ASMhandle::ASMhandle(const ASMhandle& orig){
-	if(orig.local_vars!=NULL){
-		map<string, Variable*>::iterator it;
-		for(it=(orig.local_vars)->begin(); it!=(orig.local_vars)->end(); ++it){
-			(this->local_vars)->insert(*it);
-		}
-	}
-	else this->local_vars = new map<string, Variable*>;
-
-	if(orig.global_vars!=NULL){
-		map<string, Variable*>::iterator it;
-		for(it=(orig.global_vars)->begin(); it!=(orig.global_vars)->end(); ++it){
-			(this->global_vars)->insert(*it);
-		}
-	}
-	else this->global_vars = new map<string, Variable*>;
-
-	if(orig.functions!=NULL){
-		map<string, Function*>::iterator it;
-		for(it=(orig.functions)->begin(); it!=(orig.functions)->end(); ++it){
-			(this->functions)->insert(*it);
-		}
-	}
-	else this->functions = new map<string, Function*>;
-	
-	this->return_address = new stack<string>(*(orig.return_address));
-
-	this->sp_offset=orig.sp_offset;
-	this->allocated_mem=orig.allocated_mem;
-	this->fp_offset=orig.fp_offset;
-	cerr<<"Local vars done"<<endl;
-}
-*/
 ASMhandle::ASMhandle(ASMhandle& orig){
 	local_vars = new map<string, Variable*>;
 	if(orig.local_vars!=NULL){

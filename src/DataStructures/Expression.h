@@ -39,7 +39,8 @@ protected:
 	void logical_or_ins(ASMhandle& context, char* destination, char* arg1, char* arg2);
 	void logical_and_ins(ASMhandle& context, char* destination, char* arg1, char* arg2);
 	void logical_not_ins(ASMhandle& context, char* destination, char* arg);
-	void logical_comparison_ins(ASMhandle& context, char* destination, char* arg1, char* arg2, const string& instruction, const bool& subtract=true);
+	void logical_comparison_ins(ASMhandle& context, char* destination, char* arg1, char* arg2, const string& instruction, 
+																									const bool& subtract=true);
 	void sign_ins(char* destination, char* arg, const bool& get_negative);
 	void bitwise_not_ins(char* destination, char* arg);
 	void sizeof_ins(char* destination, char* arg);

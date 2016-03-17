@@ -59,6 +59,7 @@ void Function::init_asm_name(){
 void Function::renderasm(ASMhandle& context){
 	// Initialize assembly name
 	init_asm_name();
+	cerr<<"Fucntion"<<endl;
 
 	/* Function header assembly */
 	cout<<"\t.align	2"<<endl;
@@ -75,6 +76,8 @@ void Function::renderasm(ASMhandle& context){
 
 	new_context.redefinition_check();
 		
+	cerr<<"Before CompoundStatement"<<endl;
+
 	fn_body->renderasm(new_context);
 
 

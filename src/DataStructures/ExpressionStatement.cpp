@@ -39,6 +39,7 @@ void ExpressionStatement::pretty_print(const int& indent){
 
 void ExpressionStatement::renderasm(ASMhandle& context){
 	simplify();
+
 	if(expr_list!=NULL){
 		vector<BaseExpression*>::iterator it;
 		for(it=expr_list->begin(); it!=expr_list->end(); ++it){

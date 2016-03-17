@@ -87,7 +87,7 @@ void Expression::renderasm(ASMhandle& context, char** destination /*=NULL*/){
 		if(!strcmp(oper,"&")) 	arithmetic_ins(*destination, *lhs_dest, *rhs_dest, "and"); 	
 		if(!strcmp(oper,"^")) 	arithmetic_ins(*destination, *lhs_dest, *rhs_dest, "xor"); 	
 		if(!strcmp(oper,"<<")) 	arithmetic_ins(*destination, *lhs_dest, *rhs_dest, "sllv"); 	
-		if(!strcmp(oper,">>")) 	arithmetic_ins(*destination, *lhs_dest, *rhs_dest, "srlv"); 	
+		if(!strcmp(oper,">>")) 	arithmetic_ins(*destination, *lhs_dest, *rhs_dest, "srav"); 	
 
 		//if(!strcmp(oper,"*")) 	arithmetic_ins("mult", *destination, *lhs_dest, *rhs_dest); 	
 		//if(!strcmp(oper,"%")) 	arithmetic_ins("addu", *destination, *lhs_dest, *rhs_dest); 	

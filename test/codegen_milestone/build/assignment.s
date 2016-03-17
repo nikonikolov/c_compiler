@@ -12,12 +12,13 @@ f:
 	sw      $a1, -8($fp)
 	lw      $t0, -4($fp)
 	lw      $t1, -8($fp)
-	srav    $t2, $t0, $t1
+	addu    $t2, $t0, $t1
 	sw      $t2, -12($fp)
+	addiu   $sp, $sp, -28		# Allocate more memory
 	lw      $v0, -12($fp)
 	lw      $ra, 0($fp)		# Load return address in register 31
 	lw      $fp, 4($fp)		# Restore the value of the frame pointer
-	addiu   $sp, $sp, 24		# Restore the value of the stack pointer
+	addiu   $sp, $sp, 52		# Restore the value of the stack pointer
 	j       $ra
 	nop     
 

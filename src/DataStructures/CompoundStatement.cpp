@@ -56,7 +56,6 @@ void CompoundStatement::renderasm(ASMhandle& context){
 
 	ASMhandle new_context(context);
 
-	
 	if(declarations!=NULL){
 		vector<VarDeclaration*>::iterator it;
 		for(it=declarations->begin(); it!=declarations->end(); ++it){

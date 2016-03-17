@@ -45,15 +45,20 @@ extern int yydebug;
   #include <iostream>
   #include <string>  
   #include "helper.hpp"
+  #include "DataStructures/Program.h"
   #include "DataStructures/Function.h"
   #include "DataStructures/Loop.h"
   #include "DataStructures/Variable.h"
   #include "DataStructures/Constant.h"
   #include "DataStructures/Conditional.h"
   #include "DataStructures/VarDeclaration.h"
+  #include "DataStructures/VarExpr.h"
+  #include "DataStructures/ReturnStatement.h"
+  #include "DataStructures/CompoundStatement.h"
   #include "DataStructures/BaseExpression.h"
   #include "DataStructures/TerneryExpression.h"
   #include "DataStructures/Expression.h"
+  #include "DataStructures/AssignmentExpression.h"
   #include "DataStructures/ExpressionStatement.h"
   
   using namespace std;
@@ -62,10 +67,11 @@ extern int yydebug;
   int yylex();
   int yyerror(const char* s);
 
-  //extern Function* root;
-  
+  extern Program* root;
 
-#line 69 "src/c_parser.tab.hpp" /* yacc.c:1909  */
+
+
+#line 75 "src/c_parser.tab.hpp" /* yacc.c:1909  */
 
 /* Token type.  */
 #ifndef YYTOKENTYPE
@@ -165,7 +171,7 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 26 "src/c_parser.y" /* yacc.c:1909  */
+#line 32 "src/c_parser.y" /* yacc.c:1909  */
 
   char* strval;
   uint64_t intval;
@@ -179,13 +185,16 @@ union YYSTYPE
   vector<Statement*>*       vector_statement_pointers_ptr;
   vector<Expression*>*      vector_expr_pointers_ptr;
   vector<ConditionalCase*>* vector_conditional_case_pointers_ptr;
+  vector<VarDeclaration*>* vector_var_declarations_ptrs_ptr;
   
   Function* fn_ptr;
   Statement* statement_ptr;
+  CompoundStatement* compound_statement_ptr;
   BaseExpression* base_expr_ptr;
   ExpressionStatement* expr_statement_ptr;
+  VarDeclaration* var_declaration_ptr;
 
-#line 189 "src/c_parser.tab.hpp" /* yacc.c:1909  */
+#line 198 "src/c_parser.tab.hpp" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;

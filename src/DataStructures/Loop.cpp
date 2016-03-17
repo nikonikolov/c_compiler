@@ -1,40 +1,24 @@
 #include "Loop.h"
 
-Loop::Loop(vector<Statement*>* statements_in) : Statement(ST_loop), statements(statements_in), single_statement(NULL) {}
-Loop::Loop(Statement* single_statement_in) : Statement(ST_loop), statements(NULL), single_statement(single_statement_in) {}
+Loop::Loop(Statement* loop_statement_in) :
+	Statement(ST_loop), loop_body(NULL), loop_statement(loop_statement_in) {}
+
+Loop::Loop(CompoundStatement* loop_body_in) :
+	Statement(ST_loop), loop_body(loop_body_in), loop_statement(NULL) {}
 
 Loop::~Loop(){
-	if(single_statement!=NULL) delete single_statement;
-
-	if(statements!=NULL){
-		vector<Statement*>::iterator it;
-		for(it=statements->begin(); it!=statements->end(); ++it){
-			delete *it;
-		}
-		delete statements;
-	}
+	if(loop_body!=NULL) delete loop_body;
+	if(loop_statement!=NULL) delete loop_statement;
 }
 
 
-void Loop::pretty_print(const int& indent) const{
-	string white_space, new_scope_indent="    ";
-	white_space.resize(indent, ' ');
-
-	if(single_statement!=NULL)	single_statement->pretty_print(indent);
-
-	cout<<white_space<<"SCOPE"<<endl;
-
-	if(statements==NULL) return;
-
-	// Print variables and statements defined inside the Loop
-	vector<Statement*>::iterator it;
-	for(it=statements->begin(); it!=statements->end(); ++it){
-		if(*it!=NULL) (*it)->pretty_print(indent+4);
-	}
+void Loop::pretty_print(const int& indent){
+	if(loop_body!=NULL)	loop_body->pretty_print(indent);
+	if(loop_statement!=NULL)	loop_statement->pretty_print(indent);
 }
 
 
-void Loop::renderasm(){
+void Loop::renderasm(ASMhandle& context){
 }
 
 

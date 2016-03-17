@@ -1,10 +1,10 @@
 #include "VarDeclaration.h"
 
 VarDeclaration::VarDeclaration(vector<Variable*>* variables_in) : 
-	Statement(ST_var_declaration_container), variables(variables_in) {}
+	variables(variables_in) {}
 
 VarDeclaration::VarDeclaration(char* type_name_in, vector<Variable*>* variables_in) : 
-	Statement(ST_var_declaration_container), variables(variables_in) {
+	variables(variables_in) {
 	set_types(type_name_in);
 }
 
@@ -28,7 +28,7 @@ void VarDeclaration::set_types(char* type_name_in){
 }
 
 
-void VarDeclaration::pretty_print(const int& indent) const{
+void VarDeclaration::pretty_print(const int& indent){
 	string white_space;
 	white_space.resize(indent, ' ');
 	if(variables==NULL) return;
@@ -41,6 +41,9 @@ void VarDeclaration::pretty_print(const int& indent) const{
 }
 
 
-void VarDeclaration::renderasm(){
-	return;
+void VarDeclaration::renderasm(ASMhandle& context, const bool& local /*=true*/){
+	vector<Variable*>::iterator it;
+	for(it=variables->begin(); it!=variables->end(); ++it){
+		(*it)->renderasm(context, local);
+	}
 }

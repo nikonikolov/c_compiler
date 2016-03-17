@@ -2,15 +2,20 @@
   #include <iostream>
   #include <string>  
   #include "helper.hpp"
+  #include "DataStructures/Program.h"
   #include "DataStructures/Function.h"
   #include "DataStructures/Loop.h"
   #include "DataStructures/Variable.h"
   #include "DataStructures/Constant.h"
   #include "DataStructures/Conditional.h"
   #include "DataStructures/VarDeclaration.h"
+  #include "DataStructures/VarExpr.h"
+  #include "DataStructures/ReturnStatement.h"
+  #include "DataStructures/CompoundStatement.h"
   #include "DataStructures/BaseExpression.h"
   #include "DataStructures/TerneryExpression.h"
   #include "DataStructures/Expression.h"
+  #include "DataStructures/AssignmentExpression.h"
   #include "DataStructures/ExpressionStatement.h"
   
   using namespace std;
@@ -19,8 +24,9 @@
   int yylex();
   int yyerror(const char* s);
 
-  //extern Function* root;
-  
+  extern Program* root;
+
+
 }
 
 %union{
@@ -36,11 +42,14 @@
   vector<Statement*>*       vector_statement_pointers_ptr;
   vector<Expression*>*      vector_expr_pointers_ptr;
   vector<ConditionalCase*>* vector_conditional_case_pointers_ptr;
+  vector<VarDeclaration*>* vector_var_declarations_ptrs_ptr;
   
   Function* fn_ptr;
   Statement* statement_ptr;
+  CompoundStatement* compound_statement_ptr;
   BaseExpression* base_expr_ptr;
   ExpressionStatement* expr_statement_ptr;
+  VarDeclaration* var_declaration_ptr;
 }
 
 /* --------------------------------------------------- TOKENS KEYWORDS --------------------------------------------------- */
@@ -81,17 +90,26 @@
 %type <var_ptr> init_declarator direct_declarator declarator
 %type <base_expr_ptr> initializer initializer_list
 
+%type <vector_var_declarations_ptrs_ptr> declaration_list
+%type <var_declaration_ptr> declaration
+
+%type <fn_ptr> fn_declaration
+
+
 /* ---------------------------------------------- STATEMENT TYPES -------------------------------------------- */
 
 %type <strval> bracketed_identifier
 
-%type <statement_ptr> loop for_loop while_loop do_while_loop if_block_statement fn_declaration declaration statement 
+%type <statement_ptr> loop for_loop while_loop do_while_loop if_block_statement statement 
+%type <statement_ptr> semi_colon_statement return_statement 
 
-%type <vector_statement_pointers_ptr> compound_statement declaration_list statement_list
+%type <vector_statement_pointers_ptr> statement_list
 
 %type <vector_statement_pointers_ptr> program
 
 %type <vector_conditional_case_pointers_ptr> if_statement else_statement else_statement_list
+
+%type <compound_statement_ptr> compound_statement
 
 /* ---------------------------------------------- EXPRESSION TYPES -------------------------------------------- */
 
@@ -126,8 +144,7 @@
 
 %{
   /* put additional C++ code here */
-  // Probably a better idea to make root pointer to Program in the end as function will not inherit from statement
-  vector<Statement*>* root=NULL;
+  Program* root=NULL;
 %}
 
 %%
@@ -152,10 +169,10 @@
 /* ============================================== PROGRAM START ELEMENTS ============================================== */
 
 
-program : fn_declaration                                   { root = new vector<Statement*>; root->push_back($1);}
-        | declaration                                      { root = new vector<Statement*>; root->push_back($1);}
-        | program fn_declaration                           { root->push_back($2); }
-        | program declaration                              { root->push_back($2); }
+program : fn_declaration                                   { root = new Program(); root->insert_fn($1);}
+        | declaration                                      { root = new Program(); root->push_var_back($1);}
+        | program fn_declaration                           { root->insert_fn($2); }
+        | program declaration                              { root->push_var_back($2); }
         ;
         
 /* ===================================================================================================================== */
@@ -256,7 +273,7 @@ declarator  : direct_declarator                                     { $$ = $1; }
 
 // NB make a separate grammmar for function declarations and prototypes - they are definitely not the same as variables
 // Variable name, Array cell or function
-direct_declarator : IDENTIFIER                                      { $$ = new Variable($1, ST_var_declaration); }
+direct_declarator : IDENTIFIER                                      { $$ = new Variable($1); }
                   | LBRACKET declarator RBRACKET                    { $$ = $2; }
                   // Array cell
                   //| direct_declarator LSQUARE constant_expression RSQUARE     { $$= $1; $$->dereference_back($3); }
@@ -300,7 +317,7 @@ initializer_list  : initializer                                     { /*$$ = new
 
 // Basic structure: Level 0 Precedence; corressponds to factor
 primary_expression  // Identifier
-                    : IDENTIFIER                            { $$ = new Variable($1);}
+                    : IDENTIFIER                            { $$ = new VarExpr($1);}
                     // Constant
                     | CONSTANT                              { $$ = $1;}
                     // string_literal
@@ -321,15 +338,15 @@ postfix_expression  // Reduction to Level 0
                     // Function call with no arguments
                     | postfix_expression LBRACKET RBRACKET
                     // Structs and Unions member access
-                    | postfix_expression DOT IDENTIFIER                                 //{ Expression* tmp = new Variable($3);
+                    | postfix_expression DOT IDENTIFIER                                 //{ Expression* tmp = new VarExpr($3);
                                                                                         //  $$ = new Expression($1, $2, tmp);}
                     // Structs and Unions member access via pointers
-                    | postfix_expression PTR_OP IDENTIFIER                              //{ Expression* tmp = new Variable($3);
+                    | postfix_expression PTR_OP IDENTIFIER                              //{ Expression* tmp = new VarExpr($3);
                                                                                         //  $$ = new Expression($1, $2, tmp);}
                     // Post increment
-                    | postfix_expression PLUS_PLUS                                      { $$ = new Expression($1, $2, NULL);}
+                    | postfix_expression PLUS_PLUS                      { $$ = new AssignmentExpression($1, $2, NULL);}
                     // Post decrement
-                    | postfix_expression MINUS_MINUS                                    { $$ = new Expression($1, $2, NULL);}
+                    | postfix_expression MINUS_MINUS                    { $$ = new AssignmentExpression($1, $2, NULL);}
                     ;
 
 // Note: Arguments to functions can be expressions. If so, the evaluation is executed
@@ -343,15 +360,16 @@ argument_expression_list  : assignment_expression
 unary_expression  // Reduction to Level 1 
                   : postfix_expression                                                  { $$ = $1;}
                   // Pre increment
-                  | PLUS_PLUS unary_expression                                          { $$ = new Expression(NULL, $1, $2);}
+                  | PLUS_PLUS unary_expression                            { $$ = new AssignmentExpression(NULL, $1, $2);}
                   // Pre decrement
-                  | MINUS_MINUS unary_expression                                        { $$ = new Expression(NULL, $1, $2);}
+                  | MINUS_MINUS unary_expression                          { $$ = new AssignmentExpression(NULL, $1, $2);}
                   // Type cast, see UNARY_OPERATOR
-                  | UNARY_OPERATOR cast_expression                                      { $$ = new Expression(NULL, $1, $2);}
+                  | UNARY_OPERATOR cast_expression                        { $$ = new Expression(NULL, $1, $2);}
                   // Sizeof 
-                  | SIZEOF unary_expression                                             { $$ = new Expression(NULL, $1, $2);}
+                  | SIZEOF unary_expression                               { $$ = new Expression(NULL, $1, $2);}
                   // Sizeof type
-                  | SIZEOF LBRACKET type_name RBRACKET                                  //{ $$ = new Expression(NULL, $1, $3);}
+                  //| SIZEOF LBRACKET type_name RBRACKET                                  //{ $$ = new Expression(NULL, $1, $3);}
+                  | SIZEOF LBRACKET INT RBRACKET                          { $$ = new Constant<int>(sizeof(int));}
                   ;
 
 UNARY_OPERATOR  // Address-of
@@ -493,9 +511,9 @@ conditional_expression  // Reduction to Level 12
 
 // Level 14 Precedence
 assignment_expression // Reduction to Level 13
-                      : conditional_expression                                          { $$ = $1; }
+                      : conditional_expression                                      { $$ = $1; }
                       // Assignment
-                      | unary_expression ASSIGNMENT_OPERATOR assignment_expression      { $$ = new Expression($1, $2, $3);}
+                      | unary_expression ASSIGNMENT_OPERATOR assignment_expression  { $$ = new AssignmentExpression($1, $2, $3);}
                       ;
 
 ASSIGNMENT_OPERATOR : EQUALS                      { $$ = $1;}
@@ -523,7 +541,7 @@ expression  : assignment_expression               { $$ = $1;}
 expression_list // Reduction to Level 14
                 : expression                                        { $$ = new ExpressionStatement($1);}                                    
                 // List of expressions
-                | expression COMMA assignment_expression            { $$->push_back($3);}
+                | expression_list COMMA expression                  { $$->push_back($3);}
                 ;
 
 
@@ -549,12 +567,12 @@ expression_list // Reduction to Level 14
 
 // You need to modify the grammar for return type and Variable* to be returned from the reduction of the rule
 fn_declaration  : INT IDENTIFIER LBRACKET fn_params_list RBRACKET compound_statement          
-                                                      { $$ = new Function(new Variable($1, ST_var_return), $2, $4, $6); }
+                                                      { $$ = new Function(new Variable($1, NULL), $2, $4, $6); }
                 ;
 
 fn_params_list  : INT bracketed_identifier                      { $$ = new vector<Variable*>; 
-                                                                  $$->push_back(new Variable($1, $2, ST_var_fn_param));}
-                | fn_params_list COMMA INT bracketed_identifier { /*$$=$1; */$$->push_back(new Variable($3, $4, ST_var_fn_param)); }
+                                                                  $$->push_back(new Variable($1, $2));}
+                | fn_params_list COMMA INT bracketed_identifier { $$->push_back(new Variable($3, $4)); }
                 |                                               { $$ = NULL; }
                 ;   
 
@@ -639,10 +657,10 @@ else_statement_list : else_statement                          { $$ = $1; }
                     | else_statement_list else_statement      { $$ = vec_append($1, $2); }
                     ;
 
-if_statement  : IF LBRACKET equality_expression RBRACKET compound_statement               
-                                              { $$ = new vector<ConditionalCase*>; $$->push_back(new ConditionalCase($5)); }
-              | IF LBRACKET equality_expression RBRACKET statement
-                                              { $$ = new vector<ConditionalCase*>; $$->push_back(new ConditionalCase($5)); }
+if_statement  : IF LBRACKET expression RBRACKET compound_statement               
+                                              { $$ = new vector<ConditionalCase*>; $$->push_back(new ConditionalCase($5,$3)); }
+              | IF LBRACKET expression RBRACKET statement
+                                              { $$ = new vector<ConditionalCase*>; $$->push_back(new ConditionalCase($5,$3)); }
               ;
 
 /*
@@ -669,14 +687,14 @@ else_statement  : ELSE compound_statement     { $$ = new vector<ConditionalCase*
 /* ---------------------------------------------- 3.6.2 COMPOUND STATEMENTS -------------------------------------------- */
 
 // This represents a block of code - e.g. body of a function, body of a loop, or body of a an if statement
-compound_statement  : LCURLY declaration_list statement_list RCURLY   { $$=vec_append($2, $3); }
-                    | LCURLY statement_list RCURLY                    { $$=$2; }
-                    | LCURLY declaration_list RCURLY                  { $$=$2; }
+compound_statement  : LCURLY declaration_list statement_list RCURLY   { $$=new CompoundStatement($2, $3);}
+                    | LCURLY statement_list RCURLY                    { $$=new CompoundStatement(NULL,$2);}
+                    | LCURLY declaration_list RCURLY                  { $$=new CompoundStatement($2,NULL);}
                     | LCURLY RCURLY                                   { $$=NULL; }
                     ;
 
 // Simply a list of declarations. Note this implies one or more occurences of INT keyword
-declaration_list  : declaration                                     { $$ = new vector<Statement*>; $$->push_back($1);}
+declaration_list  : declaration                                     { $$ = new vector<VarDeclaration*>; $$->push_back($1);}
                   | declaration_list declaration                    { $$->push_back($2);}
                   ;
 
@@ -689,7 +707,8 @@ statement_list  : statement                                         { $$ = new v
 statement : loop                                                    { $$=$1; }
           | if_block_statement                                      { $$=$1; }
           | expression_statement                                    { $$=$1; }
-          | semi_colon_statement                                    { $$=NULL; }
+          | semi_colon_statement                                    { $$=$1; }
+          | compound_statement                                      { $$=$1; }
           ;
 
 
@@ -698,8 +717,8 @@ expression_statement  : expression_list SEMI_COLON                  { $$ = $1;}
                       ;
 
 /* ---------------------------------------------- SEMI COLON STATEMENTS -------------------------------------------- */
-semi_colon_statement  : return_statement
-                      | SEMI_COLON
+semi_colon_statement  : return_statement                            { $$=$1;}
+                      | SEMI_COLON                                  { $$=NULL;}
                       ;
 
 /* --------------------------------------------- 3.6.6 JUMP STATEMENTS ------------------------------------------- */
@@ -710,8 +729,8 @@ semi_colon_statement  : return_statement
                 | RETURN SEMI_COLON
                 ;
 */
-return_statement  : RETURN equality_expression SEMI_COLON
-                  | RETURN SEMI_COLON
+return_statement  : RETURN expression SEMI_COLON                    { $$ = new ReturnStatement($2);}
+                  | RETURN SEMI_COLON                               { $$ = new ReturnStatement();}
                   ;
 
 
@@ -724,7 +743,7 @@ int yyerror(const char* s){
   std::cerr <<"File: "<< source_file<<", Line: "<<input_file_line << std::endl;
   return -1;
 }
-
+/*
 int main(){
 
   yydebug=1;
@@ -737,16 +756,13 @@ int main(){
 
   cerr<<"========================================= Printing starts ========================================="<<endl;
 
-  vector<Statement*>::iterator it;
-  for(it=root->begin(); it!=root->end(); ++it){
-    if(*it!=NULL) (*it)->pretty_print(0);
-  }
+  root->pretty_print(0);
 
   cerr<<"========================================= Printing successful ========================================="<<endl;
 
   return 0;
 }
-
+*/
 
 
 

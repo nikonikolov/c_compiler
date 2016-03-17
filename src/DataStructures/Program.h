@@ -1,6 +1,8 @@
-/*#ifndef PROGRAM_H
+#ifndef PROGRAM_H
 #define PROGRAM_H
 
+#include "VarDeclaration.h"
+#include "Function.h"
 #include "Variable.h"
 #include "Statement.h"
 
@@ -8,21 +10,25 @@ class Program{
 
 public:
 	Program();
-	Program(list<Function>* functions_in, list<Variable>* global_vars_in);
+	//Program(vector<VarDeclaration*>* global_vars_decl_in, vector<Function*>* functions_in);
 	~Program();
 
-	//void pretty_print(const int& indent) const;
+	void insert_fn(Function* fn_in);
+	void push_var_back(VarDeclaration* var_in);
+
+	void pretty_print(const int& indent);
+	void renderasm();
+
 private:
-	//char* name;								// Name given to the function in the source code
-	//char* assembler_name;					// Name associated with the assembler code
-	list<Function>* functions;				// Pointer to a list of all the functions defined. The MAIN is included here
-											// The list is dynamically allocated
-	vector<Variable> global_vars;			// Vector of all global variables defined in the scope of the program
-	//uint32_t address;						// Contains the address of the program - needed?? 
+	//vector<Function*>* functions;				// Pointer to a vector of all the functions defined. The MAIN is included here
+	vector<VarDeclaration*>* global_vars_decl;	// Pointer to a vector of all global variables defined in the scope of the program
+
+	ASMhandle* context;
+	map<string, Function*>* functions;			// Pointer to a map of all the functions defined. The MAIN is included here
+	map<string, Variable*>* global_vars; 		// Pointer to a map of all the global variables defined
 };
 
 
 
 #endif
 
-*/

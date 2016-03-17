@@ -1,36 +1,17 @@
 #include "Variable.h"
 
 
-Variable::Variable(char* type_name_in, char* name_in, BaseExpression* init_val_in /*=NULL*/) :
-	BaseExpression(ST_var_declaration), init_val(init_val_in), dereferencer(NULL) {
-		type_name = strdup(type_name_in);
+Variable::Variable(char* name_in) :
+	type_name(NULL), init_val(NULL), dereferencer(NULL), initialized(false), location(NULL) {
 		name = strdup(name_in);
 }
 
-Variable::Variable(char* name_in, BaseExpression* init_val_in /*=NULL*/) :
-	BaseExpression(ST_var_expr), init_val(init_val_in), dereferencer(NULL){
-	name = strdup(name_in);
+Variable::Variable(char* type_name_in, char* name_in, list<PtrDeref>* dereferencer_in/*=NULL*/) :
+	init_val(NULL), dereferencer(dereferencer_in), initialized(false), location(NULL) {
+	type_name = strdup(type_name_in);
+	if(name_in!=NULL) name = strdup(name_in);
 }
 
-Variable::Variable(char* some_name_in, const StatementT& stat_type_in, list<PtrDeref>* dereferencer_in /*=NULL*/) :
-	BaseExpression(stat_type_in){
-	cerr<<"variable declaration"<<endl;
-	if(stat_type_in==ST_var_return) 		type_name = strdup(some_name_in);
-	if(stat_type_in==ST_var_declaration) 	name = strdup(some_name_in);
-	cerr<<"exiting declaration"<<endl;
-}
-/*
-Variable::Variable(char* type_name_in, const StatementT& stat_type_in, list<PtrDeref>* dereferencer_in/*=NULL) :
-	BaseExpression(stat_type_in), init_val(NULL), dereferencer(dereferencer_in){
-	type_name = strdup(type_name_in);
-}
-*/
-
-Variable::Variable(char* type_name_in, char* name_in, const StatementT& stat_type_in, list<PtrDeref>* dereferencer_in/*=NULL*/) :
-	BaseExpression(stat_type_in), init_val(NULL), dereferencer(dereferencer_in){
-	type_name = strdup(type_name_in);
-	name = strdup(name_in);
-}
 
 Variable::~Variable(){
 	if(init_val!=NULL) delete init_val;
@@ -43,6 +24,8 @@ Variable::~Variable(){
 		delete dereferencer;
 	}
 }
+
+/* ================================================== GETTERS AND SETTERS ================================================== */
 
 
 void Variable::set_type_name(char* type_name_in){
@@ -57,6 +40,83 @@ const char* Variable::get_name() const{
 	return name;
 }
 
+string Variable::get_name_str() const{
+	return string(name);
+}
+
+
+void Variable::set_asm_location(const string& str_in){
+	location=strdup(str_in.c_str());
+}
+
+void Variable::set_asm_location(char* str_in){
+	location=strdup(str_in);
+	initialized = true;			// Called by function parameters
+}
+
+char* Variable::get_asm_location(){
+	return location;
+}
+
+bool Variable::get_initialized() const{
+	return initialized;
+}
+
+void Variable::init_asm_name(){
+	strcpy(asm_name, "abcdefg");
+	strcat(asm_name, name);
+}
+
+void Variable::generate_error(){
+	if(src_file.empty()) 	cerr<<"Error in source file at line ";
+	else 					cerr<<"Error in file "<<src_file<<" at line ";
+	cerr<<line<<" : Redefinition of variable \""<<name<<"\""<<endl;
+	exit(EXIT_FAILURE);
+}
+
+
+
+/* ================================================== VIRTUAL OVERRIDE ================================================== */
+
+
+void Variable::pretty_print(const int& indent){
+	string white_space;
+	white_space.resize(indent, ' ');
+	cout<<white_space<<name;
+
+	if(init_val!=NULL){
+		cout<<" = ";
+		init_val->pretty_print(0);
+	}
+}
+
+
+void Variable::renderasm(ASMhandle& context, const bool& local /*=true*/){
+	if(initialized) return;
+	initialized = true;
+	// Variable local
+	if(local){
+		try{	// Allocate variable on the stack
+			pair<string, Variable*> tmp(string(name), this);
+			location = context.allocate_var(tmp);
+		//	location = context.allocate_var(&location, tmp);
+		}
+		catch(const ErrorgenT& error_in){
+			generate_error();
+		}
+		if(init_val==NULL) return;
+		simplify_init_val();
+		init_val->renderasm(context, &location);
+	}
+	// Variable global
+	else{
+
+	}
+}
+
+
+
+/* ================================================== POINTER RELATED ================================================== */
 
 // You should probably use a tuple of 3 rather than a pair. 
 //The third code should tell you how to deduce the size. Do it when pointers come up
@@ -71,15 +131,21 @@ void Variable::dereference_front(BaseExpression* expr_in, const int& size/*=INTN
 }
 
 
-void Variable::pretty_print(const int& indent) const{
-	string white_space;
-	white_space.resize(indent, ' ');
-	cout<<white_space<<name;
-}
+/* ================================================== PRIVATE ================================================== */
 
-
-void Variable::renderasm(){
-	return;
+void Variable::simplify_init_val(){
+	BaseExpression* tmp_expr=NULL;
+	try{
+		if(init_val!=NULL){
+			snum_t tmp;
+			tmp_expr = init_val->simplify(tmp);
+			if(tmp_expr!=NULL){
+				delete init_val;
+				init_val = tmp_expr; 		// In case LHS was not simplified
+			}
+		} 
+	}
+	catch(const int& exception_in){}
 }
 
 

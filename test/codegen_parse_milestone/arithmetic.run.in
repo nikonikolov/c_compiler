@@ -1,26 +1,28 @@
+# 2 "arithmetic.run.in" 3 4
 int x()
 {}
 
-# 2 "github_test.run.in" 3 4
 
 int g, b, d, f=a;
 
 
 int zz(int a, int b, int c)
 {
-  {
-
-  }
-
-  {
-      int abcd;
-      abcd=a+b;
-
-  }
+  int a, b=a+b, c=(a-A)*(a+a) ;
+  b!=a*b-c/g*g%h-b+(a|b);
+  b==a*b-c/g*g%h-b+(a|b);
+  a||b;
+  a&&b;
+  a||b;
+  a=!b;
+  a=~b;
+  A||b&&c+d;
+  A||b&&c;
+  (a|b)||(a&b)&&c;
 
   if(a==b)
     a=b;
-  else if(a==c) ;
+  else if(a/c*d) ;
   else if(a==d) {
 
   }

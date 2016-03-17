@@ -23,28 +23,6 @@
 using namespace std;
 
 
-/* -------------------------------------------------------- HELP METHODS -------------------------------------------------------- */
-
-enum token_type{
-	Identifier_token, 
-	Keyword_token,
-	Constant_token,
-	Operator_token,
-	StringLiteral_token,
-	Invalid_token,
-	Enum_const_token,
-	Char_const_token,
-	Int_const_token,
-	Float_const_token,
-	Empty_token
-};
-
-
-
-
-
-/* ------------------------------------------------------ END HELP METHODS ------------------------------------------------------ */
-
 %}
 
 

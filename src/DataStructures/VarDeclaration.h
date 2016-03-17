@@ -9,7 +9,7 @@
 	It also allows to treat a declaration of multiple variables as a single Statement
 */
 
-class VarDeclaration : public Statement{
+class VarDeclaration{
 
 public:
 	VarDeclaration(vector<Variable*>* variables_in);
@@ -18,9 +18,9 @@ public:
 
 	void set_types(char* type_name_in);
 
-	void pretty_print(const int& indent) const;
-	void renderasm();
-	
+	void pretty_print(const int& indent);
+	void renderasm(ASMhandle& context, const bool& local=true);
+
 private:
 
 	vector<Variable*>* variables;			// Pointer to a vector of the variables defined

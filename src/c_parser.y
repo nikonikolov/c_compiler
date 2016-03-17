@@ -366,10 +366,10 @@ unary_expression  // Reduction to Level 1
                   // Type cast, see UNARY_OPERATOR
                   | UNARY_OPERATOR cast_expression                        { $$ = new Expression(NULL, $1, $2);}
                   // Sizeof 
-                  | SIZEOF unary_expression                                             { $$ = new Expression(NULL, $1, $2);}
+                  | SIZEOF unary_expression                               { $$ = new Expression(NULL, $1, $2);}
                   // Sizeof type
                   //| SIZEOF LBRACKET type_name RBRACKET                                  //{ $$ = new Expression(NULL, $1, $3);}
-                  | SIZEOF LBRACKET INT RBRACKET                                        { $$ = new Constant<int>(sizeof(int));}
+                  | SIZEOF LBRACKET INT RBRACKET                          { $$ = new Constant<int>(sizeof(int));}
                   ;
 
 UNARY_OPERATOR  // Address-of

@@ -51,7 +51,13 @@ void Variable::set_asm_location(const string& str_in){
 
 void Variable::set_asm_location(char* str_in){
 	location=strdup(str_in);
+	initialized = true;			// Called by function parameters
 }
+
+/*void Variable::get_asm_location(char** location_in){
+	location_in = &location;
+}
+*/
 char* Variable::get_asm_location(){
 	return location;
 }
@@ -69,6 +75,7 @@ void Variable::generate_error(){
 	if(src_file.empty()) 	cerr<<"Error in source file at line ";
 	else 					cerr<<"Error in file "<<src_file<<" at line ";
 	cerr<<line<<" : Redefinition of variable \""<<name<<"\""<<endl;
+	exit(EXIT_FAILURE);
 }
 
 
@@ -88,16 +95,27 @@ void Variable::pretty_print(const int& indent){
 }
 
 
-void Variable::renderasm(ASMhandle& context){
+void Variable::renderasm(ASMhandle& context, const bool& local /*=true*/){
 	if(initialized) return;
 	initialized = true;
-	if(init_val==NULL) return;
-	simplify_init_val();
-	/*{
-		context->stack_offset+=4;
-		cout<<"\taddiu $sp, $sp, 4"<<endl;
-		location = stack_offset+"($sp)";
-	} */
+	// Variable local
+	if(local){
+		try{	// Allocate variable on the stack
+			pair<string, Variable*> tmp(string(name), this);
+			location = context.allocate_var(tmp);
+		//	location = context.allocate_var(&location, tmp);
+		}
+		catch(const ErrorgenT& error_in){
+			generate_error();
+		}
+		if(init_val==NULL) return;
+		simplify_init_val();
+		init_val->renderasm(context, &location);
+	}
+	// Variable global
+	else{
+
+	}
 }
 
 

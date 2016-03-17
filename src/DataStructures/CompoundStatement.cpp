@@ -56,22 +56,24 @@ void CompoundStatement::renderasm(ASMhandle& context){
 
 	ASMhandle new_context(context);
 
+	
 	if(declarations!=NULL){
 		vector<VarDeclaration*>::iterator it;
 		for(it=declarations->begin(); it!=declarations->end(); ++it){
-			(*it)->renderasm(new_context);
+			(*it)->renderasm(new_context, true);
 		}
 	}
+	cerr<<"VarDeclaration done"<<endl;
 
 	new_context.redefinition_check();
 
 	// Initialize uninitialized variables	
-	if(new_context.local_vars!=NULL){
+	/*if(new_context.local_vars!=NULL){
 		map<string, Variable*>::iterator it;
 		for(it=(new_context.local_vars)->begin(); it!=(new_context.local_vars)->end(); ++it){
 			if(!((*it).second->get_initialized())) (*it).second->renderasm(new_context);
 		}
-	}
+	}*/
 
 	// Execute the statements
 	if(statements!=NULL){

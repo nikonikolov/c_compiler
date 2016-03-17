@@ -18,6 +18,10 @@ void ReturnStatement::pretty_print(const int& indent){
 
 
 void ReturnStatement::renderasm(ASMhandle& context){
+	char* destination = context.allocate_var();
+	//context.allocate_var(&destination);
+	return_expr->renderasm(context, &destination);
+	context.subroutine_exit(destination);
 }
 
 

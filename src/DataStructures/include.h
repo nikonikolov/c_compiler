@@ -4,17 +4,19 @@
 #include <vector>
 #include <list>
 #include <map>
+#include <stack>
 #include <iomanip>
 #include <iostream>
 #include <iomanip>
 #include <limits>
 #include <string>
 #include <string.h>
-//#include "ASMhandle.h"
+#include <cstdlib>
 
 using std::list;
 using std::vector;
 using std::map;
+using std::stack;
 using std::cout;
 using std::cerr;
 using std::endl;

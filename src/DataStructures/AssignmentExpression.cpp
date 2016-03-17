@@ -16,14 +16,24 @@ AssignmentExpression::~AssignmentExpression(){
 /* =============================================== VIRTUAL METHODS IMPLEMENTATION =============================================== */
 
 void AssignmentExpression::renderasm(ASMhandle& context, char** destination /*=NULL*/){
+	cerr<<"AssignmentExpression 0"<<endl;
 	char **lhs_dest, **rhs_dest;
 	if(lhs!=NULL){
-		*lhs_dest = context.allocate_var();
+		//*lhs_dest = context.allocate_var();
+	cerr<<"AssignmentExpression 1"<<endl;
+		lhs_dest = new char*(context.allocate_var());
+		//context.allocate_var(lhs_dest);
+	cerr<<"AssignmentExpression 2"<<endl;
 		lhs->renderasm(context, lhs_dest);
+	cerr<<"AssignmentExpression 3"<<endl;
 	} 
 	if(rhs!=NULL){
-		*rhs_dest = context.allocate_var();
+	cerr<<"AssignmentExpression 4"<<endl;
+		//*rhs_dest = context.allocate_var();
+		rhs_dest = new char*(context.allocate_var());
+	cerr<<"AssignmentExpression 5"<<endl;
 		rhs->renderasm(context, rhs_dest);
+	cerr<<"AssignmentExpression 6"<<endl;
 	} 
 
 	if(lhs!=NULL && rhs!=NULL){

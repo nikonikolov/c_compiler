@@ -46,6 +46,7 @@ void Constant<Type>::pretty_print(const int& indent){
 template<class Type>
 void Constant<Type>::renderasm(ASMhandle& context, char** destination /*=NULL*/){
 	cout<<pad<<"li"<<"$t0, "<<num_val<<endl;
+	cout<<pad<<"sw"<<"$t0, "<<*destination<<endl;
 	return;
 }
 

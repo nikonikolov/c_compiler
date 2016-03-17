@@ -69,13 +69,14 @@ void Expression::renderasm(ASMhandle& context, char** destination /*=NULL*/){
 
 	char **lhs_dest, **rhs_dest;
 	if(lhs!=NULL){
-		*lhs_dest = context.allocate_var();
+		lhs_dest = new char*(context.allocate_var());
 		lhs->renderasm(context, lhs_dest);
 	} 
 	if(rhs!=NULL){
-		*rhs_dest = context.allocate_var();
+		rhs_dest = new char*(context.allocate_var());
 		rhs->renderasm(context, rhs_dest);
 	} 
+
 
 	if(lhs!=NULL && rhs!=NULL){
 		if(!strcmp(oper,"+")) 	arithmetic_ins(*destination, *lhs_dest, *rhs_dest, "addu"); 	
@@ -98,14 +99,15 @@ void Expression::renderasm(ASMhandle& context, char** destination /*=NULL*/){
 		if(!strcmp(oper,">")) 	logical_comparison_ins(context, *destination, *lhs_dest, *rhs_dest, "bgtz"); 	
 		if(!strcmp(oper,"==")) 	logical_comparison_ins(context, *destination, *lhs_dest, *rhs_dest, "beq", true); 	
 		if(!strcmp(oper,"!=")) 	logical_comparison_ins(context, *destination, *lhs_dest, *rhs_dest, "bne", true); 
+	cerr<<"Expression 12"<<endl;
 	}
 	/* ----------------------------------- SINGLE OPERAND ----------------------------------- */
 	if(lhs==NULL && rhs!=NULL){
 		if(!strcmp(oper,"+"))	sign_ins(*destination, *rhs_dest, false);
 		if(!strcmp(oper,"-"))	sign_ins(*destination, *rhs_dest, true);
 		if(!strcmp(oper,"!")) 	logical_not_ins(context, *destination, *rhs_dest);
-		//if(!strcmp(oper,"~")) 	 (~(rhs_val.numval.intmem));
-		//if(!strcmp(oper,"sizeof")) 	 (sizeof(rhs_val.numval.intmem));
+		if(!strcmp(oper,"~")) 	bitwise_not_ins(*destination, *rhs_dest);
+		if(!strcmp(oper,"sizeof"))	sizeof_ins(*destination, *rhs_dest);
 	}
 
 }
@@ -209,7 +211,7 @@ BaseExpression* Expression::simplify(snum_t& value){
 		tmp_expr = res_ptr;
 		return tmp_expr;
 	} 
-	//throw gen_error();			// Invalid semantics of the expression
+	//generate_error();			// Invalid semantics of the expression
 	// Temporary for testing only. Uncomment above for final version
 	throw 1;						// Invalid semantics of the expression
 }
@@ -227,17 +229,24 @@ BaseExpression* Expression::simplify(snum_t& value){
 
 /* =============================================== CODEGEN METHODS =============================================== */
 
-string Expression::gen_error() const{
-	string result = "Error in file " + src_file +" at line " + std::to_string(line) + " around symbol " + oper;
-	return result;
+void Expression::generate_error(){
+	BaseExpression::generate_error();
+	cerr<<"around symbol "<<oper<<endl;
+	exit(EXIT_FAILURE);
 }
 
 
 void Expression::arithmetic_ins(char* destination, char* arg1, char* arg2, const string& instruction){
+	cerr<<"Expression arithmetic 0"<<endl;
+	
 	cout<<pad<<"lw"<<"$t0, "<<arg1<<endl;
+	cerr<<"Expression arithmetic 1"<<endl;
 	cout<<pad<<"lw"<<"$t1, "<<arg2<<endl;
+	cerr<<"Expression arithmetic 2"<<endl;
 	cout<<pad<<instruction<<"$t2, $t0, $t1"<<endl;
+	cerr<<"Expression arithmetic 3"<<endl;
 	cout<<pad<<"sw"<<"$t2, "<<destination<<endl;
+	cerr<<"Expression arithmetic 4"<<endl;
 }
 
 
@@ -338,8 +347,21 @@ void Expression::sign_ins(char* destination, char* arg, const bool& get_negative
 	cout<<pad<<"lw"<<"$t0, "<<arg<<endl;
 	cout<<pad<<"sra"<<"$t1, $t0, 31"<<endl;
 	cout<<pad<<"xor"<<"$t0, $t0, $t1"<<endl;
-	cout<<pad<<"sub"<<"$t0, $t0, $t1"<<endl;	// Absolute value in $t0
+	cout<<pad<<"sub"<<"$t0, $t0, $t1"<<endl;						// Absolute value in $t0
 	if(get_negative) cout<<pad<<"sub"<<"$t0, $0, $t0"<<endl;
-	cout<<pad<<"sw"<<"$t0, "<<arg<<endl;
-	if(destination==NULL)	cout<<pad<<"sw"<<"$t0, "<<destination<<endl;
+	cout<<pad<<"sw"<<"$t0, "<<destination<<endl;
 }
+
+void Expression::bitwise_not_ins(char* destination, char* arg){
+	cout<<pad<<"lw"<<"$t0, "<<arg<<endl;
+	cout<<pad<<"li"<<"$t1, 0xFFFFFFFF"<<endl;
+	cout<<pad<<"xor"<<"$t2, $t0, $t1"<<endl;
+	cout<<pad<<"sw"<<"$t2, "<<destination<<endl;
+}
+
+void Expression::sizeof_ins(char* destination, char* arg){
+	cout<<pad<<"li"<<"$t1, 4"<<endl;
+	cout<<pad<<"sw"<<"$t1, "<<destination<<endl;
+}
+
+

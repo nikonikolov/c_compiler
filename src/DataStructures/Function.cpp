@@ -47,11 +47,17 @@ void Function::pretty_print(const int& indent){
 }
 
 void Function::init_asm_name(){
-	strcpy(asm_name, "abcdefg");
-	strcat(asm_name, name);
+	if(strcmp(name,"main")){
+		asm_name=strdup("abcdefg");
+		strcat(asm_name, name);
+	} 
+	else asm_name=name;
 }
 
 void Function::renderasm(ASMhandle& context){
+	// Initialize assembly name
+	init_asm_name();
+
 	/* Function header assembly */
 	cout<<"\t.align	2"<<endl;
 	cout<<"\t.globl "<<asm_name<<endl;		// This has to be ommitted for functions declared static
@@ -94,7 +100,8 @@ void Function::prep_for_asm(ASMhandle& context){
 	for(int i=4; i<params->size(); i++){
 		pair<string, Variable*> tmp((*params)[i]->get_name_str() ,(*params)[i]);
 		try{
-			(*params)[i]->set_asm_location(context.allocate_var(tmp));
+			char* tmp_location=context.allocate_var(tmp);
+			(*params)[i]->set_asm_location(tmp_location);
 		}
 		catch(const ErrorgenT& error_in){
 			(*params)[i]->generate_error();

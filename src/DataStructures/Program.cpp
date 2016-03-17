@@ -71,30 +71,35 @@ void Program::pretty_print(const int& indent){
 
 
 void Program::renderasm(){
-	/*// Repair the following loop. You have to create global_vars and the vars inside need to know they are global vars. You might 
-	// be able to do it without the Variable knowing it's global by defining a member function that renders assembly for global var
+
+	// Create ASMhandle that manages the stack and the function calls
+	ASMhandle context(functions);
+	
+	cout<<pad<<".text"<<endl;
+	// Render assembly for global variables. Global variables initialize their assembly names on their own
 	if(global_vars_decl!=NULL){
 		vector<VarDeclaration*>::iterator it;
 		for(it=global_vars_decl->begin(); it!=global_vars_decl->end(); ++it){
-			if(*it!=NULL) (*it)->pretty_print(indent);
+			(*it)->renderasm(context, false);
 		}
 	} 
-	// Here will be the point to perform semantics check and make sure no function name matches a variable name. You can also try
-	// doing it when you traverse the vectors
 
-	// Initialize assembly names for both functions and global variables
+	// Check for clashes between global variables and function names
+	context.clash_check();
+
+	// Initialize assembly names for functions. Note it has to happen here so that function calls work properly
 	if(functions!=NULL){
-		vector<Function*>::iterator it;
+		map<string, Function*>::iterator it;
 		for(it=functions->begin(); it!=functions->end(); ++it){
-			(*it)->init_asm_name(indent);
+			(*it).second->init_asm_name();
+		}
+
+		// Render assembly for functions	
+		for(it=functions->begin(); it!=functions->end(); ++it){
+			(*it).second->renderasm(context);
 		}
 	}
-	if(global_vars!=NULL){
-		vector<Variable*>::iterator it;
-		for(it=global_vars->begin(); it!=global_vars->end(); ++it){
-			(*it)->init_asm_name(indent);
-		}
-	}
-*/
+
+	cerr<<"Code Generation Successful"<<endl;
 }
 

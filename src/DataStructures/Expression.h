@@ -9,7 +9,7 @@
 /*	REQUIRED FIXES:
 		1. Support for all types of variables
 		2. Cast variables and manage the returned struct properly
-		3. Operators not yet supported: all pointer related such as . -> & * and sizeof
+		3. Operators not yet supported: all pointer related such as . -> & * and sizeof. Note that [] translates to a variable
 */	
 
 
@@ -27,23 +27,22 @@ public:
 	void set_lhs(Expression* lhs_in);	
 	void set_rhs(Expression* rhs_in);
 
-	virtual BaseExpression* simplify(snum_t& value);
+	BaseExpression* simplify(snum_t& value);
 	void pretty_print(const int& indent);
 	virtual void renderasm(ASMhandle& context, char** destination=NULL);
 
+	void generate_error();
+
 protected:
-	string gen_error() const;
-	/*void arithmetic_ins(char* instruction, char* destination, char* arg1, char* arg2);
-	void logical_or_ins(char* destination, char* arg1, char* arg2);
-	void logical_comparison_ins(char* instruction, char* destination, char* arg1,
-																			char* arg2, const bool& subtract=true);
-	*/
+
 	void arithmetic_ins(char* destination, char* arg1, char* arg2, const string& instruction);
 	void logical_or_ins(ASMhandle& context, char* destination, char* arg1, char* arg2);
 	void logical_and_ins(ASMhandle& context, char* destination, char* arg1, char* arg2);
 	void logical_not_ins(ASMhandle& context, char* destination, char* arg);
 	void logical_comparison_ins(ASMhandle& context, char* destination, char* arg1, char* arg2, const string& instruction, const bool& subtract=true);
 	void sign_ins(char* destination, char* arg, const bool& get_negative);
+	void bitwise_not_ins(char* destination, char* arg);
+	void sizeof_ins(char* destination, char* arg);
 
 
 	char* oper;

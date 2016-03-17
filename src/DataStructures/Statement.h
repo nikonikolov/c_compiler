@@ -16,18 +16,25 @@ class ASMhandle{
 public:
 	/* ----------------------------------------------- CONSTRUCTION ----------------------------------------------- */
 
-	ASMhandle(const ASMhandle& orig);
-	ASMhandle(map<string, Function*>* functions_in, map<string, Variable*>* global_vars_in);
+	ASMhandle();
+	ASMhandle(ASMhandle& orig);
+	ASMhandle(map<string, Function*>* functions_in);
 	~ASMhandle();
+	ASMhandle& operator=(ASMhandle& orig);
+
 
 	/* ----------------------------------------------- CODEGEN METHODS ----------------------------------------------- */
 
 	void subroutine_enter(const int& mem_amount = 24);
-	void subroutine_exit();
+	void subroutine_exit(char* return_val);
 	void allocate_mem(const int& mem_amount = 24);
 	char* allocate_var(pair<string, Variable*>& var_in, const int& mem_amount = 4);
 	char* allocate_var(const int& mem_amount = 4);
+	//char** allocate_var(const int& mem_amount = 4);
+	string allocate_str_var(pair<string, Variable*>& var_in, const int& mem_amount = 4);
+	string allocate_str_var(const int& mem_amount = 4);
 	void deallocate_var(const int& mem_amount = 4);
+
 
 
 	/* ----------------------------------------------- GETTERS AND SETTERS ----------------------------------------------- */
@@ -40,6 +47,7 @@ public:
 	/* ----------------------------------------------- ERROR CHECKERS ----------------------------------------------- */
 
 	void redefinition_check();
+	void clash_check();
 
 	/* ----------------------------------------------- PUBLIC MEMBERS ----------------------------------------------- */
 
@@ -48,11 +56,12 @@ public:
 	map<string, Function*>* functions;		
 
 private:
-	int sp_offset; 					// Indicates by how much of the stack pointer needs to be incremented on subroutine exit
 	// Indicates how much memory is allocated for the current subroutine. Needs to be incremented when frame_offset becomes equal
 	int allocated_mem;					
+	int sp_offset; 					// Indicates by how much of the stack pointer needs to be incremented on subroutine exit
 	int fp_offset; 					// Indicates how much of the currently allocated stack memory is used
 
+	stack<string>* return_address;
 	static uint32_t label_idx;
 	//static int mem_amount_default;
 };

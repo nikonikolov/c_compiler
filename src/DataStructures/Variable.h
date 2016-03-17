@@ -2,7 +2,7 @@
 #define VARIABLE_H
 
 #include <cstdint>
-#include <string.h>
+#include "include.h"
 #include "BaseExpression.h"
 
 typedef std::pair<BaseExpression*,int> PtrDeref;
@@ -25,13 +25,14 @@ public:
 	void set_init_val(BaseExpression* init_val_in);
 	void set_asm_location(const string& str_in);
 	void set_asm_location(char* str_in);
+	//void get_asm_location(char** location_in);
 	char* get_asm_location();
 	void init_asm_name();
 
 	void generate_error();
 
 	void pretty_print(const int& indent);
-	void renderasm(ASMhandle& context);
+	void renderasm(ASMhandle& context, const bool& local = true);
 
 	/* ------------------------------------------------- POINTER RELATED ------------------------------------------------- */
 

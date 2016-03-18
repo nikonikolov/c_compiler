@@ -10,14 +10,32 @@ f:
 	sw      $ra, 0($fp)		# Store the return address for the current subroutine
 	sw      $a0, -4($fp)
 	sw      $a1, -8($fp)
-	li      $t0, 1
-	sw      $t0, -12($fp)
+	sw      $a2, -12($fp)
 	addiu   $sp, $sp, -28		# Allocate more memory
-	lw      $t0, -4($fp)
-	sw      $t0, -16($fp)
+	sw      $a3, -16($fp)
+	lw      $t0, -8($fp)
+	sw      $t0, -20($fp)
 	addiu   $t0, $t0, -1
-	sw      $t0, -4($fp)
-	lw      $t0, -16($fp)
+	sw      $t0, -8($fp)
+	lw      $t0, -20($fp)
+	sw      $t0, -12($fp)
+	lw      $t0, 24($fp)
+	sw      $t0, -24($fp)
+	addiu   $t0, $t0, -1
+	sw      $t0, 24($fp)
+	lw      $t0, -24($fp)
+	sw      $t0, -12($fp)
+	lw      $t0, 28($fp)
+	sw      $t0, -28($fp)
+	addiu   $t0, $t0, -1
+	sw      $t0, 28($fp)
+	lw      $t0, -28($fp)
+	sw      $t0, -12($fp)
+	lw      $t0, 32($fp)
+	sw      $t0, -32($fp)
+	addiu   $t0, $t0, -1
+	sw      $t0, 32($fp)
+	lw      $t0, -32($fp)
 	sw      $t0, -12($fp)
 	lw      $v0, -12($fp)
 	lw      $ra, 0($fp)		# Load return address in register 31

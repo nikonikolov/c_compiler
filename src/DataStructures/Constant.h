@@ -10,6 +10,7 @@ class Constant : public BaseExpression{
 
 public:
 	Constant(const Type& num_val);
+	Constant(const Type& num_val, const int& line_in, const string& src_file_in);
 	~Constant();
 
 	void pretty_print(const int& indent);
@@ -31,6 +32,10 @@ private:
 template<class Type>
 Constant<Type>::Constant(const Type& num_val_in) :
 	BaseExpression(EXPR_constant), num_val(num_val_in){}
+
+template<class Type>
+Constant<Type>::Constant(const Type& num_val_in, const int& line_in, const string& src_file_in) :
+	BaseExpression(EXPR_constant, line_in, src_file_in), num_val(num_val_in){}
 
 template<class Type>
 Constant<Type>::~Constant(){}

@@ -8,6 +8,14 @@ VarDeclaration::VarDeclaration(char* type_name_in, vector<Variable*>* variables_
 	set_types(type_name_in);
 }
 
+VarDeclaration::VarDeclaration(vector<Variable*>* variables_in, const int& line_in, const string& src_file_in) :
+	variables(variables_in), line(line_in), src_file(src_file_in) {}
+
+VarDeclaration::VarDeclaration(char* type_name_in, vector<Variable*>* variables_in, const int& line_in, const string& src_file_in) : 
+	variables(variables_in), line(line_in), src_file(src_file_in) {
+	set_types(type_name_in);
+}
+
 VarDeclaration::~VarDeclaration(){
 	if(variables!=NULL){
 		vector<Variable*>::iterator it;
@@ -16,6 +24,13 @@ VarDeclaration::~VarDeclaration(){
 		}
 		delete variables;
 	}
+}
+
+void VarDeclaration::generate_error(const string& msg_out){
+	if(src_file.empty()) 	cerr<<"Error in source file at line ";
+	else 					cerr<<"Error in file "<<src_file<<" at line ";
+	cerr<<line<<" : "<<msg_out<<endl;
+	exit(EXIT_FAILURE);
 }
 
 

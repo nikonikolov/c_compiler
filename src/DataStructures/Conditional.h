@@ -13,8 +13,13 @@
 class ConditionalCase : public Statement{
 
 public:
-	ConditionalCase(Statement* single_statement_in, BaseExpression* condition_in = NULL);
-	ConditionalCase(CompoundStatement* block_statement_in, BaseExpression* condition_in = NULL);
+	// Defaults used for else statements
+	ConditionalCase(Statement* single_statement_in, BaseExpression* condition_in);
+	ConditionalCase(CompoundStatement* block_statement_in, BaseExpression* condition_in);
+
+	ConditionalCase(Statement* single_statement_in, BaseExpression* condition_in, const int& line_in, const string& src_file_in);
+	ConditionalCase(CompoundStatement* block_statement_in, BaseExpression* condition_in, const int& line_in, const string& src_file_in);
+
 	~ConditionalCase();
 
 	void pretty_print(const int& indent);
@@ -37,6 +42,7 @@ class Conditional : public Statement{
 
 public:
 	Conditional(vector<ConditionalCase*>* conditions_in);
+	Conditional(vector<ConditionalCase*>* conditions_in, const int& line_in, const string& src_file_in);
 	~Conditional();
 
 	void pretty_print(const int& indent);

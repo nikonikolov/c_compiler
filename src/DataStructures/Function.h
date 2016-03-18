@@ -16,6 +16,8 @@ class Function{
 
 public:
 	Function(Variable* return_type_in, char* name_in, vector<Variable*>* params_in, CompoundStatement* fn_body_in);
+	Function(Variable* return_type_in, char* name_in, vector<Variable*>* params_in, CompoundStatement* fn_body_in, 
+																				const int& line_in, const string& src_file_in);
 	~Function();
 
 	string get_name() const;
@@ -27,7 +29,7 @@ public:
 	void init_asm_name();
 private:
 	
-	void prep_for_asm(ASMhandle& context);
+	void init_args(ASMhandle& context);
 
 	
 	/* 	return_type specifies what type the return value should be. This structure allows for handling pointers as well. 
@@ -44,6 +46,9 @@ private:
 	CompoundStatement* fn_body;				// CompoundStatement corresponding to function body
 
 	char* asm_name;
+
+	int line;
+	string src_file;
 };
 
 

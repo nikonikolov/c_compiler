@@ -19,7 +19,7 @@ using std::string;
 using std::stringstream;
 
 extern int input_file_line;
-extern int source_file_line;
+extern int source_line;
 extern string source_file;
 
 typedef long double double64_t;

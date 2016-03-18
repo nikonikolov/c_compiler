@@ -8,6 +8,8 @@ class TerneryExpression : public BaseExpression{
 
 public:
 	TerneryExpression(vector<BaseExpression*>* lhs_in, BaseExpression* mid_in, vector<BaseExpression*>* rhs_in);
+	TerneryExpression(vector<BaseExpression*>* lhs_in, BaseExpression* mid_in, vector<BaseExpression*>* rhs_in,
+																		const int& line_in, const string& src_file_in);
 	~TerneryExpression();
 
 	void set_lhs(vector<BaseExpression*>* lhs_in);

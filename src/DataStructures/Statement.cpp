@@ -38,6 +38,7 @@ ASMhandle::ASMhandle(ASMhandle& orig){
 	sp_offset=orig.sp_offset;
 	allocated_mem=orig.allocated_mem;
 	fp_offset=orig.fp_offset;
+	stack_args_offset=16;
 }
 
 
@@ -50,6 +51,7 @@ ASMhandle::ASMhandle(map<string, Function*>* functions_in) :
 	sp_offset = 0;
 	allocated_mem = 0;
 	fp_offset = 0;
+	stack_args_offset=16;
 }
 
 // NOTE: YOU MUST NOT BE DESTROYING THE VARIABLES IN THE MAPS
@@ -60,11 +62,10 @@ ASMhandle::~ASMhandle(){
 	if(return_address!=NULL) delete return_address; 
 }
 
-/* ----------------------------------------------- CODEGEN METHODS ----------------------------------------------- */
+/* ----------------------------------------------- SUBROUTINES AND SCOPES ----------------------------------------------- */
 
 void ASMhandle::subroutine_enter(const int& mem_amount /*= 24*/){
 	// Note that mem_amount is always postive integer
-
 	sp_offset = mem_amount;
 	allocated_mem = mem_amount-8;
 	fp_offset = 0;
@@ -79,9 +80,8 @@ void ASMhandle::subroutine_enter(const int& mem_amount /*= 24*/){
 
 	// You should push this to a new method that gets called only on function calls
 	string ret_address = allocate_str_var();
-	cout<<pad<<"sw"<<"$ra, "<<ret_address<<"\t\t# Store the return address for the subroutine"<<endl;
+	cout<<pad<<"sw"<<"$ra, "<<ret_address<<"\t\t# Store the return address for the current subroutine"<<endl;
 	return_address->push(ret_address);
-	
 }
 
 void ASMhandle::subroutine_exit(char* return_val){
@@ -92,18 +92,36 @@ void ASMhandle::subroutine_exit(char* return_val){
 
 	// Load return address
 	cout<<pad<<"lw"<<"$ra, "<<ret_address<<"\t\t# Load return address in register 31"<<endl;
-	//cout<<pad<<"lw"<<"$2, "<<ret_address<<"\t\t# Load return address in register 31"<<endl;
-
 	// Restore frame pointer. This should be load and should be -4
-	//cout<<pad<<"move"<<"$fp, 4($fp)"<<"\t\t# Restore the value of the frame pointer"<<endl; 								
 	cout<<pad<<"lw"<<"$fp, 4($fp)"<<"\t\t# Restore the value of the frame pointer"<<endl; 								
-	
 	// Restore stack pointer		
 	cout<<pad<<"addiu"<<"$sp, $sp, "<<sp_offset<<"\t\t# Restore the value of the stack pointer"<<endl; 						
-
-	cout<<pad<<"j"<<"$ra"<<endl;											// Go back to caller
+	// Go back to caller
+	cout<<pad<<"j"<<"$ra"<<endl;											
 	cout<<pad<<"nop"<<endl;
 }
+
+
+char* ASMhandle::allocate_subroutine_stack_param(pair<string, Variable*>& var_in, const int& mem_amount /*= 4*/){
+	insert_local_var(var_in);
+	/* 	Get the location of the argument on the stack. NOTE that the convention says: arg5 will be at 16($sp), arg6 at 20($sp),
+		arg7 at 24($sp) and so on. $sp in this case is the value of the stack pointer at entering the function. This means that
+		arg5 will be at the top and the rest of the arguments will be below it
+	*/
+	char* address=strdup(string(std::to_string(8+stack_args_offset)+"($fp)").c_str());	
+	stack_args_offset+=mem_amount;			// Increment stack_args_offset
+	return address;
+}
+
+
+// Used at the exit of a scope so that newly allocated memory will be accounted for
+void ASMhandle::exit_scope(const ASMhandle& new_context){
+	allocated_mem = new_context.allocated_mem;
+	sp_offset=new_context.sp_offset;
+	fp_offset=new_context.fp_offset;
+}
+
+/* ----------------------------------------------- LOCAL VARIABLES ----------------------------------------------- */
 
 void ASMhandle::allocate_mem(const int& mem_amount /*= 24*/){
 	// Allocate memory
@@ -153,13 +171,6 @@ void ASMhandle::deallocate_var(const int& mem_amount/* = 4*/){
 }
 
 
-/* ----------------------------------------------- GETTERS AND SETTERS ----------------------------------------------- */
-
-string ASMhandle::get_label(){
-	label_idx++;
-	return string("$L"+std::to_string(label_idx-1));
-}
-
 Variable* ASMhandle::get_var_location(char* name){
 	map<string, Variable*>::iterator it;
 	it=local_vars->find(string(name));
@@ -176,6 +187,29 @@ void ASMhandle::insert_local_var(pair<string, Variable*>& var_in){
 	ret = local_vars->insert(var_in);									// Put Variable* in local_vars
   	if (ret.second==false) throw ERROR_redefinition;
 }
+
+/* ----------------------------------------------- GLOBAL VARIABLES ----------------------------------------------- */
+
+void ASMhandle::insert_global_var(pair<string, Variable*>& var_in){
+	pair<map<string, Variable*>::iterator,bool> ret;
+	ret = global_vars->insert(var_in);									// Put Variable* in global_vars
+  	if (ret.second==false) throw ERROR_redefinition;
+	
+	// Check for name clashes with functions
+	map<string, Function*>::iterator it;
+	it=functions->find(var_in.first);
+	if(it!=functions->end()) throw ERROR_fn_var_clash;
+
+}
+
+
+/* ----------------------------------------------- GETTERS AND SETTERS ----------------------------------------------- */
+
+string ASMhandle::get_assembly_label(){
+	label_idx++;
+	return string("$LKDHGF"+std::to_string(label_idx-1));
+}
+
 
 /* ----------------------------------------------- ERROR CHECKERS ----------------------------------------------- */
 
@@ -205,8 +239,9 @@ StatementT Statement::get_stat_type() const{
 	return stat_type;
 }
 
-void Statement::generate_error(){
+void Statement::generate_error(const string& msg_out){
 	if(src_file.empty()) 	cerr<<"Error in source file at line ";
 	else 					cerr<<"Error in file "<<src_file<<" at line ";
-	cerr<<line<<" : ";
+	cerr<<line<<" : "<<msg_out<<endl;
+	exit(EXIT_FAILURE);
 }

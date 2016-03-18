@@ -10,7 +10,13 @@ f:
 	sw      $ra, 0($fp)		# Store the return address for the current subroutine
 	sw      $a0, -4($fp)
 	sw      $a1, -8($fp)
-	lw      $v0, -4($fp)
+	lw      $t0, -4($fp)
+	lw      $t1, -8($fp)
+	teq     $t1, $0, 7
+	div     $t0, $t1
+	mfhi    $t2
+	sw      $t2, -12($fp)
+	lw      $v0, -12($fp)
 	lw      $ra, 0($fp)		# Load return address in register 31
 	lw      $fp, 4($fp)		# Restore the value of the frame pointer
 	addiu   $sp, $sp, 24		# Restore the value of the stack pointer

@@ -113,7 +113,7 @@ Preprocessor 			^#[ ].+$
 
 /* ============================================== Pattern matching rule section ============================================== */
 %%
-[\n]				{ input_file_line++; source_file_line++; }
+[\n]				{ input_file_line++; source_line++; }
 [ ]|[\t]			{ }
 auto				{ yylval.strval = strdup(yytext); return AUTO; }
 double				{ yylval.strval = strdup(yytext); return DOUBLE; }
@@ -203,7 +203,7 @@ sizeof				{ yylval.strval = strdup(yytext); return SIZEOF; }
 \^					{ yylval.strval = strdup(yytext); return BITWISE_XOR; }
 {StringLiteral}		{ yylval.strval = strdup(yytext); return STRING_LITERAL; }
 {Preprocessor}		{ process_prep_include(yytext); yylval.strval = strdup(yytext); }
-{Invalid}			{ cerr<<"In file "<<source_file<<": Invalid syntax at line "<<source_file_line<<endl; exit(EXIT_FAILURE); }
+{Invalid}			{ cerr<<"In file "<<source_file<<": Invalid syntax at line "<<source_line<<endl; exit(EXIT_FAILURE); }
 %%
 /* ==================== User function section - optional. Define the functions called on regex matches here ==================== */
 

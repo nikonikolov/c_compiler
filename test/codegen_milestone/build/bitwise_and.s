@@ -7,7 +7,7 @@ f:
 	addiu   $sp, $sp, -24		# Allocate memory on the stack
 	sw      $fp, 20($sp)		# Store value of fp on the bottom of the stack
 	addiu   $fp, $sp, 16		# Modify fp to point to the the bottom of the available stack memory
-	sw      $ra, 0($fp)		# Store the return address for the subroutine
+	sw      $ra, 0($fp)		# Store the return address for the current subroutine
 	sw      $a0, -4($fp)
 	sw      $a1, -8($fp)
 	lw      $t0, -4($fp)

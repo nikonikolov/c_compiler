@@ -8,6 +8,16 @@ ExpressionStatement::ExpressionStatement(BaseExpression* expr_in) :
 	expr_list->push_back(expr_in);
 }
 
+ExpressionStatement::ExpressionStatement(vector<BaseExpression*>* expr_list_in, const int& line_in, const string& src_file_in) : 
+	Statement(ST_expr_statement, line_in, src_file_in), expr_list(expr_list_in){}
+
+ExpressionStatement::ExpressionStatement(BaseExpression* expr_in, const int& line_in, const string& src_file_in) : 
+	Statement(ST_expr_statement, line_in, src_file_in){
+	expr_list = new vector<BaseExpression*>;
+	expr_list->push_back(expr_in);
+}
+
+
 ExpressionStatement::~ExpressionStatement(){
 	if (expr_list!=NULL){
 		vector<BaseExpression*>::iterator it;
@@ -67,4 +77,10 @@ void ExpressionStatement::simplify(){
 			}
 		}
 	}
+}
+
+
+BaseExpression* ExpressionStatement::get_last(){
+	int idx=expr_list->size()-1;
+	return (*expr_list)[idx];
 }

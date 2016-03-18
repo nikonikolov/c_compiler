@@ -8,6 +8,8 @@ class CompoundStatement : public Statement{
 
 public:
 	CompoundStatement(vector<VarDeclaration*>* declarations_in, vector<Statement*>* statements_in);
+	CompoundStatement(vector<VarDeclaration*>* declarations_in, vector<Statement*>* statements_in, 
+																	const int& line_in, const string& src_file_in);
 	~CompoundStatement();
 
 	void renderasm(ASMhandle& context);

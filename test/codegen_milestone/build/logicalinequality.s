@@ -7,23 +7,23 @@ f:
 	addiu   $sp, $sp, -24		# Allocate memory on the stack
 	sw      $fp, 20($sp)		# Store value of fp on the bottom of the stack
 	addiu   $fp, $sp, 16		# Modify fp to point to the the bottom of the available stack memory
-	sw      $ra, 0($fp)		# Store the return address for the subroutine
+	sw      $ra, 0($fp)		# Store the return address for the current subroutine
 	sw      $a0, -4($fp)
 	sw      $a1, -8($fp)
 	lw      $t0, -4($fp)
 	lw      $t1, -8($fp)
-	bne     $t0, $t1, $L3
+	bne     $t0, $t1, $LKDHGF3
 	nop     
 	move    $t2, $0
 	sw      $t2, -12($fp)
-	b       $L4
+	b       $LKDHGF4
 	nop     
-$L3:
+$LKDHGF3:
 	li      $t2, 1
 	sw      $t2, -12($fp)
-	b       $L4
+	b       $LKDHGF4
 	nop     
-$L4:
+$LKDHGF4:
 	lw      $v0, -12($fp)
 	lw      $ra, 0($fp)		# Load return address in register 31
 	lw      $fp, 4($fp)		# Restore the value of the frame pointer

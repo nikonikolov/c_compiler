@@ -10,6 +10,8 @@ class Loop : public Statement{
 public:
 	Loop(CompoundStatement* loop_body_in);
 	Loop(Statement* loop_statement_in);
+	Loop(Statement* loop_statement_in, const int& line_in, const string& src_file_in);
+	Loop(CompoundStatement* loop_body_in, const int& line_in, const string& src_file_in);
 	~Loop();
 
 	void pretty_print(const int& indent);

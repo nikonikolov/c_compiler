@@ -31,8 +31,6 @@ public:
 	void pretty_print(const int& indent);
 	virtual void renderasm(ASMhandle& context, char** destination=NULL);
 
-	void generate_error();
-
 protected:
 
 	void arithmetic_ins(char* destination, char* arg1, char* arg2, const string& instruction);
@@ -41,6 +39,7 @@ protected:
 	void logical_not_ins(ASMhandle& context, char* destination, char* arg);
 	void logical_comparison_ins(ASMhandle& context, char* destination, char* arg1, char* arg2, const string& instruction, 
 																									const bool& subtract=true);
+	void div_rem_ins(char* destination, char* arg1, char* arg2, const string& instruction);
 	void sign_ins(char* destination, char* arg, const bool& get_negative);
 	void bitwise_not_ins(char* destination, char* arg);
 	void sizeof_ins(char* destination, char* arg);

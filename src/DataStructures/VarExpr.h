@@ -15,6 +15,7 @@ class VarExpr : public BaseExpression{
 
 public:
 	VarExpr(char* name_in);
+	VarExpr(char* name_in, const int& line_in, const string& src_file_in);
 	~VarExpr();
 	const char* get_name() const;
 	
@@ -22,7 +23,6 @@ public:
 	void renderasm(ASMhandle& context, char** destination=NULL);
 	BaseExpression* simplify(snum_t& value);
 
-	void generate_error();
 private:
 	char* name;
 

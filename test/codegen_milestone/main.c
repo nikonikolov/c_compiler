@@ -5,7 +5,8 @@ int f(int a, int b);
 
 int main()
 {
-   int vs[]={0,-1,+1,-2,+2,78686, -454, 0xFFFF, -0xFFFF  };
+   int vs[]={10,-1,+1,-2,+2,78686, -454, 0xFFFF, -0xFFFF  };
+   //int vs[]={0,-1,+1,-2,+2,78686, -454, 0xFFFF, -0xFFFF  };
    int ns=sizeof(vs)/sizeof(vs[0]);
 
    for(int i=0;i<ns;i++){

@@ -1141,7 +1141,7 @@ case 1:
 /* rule 1 can match eol */
 YY_RULE_SETUP
 #line 116 "src/c_lexer.lex"
-{ input_file_line++; source_file_line++; }
+{ input_file_line++; source_line++; }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
@@ -1594,7 +1594,7 @@ YY_RULE_SETUP
 case 91:
 YY_RULE_SETUP
 #line 206 "src/c_lexer.lex"
-{ cerr<<"In file "<<source_file<<": Invalid syntax at line "<<source_file_line<<endl; exit(EXIT_FAILURE); }
+{ cerr<<"In file "<<source_file<<": Invalid syntax at line "<<source_line<<endl; exit(EXIT_FAILURE); }
 	YY_BREAK
 case 92:
 YY_RULE_SETUP

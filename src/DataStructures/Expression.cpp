@@ -89,9 +89,9 @@ void Expression::renderasm(ASMhandle& context, char** destination /*=NULL*/){
 		if(!strcmp(oper,"<<")) 	arithmetic_ins(*destination, *lhs_dest, *rhs_dest, "sllv"); 	
 		if(!strcmp(oper,">>")) 	arithmetic_ins(*destination, *lhs_dest, *rhs_dest, "srav"); 	
 
-		//if(!strcmp(oper,"*")) 	arithmetic_ins("mult", *destination, *lhs_dest, *rhs_dest); 	
-		//if(!strcmp(oper,"%")) 	arithmetic_ins("addu", *destination, *lhs_dest, *rhs_dest); 	
-		//if(!strcmp(oper,"/")) 	arithmetic_ins("addu", *destination, *lhs_dest, *rhs_dest); 	
+		if(!strcmp(oper,"*")) 	arithmetic_ins(*destination, *lhs_dest, *rhs_dest, "mul"); 	
+		if(!strcmp(oper,"%")) 	div_rem_ins(*destination, *lhs_dest, *rhs_dest, "mfhi"); 	
+		if(!strcmp(oper,"/")) 	div_rem_ins(*destination, *lhs_dest, *rhs_dest, "mflo"); 	
 
 		if(!strcmp(oper,"||")) 	logical_or_ins(context, *destination, *lhs_dest, *rhs_dest); 	
 		if(!strcmp(oper,"&&")) 	logical_and_ins(context, *destination, *lhs_dest, *rhs_dest); 	
@@ -212,7 +212,7 @@ BaseExpression* Expression::simplify(snum_t& value){
 		tmp_expr = res_ptr;
 		return tmp_expr;
 	} 
-	//generate_error();			// Invalid semantics of the expression
+	//generate_error("unrecognized operator \""+string(oper)+"\" in expression");			// Invalid semantics of the expression
 	// Temporary for testing only. Uncomment above for final version
 	throw 1;						// Invalid semantics of the expression
 }
@@ -230,13 +230,6 @@ BaseExpression* Expression::simplify(snum_t& value){
 
 /* =============================================== CODEGEN METHODS =============================================== */
 
-void Expression::generate_error(){
-	BaseExpression::generate_error();
-	cerr<<"around symbol "<<oper<<endl;
-	exit(EXIT_FAILURE);
-}
-
-
 void Expression::arithmetic_ins(char* destination, char* arg1, char* arg2, const string& instruction){
 	cout<<pad<<"lw"<<"$t0, "<<arg1<<endl;
 	cout<<pad<<"lw"<<"$t1, "<<arg2<<endl;
@@ -246,8 +239,8 @@ void Expression::arithmetic_ins(char* destination, char* arg1, char* arg2, const
 
 
 void Expression::logical_or_ins(ASMhandle& context, char* destination, char* arg1, char* arg2){
-	string non_default_action = context.get_label();		
-	string continued_exec = context.get_label();		
+	string non_default_action = context.get_assembly_label();		
+	string continued_exec = context.get_assembly_label();		
 	
 	cout<<pad<<"lw"<<"$t0, "<<arg1<<endl;
 	cout<<pad<<"bne"<<"$0, $t0, "<<non_default_action<<endl;	// If arg1 is not 0, go to non_default action
@@ -269,8 +262,8 @@ void Expression::logical_or_ins(ASMhandle& context, char* destination, char* arg
 
 
 void Expression::logical_and_ins(ASMhandle& context, char* destination, char* arg1, char* arg2){
-	string non_default_action = context.get_label();		
-	string continued_exec = context.get_label();		
+	string non_default_action = context.get_assembly_label();		
+	string continued_exec = context.get_assembly_label();		
 	
 	cout<<pad<<"lw"<<"$t0, "<<arg1<<endl;
 	cout<<pad<<"beq"<<"$0, $t0, "<<non_default_action<<endl;	// If arg1 is 0, go to non_default action
@@ -292,8 +285,8 @@ void Expression::logical_and_ins(ASMhandle& context, char* destination, char* ar
 
 
 void Expression::logical_not_ins(ASMhandle& context, char* destination, char* arg){
-	string non_default_action = context.get_label();		
-	string continued_exec = context.get_label();		
+	string non_default_action = context.get_assembly_label();		
+	string continued_exec = context.get_assembly_label();		
 	
 	cout<<pad<<"lw"<<"$t0, "<<arg<<endl;
 	cout<<pad<<"bne"<<"$0, $t0, "<<non_default_action<<endl;	// If arg1 is not 0, go to non_default action
@@ -312,18 +305,18 @@ void Expression::logical_not_ins(ASMhandle& context, char* destination, char* ar
 // if comparison of arg1-arg2 is true, then 1, otherwise 0
 void Expression::logical_comparison_ins(ASMhandle& context, char* destination, char* arg1, char* arg2, 
 														const string& instruction, const bool& subtract/*=true*/){
-	string non_default_action = context.get_label();		
-	string continued_exec = context.get_label();		
+	string non_default_action = context.get_assembly_label();		
+	string continued_exec = context.get_assembly_label();		
 	
 	cout<<pad<<"lw"<<"$t0, "<<arg1<<endl;
 	cout<<pad<<"lw"<<"$t1, "<<arg2<<endl;
 	
 	if(subtract){
 	 	cout<<pad<<"subu"<<"$t2, $t0, $t1"<<endl;
-		cout<<pad<<instruction<<"$t2, "<<non_default_action<<endl;		// Branch if comparison is true
+		cout<<pad<<instruction<<"$t2, "<<non_default_action<<endl;			// Branch if comparison is true
 	}
 	
-	else 	cout<<pad<<instruction<<"$t0, $t1, "<<non_default_action<<endl; // Branch if comparison is true
+	else cout<<pad<<instruction<<"$t0, $t1, "<<non_default_action<<endl; 	// Branch if comparison is true
 	cout<<pad<<"nop"<<endl;
 
 	cout<<pad<<"move"<<"$t2"<<", $0"<<endl; 						// Default action reached, result is 0
@@ -341,12 +334,14 @@ void Expression::logical_comparison_ins(ASMhandle& context, char* destination, c
 
 void Expression::sign_ins(char* destination, char* arg, const bool& get_negative){
 	cout<<pad<<"lw"<<"$t0, "<<arg<<endl;
-	cout<<pad<<"sra"<<"$t1, $t0, 31"<<endl;
-	cout<<pad<<"xor"<<"$t0, $t0, $t1"<<endl;
-	cout<<pad<<"sub"<<"$t0, $t0, $t1"<<endl;						// Absolute value in $t0
-	if(get_negative) cout<<pad<<"sub"<<"$t0, $0, $t0"<<endl;
+	if(get_negative){
+		cout<<pad<<"li"<<"$t1, 0xFFFFFFFF"<<endl;
+		cout<<pad<<"xor"<<"$t0, $t0, $t1"<<endl;					// Invert
+		cout<<pad<<"addi"<<"$t0, $t0, 1"<<endl;						// Add 1
+	}
 	cout<<pad<<"sw"<<"$t0, "<<destination<<endl;
 }
+
 
 void Expression::bitwise_not_ins(char* destination, char* arg){
 	cout<<pad<<"lw"<<"$t0, "<<arg<<endl;
@@ -360,4 +355,12 @@ void Expression::sizeof_ins(char* destination, char* arg){
 	cout<<pad<<"sw"<<"$t1, "<<destination<<endl;
 }
 
+void Expression::div_rem_ins(char* destination, char* arg1, char* arg2, const string& instruction){
+	cout<<pad<<"lw"<<"$t0, "<<arg1<<endl;
+	cout<<pad<<"lw"<<"$t1, "<<arg2<<endl;
+	cout<<pad<<"teq"<<"$t1, $0, 7"<<endl;
+	cout<<pad<<"div"<<"$t0, $t1"<<endl;
+	cout<<pad<<instruction<<"$t2"<<endl;
+	cout<<pad<<"sw"<<"$t2, "<<destination<<endl;
+}
 

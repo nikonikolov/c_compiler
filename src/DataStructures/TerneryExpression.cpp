@@ -3,6 +3,12 @@
 TerneryExpression::TerneryExpression(vector<BaseExpression*>* lhs_in, BaseExpression* mid_in, vector<BaseExpression*>* rhs_in) :
 	BaseExpression(EXPR_ternery_expr), lhs(lhs_in), mid(mid_in), rhs(rhs_in) {}
 
+TerneryExpression::TerneryExpression(vector<BaseExpression*>* lhs_in, BaseExpression* mid_in, vector<BaseExpression*>* rhs_in,
+																		const int& line_in, const string& src_file_in) :
+	BaseExpression(EXPR_ternery_expr, line_in, src_file_in), lhs(lhs_in), mid(mid_in), rhs(rhs_in) {}
+
+
+
 TerneryExpression::~TerneryExpression(){
 	if(lhs!=NULL){
 		vector<BaseExpression*>::iterator it;

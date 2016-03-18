@@ -273,7 +273,7 @@ declarator  : direct_declarator                                     { $$ = $1; }
 
 // NB make a separate grammmar for function declarations and prototypes - they are definitely not the same as variables
 // Variable name, Array cell or function
-direct_declarator : IDENTIFIER                                      { $$ = new Variable($1); }
+direct_declarator : IDENTIFIER                                      { $$ = new Variable($1, source_line, source_file); }
                   | LBRACKET declarator RBRACKET                    { $$ = $2; }
                   // Array cell
                   //| direct_declarator LSQUARE constant_expression RSQUARE     { $$= $1; $$->dereference_back($3); }
@@ -308,7 +308,7 @@ initializer_list  : initializer                                     { /*$$ = new
 
 /* ===================================================================================================================== */
 
-/* ============================================== 3.3 EXPRESSIONS ============================================== */
+/* ================================================== 3.3 EXPRESSIONS ================================================== */
 
 /* ===================================================================================================================== */
 
@@ -317,7 +317,7 @@ initializer_list  : initializer                                     { /*$$ = new
 
 // Basic structure: Level 0 Precedence; corressponds to factor
 primary_expression  // Identifier
-                    : IDENTIFIER                            { $$ = new VarExpr($1);}
+                    : IDENTIFIER                            { $$ = new VarExpr($1, source_line, source_file);}
                     // Constant
                     | CONSTANT                              { $$ = $1;}
                     // string_literal
@@ -344,9 +344,9 @@ postfix_expression  // Reduction to Level 0
                     | postfix_expression PTR_OP IDENTIFIER                              //{ Expression* tmp = new VarExpr($3);
                                                                                         //  $$ = new Expression($1, $2, tmp);}
                     // Post increment
-                    | postfix_expression PLUS_PLUS                      { $$ = new AssignmentExpression($1, $2, NULL);}
+                    | postfix_expression PLUS_PLUS          { $$ = new AssignmentExpression($1, $2, NULL, source_line, source_file);}
                     // Post decrement
-                    | postfix_expression MINUS_MINUS                    { $$ = new AssignmentExpression($1, $2, NULL);}
+                    | postfix_expression MINUS_MINUS        { $$ = new AssignmentExpression($1, $2, NULL, source_line, source_file);}
                     ;
 
 // Note: Arguments to functions can be expressions. If so, the evaluation is executed
@@ -360,16 +360,16 @@ argument_expression_list  : assignment_expression
 unary_expression  // Reduction to Level 1 
                   : postfix_expression                                                  { $$ = $1;}
                   // Pre increment
-                  | PLUS_PLUS unary_expression                            { $$ = new AssignmentExpression(NULL, $1, $2);}
+                  | PLUS_PLUS unary_expression           { $$ = new AssignmentExpression(NULL, $1, $2, source_line, source_file);}
                   // Pre decrement
-                  | MINUS_MINUS unary_expression                          { $$ = new AssignmentExpression(NULL, $1, $2);}
+                  | MINUS_MINUS unary_expression         { $$ = new AssignmentExpression(NULL, $1, $2, source_line, source_file);}
                   // Type cast, see UNARY_OPERATOR
-                  | UNARY_OPERATOR cast_expression                        { $$ = new Expression(NULL, $1, $2);}
+                  | UNARY_OPERATOR cast_expression       { $$ = new Expression(NULL, $1, $2, source_line, source_file);}
                   // Sizeof 
-                  | SIZEOF unary_expression                               { $$ = new Expression(NULL, $1, $2);}
+                  | SIZEOF unary_expression              { $$ = new Expression(NULL, $1, $2, source_line, source_file);}
                   // Sizeof type
-                  //| SIZEOF LBRACKET type_name RBRACKET                                  //{ $$ = new Expression(NULL, $1, $3);}
-                  | SIZEOF LBRACKET INT RBRACKET                          { $$ = new Constant<int>(sizeof(int));}
+                  //| SIZEOF LBRACKET type_name RBRACKET                   { $$ = new Expression(NULL, $1, $3);}
+                  | SIZEOF LBRACKET INT RBRACKET         { $$ = new Constant<int>(sizeof(int), source_line, source_file);}
                   ;
 
 UNARY_OPERATOR  // Address-of
@@ -386,8 +386,8 @@ UNARY_OPERATOR  // Address-of
                 | EXL_MARK                            { $$ = $1; }
                 ;
 
-cast_expression : unary_expression                                                      { $$ = $1; }
-                | LBRACKET type_name RBRACKET cast_expression                           { $$ = new Expression(NULL, $2, $4);}
+cast_expression : unary_expression                               { $$ = $1; }
+                | LBRACKET type_name RBRACKET cast_expression    { $$ = new Expression(NULL, $2, $4, source_line, source_file);}
                 ;
 
 /* ---------------------------------------------- 3.3.5 MULTIPLICATIVE OPERATORS -------------------------------------------- */
@@ -396,124 +396,140 @@ cast_expression : unary_expression                                              
 multiplicative_expression // Reduction to Level 2 
                           : cast_expression                                             { $$ = $1;}                                  
                           // Multiplication
-                          | multiplicative_expression MULT cast_expression              { $$ = new Expression($1, $2, $3);}
+                          | multiplicative_expression MULT cast_expression    
+                                                                  { $$ = new Expression($1, $2, $3, source_line, source_file);}
                           // Division
-                          | multiplicative_expression DIV cast_expression               { $$ = new Expression($1, $2, $3);}
+                          | multiplicative_expression DIV cast_expression     
+                                                                  { $$ = new Expression($1, $2, $3, source_line, source_file);}
                           // Remainder
-                          | multiplicative_expression PERCENT cast_expression           { $$ = new Expression($1, $2, $3);}
+                          | multiplicative_expression PERCENT cast_expression 
+                                                                  { $$ = new Expression($1, $2, $3, source_line, source_file);}
                           ;
 
 /* ---------------------------------------------- 3.3.6 ADDITIVE OPERATORS -------------------------------------------- */
 
 // Level 4 Precedence
 additive_expression // Reduction to Level 3 
-                    : multiplicative_expression                                         { $$ = $1; }
+                    : multiplicative_expression                   { $$ = $1; }
                     // Addition
-                    | additive_expression PLUS multiplicative_expression                { $$ = new Expression($1, $2, $3);}
+                    | additive_expression PLUS multiplicative_expression      
+                                                                  { $$ = new Expression($1, $2, $3, source_line, source_file);}
                     // Subtraction
-                    | additive_expression MINUS multiplicative_expression               { $$ = new Expression($1, $2, $3);}
+                    | additive_expression MINUS multiplicative_expression     
+                                                                  { $$ = new Expression($1, $2, $3, source_line, source_file);}
                     ;
 
 /* ---------------------------------------------- 3.3.7 BITWISE SHIFT OPERATORS -------------------------------------------- */
 
 // Level 5 Precedence
 shift_expression  // Reduction to Level 4
-                  : additive_expression                                                 { $$ = $1;}
+                  : additive_expression                           { $$ = $1;}
                   // Bitwise shift left
-                  | shift_expression LSHIFT additive_expression                         { $$ = new Expression($1, $2, $3);}
+                  | shift_expression LSHIFT additive_expression   { $$ = new Expression($1, $2, $3, source_line, source_file);}
                   // Bitwise shift right
-                  | shift_expression RSHIFT additive_expression                         { $$ = new Expression($1, $2, $3);}
+                  | shift_expression RSHIFT additive_expression   { $$ = new Expression($1, $2, $3, source_line, source_file);}
                   ;
 
 /* ---------------------------------------------- 3.3.8 RELATIONAL OPERATORS -------------------------------------------- */
 
 // Level 6 Precedence
 relational_expression // Reduction to Level 5 
-                      : shift_expression                                                { $$ = $1; }
+                      : shift_expression                          { $$ = $1; }
                       // More than comparison
-                      | relational_expression LOGICAL_LESS shift_expression             { $$ = new Expression($1, $2, $3);}
+                      | relational_expression LOGICAL_LESS shift_expression             
+                                                                  { $$ = new Expression($1, $2, $3, source_line, source_file);}
                       // Less than comparison
-                      | relational_expression LOGICAL_MORE shift_expression             { $$ = new Expression($1, $2, $3);}
+                      | relational_expression LOGICAL_MORE shift_expression             
+                                                                  { $$ = new Expression($1, $2, $3, source_line, source_file);}
                       // Less than or equal comparison
-                      | relational_expression LESS_OR_EQUAL shift_expression            { $$ = new Expression($1, $2, $3);}
+                      | relational_expression LESS_OR_EQUAL shift_expression            
+                                                                  { $$ = new Expression($1, $2, $3, source_line, source_file);}
                       // More than or equal comparison
-                      | relational_expression MORE_OR_EQUAL shift_expression            { $$ = new Expression($1, $2, $3);}
+                      | relational_expression MORE_OR_EQUAL shift_expression            
+                                                                  { $$ = new Expression($1, $2, $3, source_line, source_file);}
                       ;   
 
 /* ---------------------------------------------- 3.3.9 EQUALITY OPERATORS -------------------------------------------- */
 
 // Level 7 Precedence
 equality_expression // Reduction to Level 6
-                    : relational_expression                                             { $$ = $1; }
+                    : relational_expression                       { $$ = $1; }
                     // Logical equality comparison
-                    | equality_expression LOGICAL_EQUALITY relational_expression        { $$ = new Expression($1, $2, $3);}
+                    | equality_expression LOGICAL_EQUALITY relational_expression        
+                                                                  { $$ = new Expression($1, $2, $3, source_line, source_file);}
                     // Logical ineqality comparison
-                    | equality_expression LOGICAL_INEQUALITY relational_expression      { $$ = new Expression($1, $2, $3);}          
+                    | equality_expression LOGICAL_INEQUALITY relational_expression      
+                                                                  { $$ = new Expression($1, $2, $3, source_line, source_file);}          
                     ;
 
 /* ---------------------------------------------- 3.3.10 BITWISE AND OPERATOR -------------------------------------------- */
 
 // Level 8 Precedence
 and_expression  // Reduction to Level 7
-                : equality_expression                                                   { $$ = $1; } 
+                : equality_expression                             { $$ = $1; } 
                 // Bitwise AND operation between two arguments
-                | and_expression BITWISE_AND equality_expression                        { $$ = new Expression($1, $2, $3);}
+                | and_expression BITWISE_AND equality_expression                        
+                                                                  { $$ = new Expression($1, $2, $3, source_line, source_file);}
                 ;
 
 /* -------------------------------------------- 3.3.11 BITWISE EXCLUSIVE OR OPERATOR ------------------------------------------ */
 
 // Level 9 Precedence
 exclusive_or_expression // Reduction to Level 8
-                        : and_expression                                                { $$ = $1; }
+                        : and_expression                          { $$ = $1; }
                         // Bitwise XOR operation between two arguments
-                        | exclusive_or_expression BITWISE_XOR and_expression            { $$ = new Expression($1, $2, $3);}
+                        | exclusive_or_expression BITWISE_XOR and_expression            
+                                                                  { $$ = new Expression($1, $2, $3, source_line, source_file);}
                         ;
 
 /* -------------------------------------------- 3.3.12 BITWISE INCLUSIVE OR OPERATOR ------------------------------------------ */
 
 // Level 10 Precedence
 inclusive_or_expression // Reduction to Level 9
-                        : exclusive_or_expression                                       { $$ = $1; }
+                        : exclusive_or_expression                 { $$ = $1; }
                         // Bitwise OR operation between two arguments
-                        | inclusive_or_expression BITWISE_OR exclusive_or_expression    { $$ = new Expression($1, $2, $3);}         
+                        | inclusive_or_expression BITWISE_OR exclusive_or_expression    
+                                                                  { $$ = new Expression($1, $2, $3, source_line, source_file);}         
                         ;
 
 /* -------------------------------------------- 3.3.13 LOGICAL AND OPERATOR ------------------------------------------ */
 
 // Level 11 Precedence
 logical_and_expression  // Reduction to Level 10
-                        : inclusive_or_expression                                       { $$ = $1; }
+                        : inclusive_or_expression                 { $$ = $1; }
                         // Logical AND expression
-                        | logical_and_expression LOGICAL_AND inclusive_or_expression    { $$ = new Expression($1, $2, $3);}
+                        | logical_and_expression LOGICAL_AND inclusive_or_expression    
+                                                                  { $$ = new Expression($1, $2, $3, source_line, source_file);}
                         ;
 
 /* -------------------------------------------- 3.3.14 LOGICAL OR OPERATOR ------------------------------------------ */
 
 // Level 12 Precedence
 logical_or_expression // Reduction to Level 11
-                      : logical_and_expression                                          { $$ = $1; } 
+                      : logical_and_expression                    { $$ = $1; } 
                       // Logical OR expression
-                      | logical_or_expression LOGICAL_OR logical_and_expression         { $$ = new Expression($1, $2, $3);}
+                      | logical_or_expression LOGICAL_OR logical_and_expression         
+                                                                  { $$ = new Expression($1, $2, $3, source_line, source_file);}
                       ;
 
 /* -------------------------------------------- 3.3.15 CONDITIONAL OPERATOR ------------------------------------------ */
 
 // Level 13 Precedence
 conditional_expression  // Reduction to Level 12
-                        : logical_or_expression                                         { $$ = $1; }
+                        : logical_or_expression                   { $$ = $1; }
                         // Ternary conditional
                         | logical_or_expression Q_MARK expression COLON conditional_expression   
+                                                        //{ $$ = new ConditionalExpression($1, $3, $5, source_line, source_file)}
                         ;
 
 /* -------------------------------------------- 3.3.16 ASSIGNMENT OPERATOR ------------------------------------------ */
 
-// You probably need to make some synchronizations with your grammar at this point
-
 // Level 14 Precedence
 assignment_expression // Reduction to Level 13
-                      : conditional_expression                                      { $$ = $1; }
+                      : conditional_expression                    { $$ = $1; }
                       // Assignment
-                      | unary_expression ASSIGNMENT_OPERATOR assignment_expression  { $$ = new AssignmentExpression($1, $2, $3);}
+                      | unary_expression ASSIGNMENT_OPERATOR assignment_expression  
+                                                        { $$ = new AssignmentExpression($1, $2, $3, source_line, source_file);}
                       ;
 
 ASSIGNMENT_OPERATOR : EQUALS                      { $$ = $1;}
@@ -534,8 +550,6 @@ expression  : assignment_expression               { $$ = $1;}
             ;
 
 /* -------------------------------------------- 3.3.17 COMMA OPERATOR ------------------------------------------ */
-
-// You probably need to make some synchronizations with your grammar at this point
 
 // Level 15 Precedence
 expression_list // Reduction to Level 14
@@ -571,8 +585,8 @@ fn_declaration  : INT IDENTIFIER LBRACKET fn_params_list RBRACKET compound_state
                 ;
 
 fn_params_list  : INT bracketed_identifier                      { $$ = new vector<Variable*>; 
-                                                                  $$->push_back(new Variable($1, $2));}
-                | fn_params_list COMMA INT bracketed_identifier { $$->push_back(new Variable($3, $4)); }
+                                                                  $$->push_back(new Variable($1, $2, source_line, source_file));}
+                | fn_params_list COMMA INT bracketed_identifier { $$->push_back(new Variable($3, $4, source_line, source_file));}
                 |                                               { $$ = NULL; }
                 ;   
 
@@ -583,7 +597,6 @@ bracketed_identifier  : IDENTIFIER                                  { $$ = $1; }
 
 /* -------------------------------------------- LOOP STATEMENTS ------------------------------------------ */
 
-// Add do while for final version
 loop  : for_loop                                                  { $$=$1; }
       | while_loop                                                { $$=$1; }
       | do_while_loop                                             { $$=$1; }
@@ -597,24 +610,6 @@ for_loop  : FOR LBRACKET for_loop_decl_statement RBRACKET compound_statement    
           | FOR LBRACKET for_loop_decl_statement RBRACKET statement              { $$ = new Loop($5); }
           ;
 
-// NB: to prevent memory leaks, at this stage you need to delete the structures returned in the following conditions
-// Fix memory management. Some pointer does not get deleted
-/*for_loop_decl_statement : assignment_expression_list SEMI_COLON equality_expression SEMI_COLON assignment_expression_list 
-                              { delete $1; delete $5; }
-                        | assignment_expression_list SEMI_COLON equality_expression SEMI_COLON
-                              { delete $1; }
-                        | assignment_expression_list SEMI_COLON SEMI_COLON assignment_expression_list
-                              { delete $1; delete $4; }
-                        | SEMI_COLON equality_expression SEMI_COLON assignment_expression_list
-                              { delete $4; }
-                        | assignment_expression_list SEMI_COLON SEMI_COLON
-                              { delete $1; }
-                        | SEMI_COLON SEMI_COLON assignment_expression_list
-                              { delete $3; }
-                        | SEMI_COLON equality_expression SEMI_COLON
-                        | SEMI_COLON SEMI_COLON
-                        ;
-*/
 for_loop_decl_statement : expression_list SEMI_COLON expression_list SEMI_COLON expression_list 
                         | expression_list SEMI_COLON expression_list SEMI_COLON
                         | expression_list SEMI_COLON SEMI_COLON expression_list
@@ -644,11 +639,7 @@ LABELED_STATEMENT : IDENTIFIER COLON STATEMENT
                   ;
 */
 
-/* Be very careful - this can be function call, comparison, number or even assignment - maybe you can put it as a statement
-equality_expression : LBRACKET equality_expression
-*/
 
-// arithmetic expressions etc
 if_block_statement  : if_statement                            { $$ = new Conditional($1); }
                     | if_statement else_statement_list        { $$ = new Conditional(vec_append($1,$2)); }
                     ;
@@ -657,10 +648,11 @@ else_statement_list : else_statement                          { $$ = $1; }
                     | else_statement_list else_statement      { $$ = vec_append($1, $2); }
                     ;
 
-if_statement  : IF LBRACKET expression RBRACKET compound_statement               
-                                              { $$ = new vector<ConditionalCase*>; $$->push_back(new ConditionalCase($5,$3)); }
-              | IF LBRACKET expression RBRACKET statement
-                                              { $$ = new vector<ConditionalCase*>; $$->push_back(new ConditionalCase($5,$3)); }
+// Memory leak
+if_statement  : IF LBRACKET expression_list RBRACKET compound_statement               
+                { $$ = new vector<ConditionalCase*>; $$->push_back(new ConditionalCase($5,$3->get_last(), source_line, source_file)); }
+              | IF LBRACKET expression_list RBRACKET statement
+                { $$ = new vector<ConditionalCase*>; $$->push_back(new ConditionalCase($5,$3->get_last(), source_line, source_file)); }
               ;
 
 /*
@@ -672,8 +664,10 @@ else_statement  : ELSE if_statement           { $$ = $2; }
 */
 
 
-else_statement  : ELSE compound_statement     { $$ = new vector<ConditionalCase*>; $$->push_back(new ConditionalCase($2)); }
-                | ELSE statement              { $$ = new vector<ConditionalCase*>; $$->push_back(new ConditionalCase($2)); }
+else_statement  : ELSE compound_statement     
+                  { $$ = new vector<ConditionalCase*>; $$->push_back(new ConditionalCase($2, NULL, source_line, source_file)); }
+                | ELSE statement              
+                  { $$ = new vector<ConditionalCase*>; $$->push_back(new ConditionalCase($2, NULL, source_line, source_file)); }
                 ;
 
 
@@ -729,8 +723,8 @@ semi_colon_statement  : return_statement                            { $$=$1;}
                 | RETURN SEMI_COLON
                 ;
 */
-return_statement  : RETURN expression SEMI_COLON                    { $$ = new ReturnStatement($2);}
-                  | RETURN SEMI_COLON                               { $$ = new ReturnStatement();}
+return_statement  : RETURN expression SEMI_COLON                    { $$ = new ReturnStatement($2, source_line, source_file);}
+                  | RETURN SEMI_COLON                               { $$ = new ReturnStatement(NULL, source_line, source_file);}
                   ;
 
 
@@ -741,8 +735,10 @@ return_statement  : RETURN expression SEMI_COLON                    { $$ = new R
 int yyerror(const char* s){ 
   cerr<<"========================================= Parser ERROR ========================================="<<endl;
   std::cerr <<"File: "<< source_file<<", Line: "<<input_file_line << std::endl;
+  cerr<<"========================================= Parser ERROR ========================================="<<endl;
   return -1;
 }
+
 /*
 int main(){
 

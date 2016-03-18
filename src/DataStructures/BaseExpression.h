@@ -17,7 +17,7 @@ public:
 	virtual void renderasm(ASMhandle& context, char** destination=NULL)=0;
 	virtual BaseExpression* simplify(snum_t& value) =0;
 
-	virtual void generate_error();
+	virtual void generate_error(const string& msg_out);
 
 protected:
 	ExprT expr_type;	

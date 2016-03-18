@@ -27,6 +27,7 @@ private:
 	void assignment_ins(char** destination, char* lhs_dest, char* rhs_dest, const string& instruction="");
 	void arithmetic_ins(char* lhs_dest, char* rhs_dest, const string& instruction);
 	void inc_dec_ins(char** destination, char* arg, const int& val, const bool& post_inc);
+	void div_rem_ins(char** destination, char* lhs_dest, char* rhs_dest, const string& instruction);
 
 };
 

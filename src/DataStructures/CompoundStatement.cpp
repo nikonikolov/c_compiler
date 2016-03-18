@@ -3,6 +3,10 @@
 CompoundStatement::CompoundStatement(vector<VarDeclaration*>* declarations_in, vector<Statement*>* statements_in) :
 	Statement(ST_compound), declarations(declarations_in), statements(statements_in) {
 }
+	
+CompoundStatement::CompoundStatement(vector<VarDeclaration*>* declarations_in, vector<Statement*>* statements_in, 
+																	const int& line_in, const string& src_file_in) :
+	Statement(ST_compound, line_in, src_file_in), declarations(declarations_in), statements(statements_in) {}
 
 
 CompoundStatement::~CompoundStatement(){
@@ -65,14 +69,6 @@ void CompoundStatement::renderasm(ASMhandle& context){
 
 	new_context.redefinition_check();
 
-	// Initialize uninitialized variables	
-	/*if(new_context.local_vars!=NULL){
-		map<string, Variable*>::iterator it;
-		for(it=(new_context.local_vars)->begin(); it!=(new_context.local_vars)->end(); ++it){
-			if(!((*it).second->get_initialized())) (*it).second->renderasm(new_context);
-		}
-	}*/
-
 	// Execute the statements
 	if(statements!=NULL){
 		vector<Statement*>::iterator it;
@@ -80,4 +76,7 @@ void CompoundStatement::renderasm(ASMhandle& context){
 			(*it)->renderasm(new_context);
 		}
 	}
+
+	// Make sure that if the CompoundStatemtent appears as a scope(not a function) the prover values for $fp and $sp are kept
+	context.exit_scope(new_context);
 }

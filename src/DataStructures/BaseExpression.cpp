@@ -12,8 +12,9 @@ ExprT BaseExpression::get_expr_type() const {
 }
 
 
-void BaseExpression::generate_error(){
+void BaseExpression::generate_error(const string& msg_out){
 	if(src_file.empty()) 	cerr<<"Error in source file at line ";
 	else 					cerr<<"Error in file "<<src_file<<" at line ";
-	cerr<<line<<" : ";
+	cerr<<line<<" : "<<msg_out<<endl;
+	exit(EXIT_FAILURE);
 }

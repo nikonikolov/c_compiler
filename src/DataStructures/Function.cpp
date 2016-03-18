@@ -6,6 +6,12 @@ Function::Function(Variable* return_type_in, char* name_in, vector<Variable*>* p
 	name=strdup(name_in);
 }
 
+Function::Function(Variable* return_type_in, char* name_in, vector<Variable*>* params_in, CompoundStatement* fn_body_in, 
+																			const int& line_in, const string& src_file_in) :
+	return_type(return_type_in), params(params_in), fn_body(fn_body_in), line(line_in), src_file(src_file_in) {
+	name=strdup(name_in);
+}
+
 
 
 Function::~Function(){
@@ -63,57 +69,51 @@ void Function::renderasm(ASMhandle& context){
 
 	/* Function header assembly */
 	cout<<"\t.align	2"<<endl;
-	cout<<"\t.globl "<<asm_name<<endl;		// This has to be ommitted for functions declared static
-	cout<<"\t.ent "<<asm_name<<endl;
-	cout<<"\t.type "<<asm_name<<", @function"<<endl;
-	cout<<asm_name<<":"<<endl;
+	cout<<"\t.globl "<<name<<endl;		// This has to be ommitted for functions declared static
+	cout<<"\t.ent "<<name<<endl;
+	cout<<"\t.type "<<name<<", @function"<<endl;
+	cout<<name<<":"<<endl;
 
 	ASMhandle new_context(context);
 
 	new_context.subroutine_enter();
 
-	prep_for_asm(new_context);
+	init_args(new_context);
 
 	new_context.redefinition_check();
 		
-	cerr<<"Before CompoundStatement"<<endl;
-
 	fn_body->renderasm(new_context);
 
-
 	/* Function end assembly */
-	cout<<endl<<"\t.end "<<asm_name<<endl<<endl;
+	cout<<endl<<"\t.end "<<name<<endl<<endl;
 }
 
 
 
-void Function::prep_for_asm(ASMhandle& context){
+void Function::init_args(ASMhandle& context){
 	if(params==NULL) return;
 
 	// Repair - put arguments on the stack and account for arguments bigger than 32bits
 	for(int i=0; i<params->size() && i<4; i++){
-		//(*params)[i]->set_asm_location("$a"+std::to_string(i));
-		//pair<string, Variable*> tmp((*params)[i]->get_name_str() ,(*params)[i]);
 		try{
-			//context.insert_local_var(tmp);
-			pair<string, Variable*> tmp((*params)[i]->get_name_str() ,(*params)[i]);
+			pair<string, Variable*> tmp((*params)[i]->get_name_str(), (*params)[i]);
 			char* asm_location = context.allocate_var(tmp);
 			(*params)[i]->set_asm_location(asm_location);
 			cout<<pad<<"sw"<<"$a"<<i<<", "<<asm_location<<endl;
 		}
 		catch(const ErrorgenT& error_in){
-			(*params)[i]->generate_error();
+			(*params)[i]->generate_error("Function parameters cannot have the same name");
 		}
 	}
 
 	for(int i=4; i<params->size(); i++){
-		/*pair<string, Variable*> tmp((*params)[i]->get_name_str() ,(*params)[i]);
+		pair<string, Variable*> tmp((*params)[i]->get_name_str(), (*params)[i]);
 		try{
-			char* tmp_location=context.allocate_var(tmp);
-			(*params)[i]->set_asm_location(tmp_location);
+			char* asm_location=context.allocate_subroutine_stack_param(tmp);
+			(*params)[i]->set_asm_location(asm_location);
 		}
 		catch(const ErrorgenT& error_in){
-			(*params)[i]->generate_error();
-		}*/
+			(*params)[i]->generate_error("Function parameters cannot have the same name");
+		}
 	}
 }

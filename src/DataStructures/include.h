@@ -70,7 +70,8 @@ enum ExprT{
 /* =============================================== ERROR TYPES =============================================== */
 
 enum ErrorgenT{
-	ERROR_redefinition = 1 
+	ERROR_redefinition = 1,
+	ERROR_fn_var_clash = 2 
 };
 
 /* =============================================== VARIOUS EXPRESSION RETURN TYPE =============================================== */

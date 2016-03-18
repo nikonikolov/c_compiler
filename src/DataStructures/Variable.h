@@ -15,6 +15,9 @@ public:
 	Variable(char* name_in);
 	Variable(char* type_name_in, char* name_in, list<PtrDeref>* dereferencer_in=NULL);
 
+	Variable(char* name_in, const int& line_in, const string& src_file_in);
+	Variable(char* type_name_in, char* name_in, const int& line_in, const string& src_file_in, list<PtrDeref>* dereferencer_in=NULL);
+
 	~Variable();
 
 	const char* get_name() const;
@@ -28,7 +31,7 @@ public:
 	char* get_asm_location();
 	void init_asm_name();
 
-	void generate_error();
+	void generate_error(const string& msg_out);
 
 	void pretty_print(const int& indent);
 	void renderasm(ASMhandle& context, const bool& local = true);
@@ -43,6 +46,7 @@ public:
 
 private:
 	void simplify_init_val();
+	void renderasm_global(ASMhandle& context);
 
 	/* 	Template version instead of using var_type would not be a good idea since you would not know the types of Variables
 		appearing in BaseExpressions. Enum type instead of string would not be useful as well because you won't be able to
@@ -73,6 +77,9 @@ private:
 	char* location;				// Holds the location of the variable, e.g. 4($sp) or $t0
 	bool initialized;
 	char* asm_name;
+	
+	bool global;
+	static bool first_global;		// Needed to identify when to print .data
 
 	int line;
 	string src_file;

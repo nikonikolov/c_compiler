@@ -40,9 +40,9 @@ void AssignmentExpression::renderasm(ASMhandle& context, char** destination /*=N
 		if(!strcmp(oper,"<<=")) assignment_ins(destination, *lhs_dest, *rhs_dest, "sllv"); 	
 		if(!strcmp(oper,">>=")) assignment_ins(destination, *lhs_dest, *rhs_dest, "srav"); 	
 
-		//if(!strcmp(oper,"*=")) 	arithmetic_ins("mult", destination, lhs_dest, rhs_dest); 	
-		//if(!strcmp(oper,"%=")) 	arithmetic_ins("addu", destination, lhs_dest, rhs_dest); 	
-		//if(!strcmp(oper,"/=")) 	arithmetic_ins("addu", destination, lhs_dest, rhs_dest); 	
+		if(!strcmp(oper,"*=")) 	assignment_ins(destination, *lhs_dest, *rhs_dest, "mul"); 	
+		if(!strcmp(oper,"%=")) 	div_rem_ins(destination, *lhs_dest, *rhs_dest, "mfhi"); 	
+		if(!strcmp(oper,"/=")) 	div_rem_ins(destination, *lhs_dest, *rhs_dest, "mflo"); 	
 
 	}
 	/* ----------------------------------- SINGLE OPERAND ----------------------------------- */
@@ -81,4 +81,14 @@ void AssignmentExpression::inc_dec_ins(char** destination, char* arg, const int&
 	cout<<pad<<"addiu"<<"$t0, $t0, "<<val<<endl;
 	cout<<pad<<"sw"<<"$t0, "<<arg<<endl;											// Assign the new value to the variable
 	if(destination!=NULL && !post_inc) cout<<pad<<"sw"<<"$t0, "<<*destination<<endl;	// Assign the new value to the destination
+}
+
+void AssignmentExpression::div_rem_ins(char** destination, char* lhs_dest, char* rhs_dest, const string& instruction){
+	cout<<pad<<"lw"<<"$t0, "<<lhs_dest<<endl;
+	cout<<pad<<"lw"<<"$t1, "<<rhs_dest<<endl;
+	cout<<pad<<"teq"<<"$t1, $0, 7"<<endl;
+	cout<<pad<<"div"<<"$t0, $t1"<<endl;
+	cout<<pad<<instruction<<"$t2"<<endl;
+	cout<<pad<<"sw"<<"$t2, "<<lhs_dest<<endl;
+	if(destination!=NULL)	cout<<pad<<"sw"<<"$t2, "<<*destination<<endl;
 }

@@ -5,6 +5,10 @@ VarExpr::VarExpr(char* name_in) : BaseExpression(EXPR_tmp_var){
 	name = strdup(name_in);
 }
 
+VarExpr::VarExpr(char* name_in, const int& line_in, const string& src_file_in) : 
+	BaseExpression(EXPR_tmp_var, line_in, src_file_in){
+	name = strdup(name_in);
+}
 
 VarExpr::~VarExpr(){}
 
@@ -28,7 +32,7 @@ void VarExpr::renderasm(ASMhandle& context, char** destination /*=NULL*/){
 		result = context.get_var_location(name);
 	}
 	catch(const int& error){
-		generate_error();
+		generate_error("variable \""+string(name)+"\" not defined for the current scope");
 	}
 	//char* var_location = result->get_asm_location();
 	//cout<<pad<<"lw"<<"$t0, "<<var_location<<endl;
@@ -42,9 +46,3 @@ BaseExpression* VarExpr::simplify(snum_t& value){
 	throw 1;
 }
 
-
-void VarExpr::generate_error(){
-	BaseExpression::generate_error();
-	cerr<<"variable "<<name<<" not defined"<<endl;	
-	exit(EXIT_FAILURE);
-}

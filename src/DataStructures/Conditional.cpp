@@ -1,11 +1,20 @@
 #include "Conditional.h"
 
 
-ConditionalCase::ConditionalCase(CompoundStatement* block_statement_in, BaseExpression* condition_in /*= NULL*/) :
+ConditionalCase::ConditionalCase(CompoundStatement* block_statement_in, BaseExpression* condition_in) :
 	Statement(ST_conditional_case), single_statement(NULL), block_statement(block_statement_in), condition(condition_in) {}
 
-ConditionalCase::ConditionalCase(Statement* single_statement_in, BaseExpression* condition_in /*= NULL*/) :
+ConditionalCase::ConditionalCase(Statement* single_statement_in, BaseExpression* condition_in) :
 	Statement(ST_conditional_case), single_statement(single_statement_in), block_statement(NULL), condition(condition_in) {}
+
+
+ConditionalCase::ConditionalCase(CompoundStatement* block_statement_in, BaseExpression* condition_in, const int& line_in, 
+	const string& src_file_in) : Statement(ST_conditional_case, line_in, src_file_in), single_statement(NULL), 
+	block_statement(block_statement_in), condition(condition_in) {}
+
+ConditionalCase::ConditionalCase(Statement* single_statement_in, BaseExpression* condition_in, const int& line_in, 
+	const string& src_file_in) : Statement(ST_conditional_case, line_in, src_file_in), single_statement(single_statement_in), 
+	block_statement(NULL), condition(condition_in) {}
 
 
 
@@ -28,6 +37,9 @@ void ConditionalCase::renderasm(ASMhandle& context){
 
 
 Conditional::Conditional(vector<ConditionalCase*>* conditions_in) : Statement(ST_conditional), conditions(conditions_in) {}
+
+Conditional::Conditional(vector<ConditionalCase*>* conditions_in, const int& line_in, const string& src_file_in) :
+	Statement(ST_conditional, line_in, src_file_in), conditions(conditions_in) {}
 
 Conditional::~Conditional(){
 	//if(conditions!=NULL) delete conditions;

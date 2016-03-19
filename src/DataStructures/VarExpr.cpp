@@ -36,7 +36,7 @@ void VarExpr::renderasm(ASMhandle& context, char** destination /*=NULL*/){
 	}
 	bool global_var=false;
 	*destination=result->get_asm_location(context, global_var);
-	if(global_var) throw result;
+	if(global_var) throw global_var;
 }
 
 

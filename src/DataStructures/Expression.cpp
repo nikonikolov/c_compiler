@@ -63,65 +63,6 @@ void Expression::pretty_print(const int& indent){
 }
 
 
-void Expression::renderasm(ASMhandle& context, char** destination /*=NULL*/){
-	// Case when Expression appears just as arithmetical action with result saved nowhere
-	if(destination==NULL) return;
-
-	char **lhs_dest, **rhs_dest;
-	if(lhs!=NULL){
-		if(lhs->get_expr_type()!=EXPR_tmp_var) lhs_dest = new char*(context.allocate_var());
-		else lhs_dest=new char*;
-		try{
-			lhs->renderasm(context, lhs_dest);
-		}
-		catch(Variable* var_in){}
-	} 
-	if(rhs!=NULL){
-		if(rhs->get_expr_type()!=EXPR_tmp_var) rhs_dest = new char*(context.allocate_var());
-		else rhs_dest=new char*;
-		try{
-			rhs->renderasm(context, rhs_dest);
-		}
-		catch(Variable* var_in){}
-	} 
-
-
-	if(lhs!=NULL && rhs!=NULL){
-		if(!strcmp(oper,"+")) 	arithmetic_ins(*destination, *lhs_dest, *rhs_dest, "addu"); 	
-		if(!strcmp(oper,"-")) 	arithmetic_ins(*destination, *lhs_dest, *rhs_dest, "subu"); 	
-		if(!strcmp(oper,"|")) 	arithmetic_ins(*destination, *lhs_dest, *rhs_dest, "or"); 	
-		if(!strcmp(oper,"&")) 	arithmetic_ins(*destination, *lhs_dest, *rhs_dest, "and"); 	
-		if(!strcmp(oper,"^")) 	arithmetic_ins(*destination, *lhs_dest, *rhs_dest, "xor"); 	
-		if(!strcmp(oper,"<<")) 	arithmetic_ins(*destination, *lhs_dest, *rhs_dest, "sllv"); 	
-		if(!strcmp(oper,">>")) 	arithmetic_ins(*destination, *lhs_dest, *rhs_dest, "srav"); 	
-
-		if(!strcmp(oper,"*")) 	arithmetic_ins(*destination, *lhs_dest, *rhs_dest, "mul"); 	
-		if(!strcmp(oper,"%")) 	div_rem_ins(*destination, *lhs_dest, *rhs_dest, "mfhi"); 	
-		if(!strcmp(oper,"/")) 	div_rem_ins(*destination, *lhs_dest, *rhs_dest, "mflo"); 	
-
-		if(!strcmp(oper,"||")) 	logical_or_ins(context, *destination, *lhs_dest, *rhs_dest); 	
-		if(!strcmp(oper,"&&")) 	logical_and_ins(context, *destination, *lhs_dest, *rhs_dest); 	
-		if(!strcmp(oper,"<=")) 	logical_comparison_ins(context, *destination, *lhs_dest, *rhs_dest, "blez"); 	
-		if(!strcmp(oper,">=")) 	logical_comparison_ins(context, *destination, *lhs_dest, *rhs_dest, "bgez"); 	
-		if(!strcmp(oper,"<")) 	logical_comparison_ins(context, *destination, *lhs_dest, *rhs_dest, "bltz"); 	
-		if(!strcmp(oper,">")) 	logical_comparison_ins(context, *destination, *lhs_dest, *rhs_dest, "bgtz"); 	
-		if(!strcmp(oper,"==")) 	logical_comparison_ins(context, *destination, *lhs_dest, *rhs_dest, "beq", false); 	
-		if(!strcmp(oper,"!=")) 	logical_comparison_ins(context, *destination, *lhs_dest, *rhs_dest, "bne", false); 
-	}
-	/* ----------------------------------- SINGLE OPERAND ----------------------------------- */
-	if(lhs==NULL && rhs!=NULL){
-		if(!strcmp(oper,"+"))	sign_ins(*destination, *rhs_dest, false);
-		if(!strcmp(oper,"-"))	sign_ins(*destination, *rhs_dest, true);
-		if(!strcmp(oper,"!")) 	logical_not_ins(context, *destination, *rhs_dest);
-		if(!strcmp(oper,"~")) 	bitwise_not_ins(*destination, *rhs_dest);
-		if(!strcmp(oper,"sizeof"))	sizeof_ins(*destination, *rhs_dest);
-	}
-
-}
-
-
-
-
 /* 	Note the caller to simplify has to handle the exception. Usually that would be renderasm(ASMhandle& context) member method
 	of a BaseExpression implementation. Note you cannot have Constant as return type as this is a pure virtual function 
  	defined in BaseExpression which,"<< cannot have visibility of the Constant class
@@ -234,24 +175,98 @@ BaseExpression* Expression::simplify(snum_t& value){
 	operands have type int.
 */
 
+
+void Expression::renderasm(ASMhandle& context, char** destination /*=NULL*/){
+	// Case when Expression appears just as arithmetical action with result saved nowhere
+	if(destination==NULL) return;
+
+	char **lhs_dest, **rhs_dest;
+	//lhs_global=false;
+	//rhs_global=false;
+	if(lhs!=NULL){
+		if(lhs->get_expr_type()!=EXPR_tmp_var) lhs_dest = new char*(context.allocate_var());
+		else lhs_dest=new char*;
+		try 					{ lhs->renderasm(context, lhs_dest); }
+		catch(const bool& glob)	{ lhs_global=glob; }
+	} 
+	if(rhs!=NULL){
+		if(rhs->get_expr_type()!=EXPR_tmp_var) rhs_dest = new char*(context.allocate_var());
+		else rhs_dest=new char*;
+		try 					{ rhs->renderasm(context, rhs_dest); }
+		catch(const bool& glob)	{ rhs_global=glob; }
+	} 
+
+
+	if(lhs!=NULL && rhs!=NULL){
+		if(!strcmp(oper,"+")) 	arithmetic_ins(*destination, *lhs_dest, *rhs_dest, "addu"); 	
+		if(!strcmp(oper,"-")) 	arithmetic_ins(*destination, *lhs_dest, *rhs_dest, "subu"); 	
+		if(!strcmp(oper,"|")) 	arithmetic_ins(*destination, *lhs_dest, *rhs_dest, "or"); 	
+		if(!strcmp(oper,"&")) 	arithmetic_ins(*destination, *lhs_dest, *rhs_dest, "and"); 	
+		if(!strcmp(oper,"^")) 	arithmetic_ins(*destination, *lhs_dest, *rhs_dest, "xor"); 	
+		if(!strcmp(oper,"<<")) 	arithmetic_ins(*destination, *lhs_dest, *rhs_dest, "sllv"); 	
+		if(!strcmp(oper,">>")) 	arithmetic_ins(*destination, *lhs_dest, *rhs_dest, "srav"); 	
+
+		if(!strcmp(oper,"*")) 	arithmetic_ins(*destination, *lhs_dest, *rhs_dest, "mul"); 	
+		if(!strcmp(oper,"%")) 	div_rem_ins(*destination, *lhs_dest, *rhs_dest, "mfhi"); 	
+		if(!strcmp(oper,"/")) 	div_rem_ins(*destination, *lhs_dest, *rhs_dest, "mflo"); 	
+
+		if(!strcmp(oper,"||")) 	logical_or_ins(context, *destination, *lhs_dest, *rhs_dest); 	
+		if(!strcmp(oper,"&&")) 	logical_and_ins(context, *destination, *lhs_dest, *rhs_dest); 	
+		if(!strcmp(oper,"<=")) 	logical_comparison_ins(context, *destination, *lhs_dest, *rhs_dest, "blez"); 	
+		if(!strcmp(oper,">=")) 	logical_comparison_ins(context, *destination, *lhs_dest, *rhs_dest, "bgez"); 	
+		if(!strcmp(oper,"<")) 	logical_comparison_ins(context, *destination, *lhs_dest, *rhs_dest, "bltz"); 	
+		if(!strcmp(oper,">")) 	logical_comparison_ins(context, *destination, *lhs_dest, *rhs_dest, "bgtz"); 	
+		if(!strcmp(oper,"==")) 	logical_comparison_ins(context, *destination, *lhs_dest, *rhs_dest, "beq", false); 	
+		if(!strcmp(oper,"!=")) 	logical_comparison_ins(context, *destination, *lhs_dest, *rhs_dest, "bne", false); 
+	}
+	/* ----------------------------------- SINGLE OPERAND ----------------------------------- */
+	if(lhs==NULL && rhs!=NULL){
+		if(!strcmp(oper,"+"))	sign_ins(*destination, *rhs_dest, false);
+		if(!strcmp(oper,"-"))	sign_ins(*destination, *rhs_dest, true);
+		if(!strcmp(oper,"!")) 	logical_not_ins(context, *destination, *rhs_dest);
+		if(!strcmp(oper,"~")) 	bitwise_not_ins(*destination, *rhs_dest);
+		if(!strcmp(oper,"sizeof"))	sizeof_ins(*destination, *rhs_dest);
+	}
+
+}
+
+
 /* =============================================== CODEGEN METHODS =============================================== */
 
+
+/* ---------------------------------------------- ARITHMETIC INSTRUCTIONS ---------------------------------------------- */
+
 void Expression::arithmetic_ins(char* destination, char* arg1, char* arg2, const string& instruction){
-	cout<<pad<<"lw"<<"$t0, "<<arg1<<endl;
-	cout<<pad<<"lw"<<"$t1, "<<arg2<<endl;
+	load_lhs(arg1, "$t0");
+	load_rhs(arg2, "$t1");
 	cout<<pad<<instruction<<"$t2, $t0, $t1"<<endl;
 	cout<<pad<<"sw"<<"$t2, "<<destination<<endl;
 }
 
+void Expression::div_rem_ins(char* destination, char* arg1, char* arg2, const string& instruction){
+	load_lhs(arg1, "$t0");
+	//cout<<pad<<"lw"<<"$t0, "<<arg1<<endl;
+	load_rhs(arg2, "$t1");
+	//cout<<pad<<"lw"<<"$t1, "<<arg2<<endl;
+	cout<<pad<<"teq"<<"$t1, $0, 7"<<endl;
+	cout<<pad<<"div"<<"$t0, $t1"<<endl;
+	cout<<pad<<instruction<<"$t2"<<endl;
+	cout<<pad<<"sw"<<"$t2, "<<destination<<endl;
+}
+
+
+/* ---------------------------------------------- LOGICAL INSTRUCTIONS ---------------------------------------------- */
 
 void Expression::logical_or_ins(ASMhandle& context, char* destination, char* arg1, char* arg2){
 	string non_default_action = context.get_assembly_label();		
 	string continued_exec = context.get_assembly_label();		
 	
-	cout<<pad<<"lw"<<"$t0, "<<arg1<<endl;
+	load_lhs(arg1, "$t0");
+	//cout<<pad<<"lw"<<"$t0, "<<arg1<<endl;
 	cout<<pad<<"bne"<<"$0, $t0, "<<non_default_action<<endl;	// If arg1 is not 0, go to non_default action
 	cout<<pad<<"nop"<<endl;
-	cout<<pad<<"lw"<<"$t1, "<<arg2<<endl;
+	load_rhs(arg2, "$t1");
+	//cout<<pad<<"lw"<<"$t1, "<<arg2<<endl;
 	cout<<pad<<"bne"<<"$0, $t1, "<<non_default_action<<endl; 	// If arg2 is not 0, go to non_default action
 	cout<<pad<<"nop"<<endl;
 	cout<<pad<<"move"<<"$t2"<<", $0"<<endl; 					// Default action reached, result is 0
@@ -271,10 +286,12 @@ void Expression::logical_and_ins(ASMhandle& context, char* destination, char* ar
 	string non_default_action = context.get_assembly_label();		
 	string continued_exec = context.get_assembly_label();		
 	
-	cout<<pad<<"lw"<<"$t0, "<<arg1<<endl;
+	load_lhs(arg1, "$t0");
+	//cout<<pad<<"lw"<<"$t0, "<<arg1<<endl;
 	cout<<pad<<"beq"<<"$0, $t0, "<<non_default_action<<endl;	// If arg1 is 0, go to non_default action
 	cout<<pad<<"nop"<<endl;
-	cout<<pad<<"lw"<<"$t1, "<<arg2<<endl;
+	load_rhs(arg2, "$t1");
+	//cout<<pad<<"lw"<<"$t1, "<<arg2<<endl;
 	cout<<pad<<"beq"<<"$0, $t1, "<<non_default_action<<endl; 	// If arg2 is 0, go to non_default action
 	cout<<pad<<"nop"<<endl;
 	cout<<pad<<"li"<<"$t2, 1"<<endl; 							// Default action reached, result is 1
@@ -294,7 +311,8 @@ void Expression::logical_not_ins(ASMhandle& context, char* destination, char* ar
 	string non_default_action = context.get_assembly_label();		
 	string continued_exec = context.get_assembly_label();		
 	
-	cout<<pad<<"lw"<<"$t0, "<<arg<<endl;
+	load_rhs(arg, "$t0");
+	//cout<<pad<<"lw"<<"$t0, "<<arg<<endl;
 	cout<<pad<<"bne"<<"$0, $t0, "<<non_default_action<<endl;	// If arg1 is not 0, go to non_default action
 	cout<<pad<<"nop"<<endl;
 	cout<<pad<<"li"<<"$t2, 1"<<endl; 							// non-default action reached, result is 1
@@ -314,8 +332,10 @@ void Expression::logical_comparison_ins(ASMhandle& context, char* destination, c
 	string non_default_action = context.get_assembly_label();		
 	string continued_exec = context.get_assembly_label();		
 	
-	cout<<pad<<"lw"<<"$t0, "<<arg1<<endl;
-	cout<<pad<<"lw"<<"$t1, "<<arg2<<endl;
+	load_lhs(arg1, "$t0");
+	load_rhs(arg2, "$t1");
+	//cout<<pad<<"lw"<<"$t0, "<<arg1<<endl;
+	//cout<<pad<<"lw"<<"$t1, "<<arg2<<endl;
 	
 	if(subtract){
 	 	cout<<pad<<"subu"<<"$t2, $t0, $t1"<<endl;
@@ -338,8 +358,11 @@ void Expression::logical_comparison_ins(ASMhandle& context, char* destination, c
 }
 
 
+/* ---------------------------------------------- SINGLE OPERAND ---------------------------------------------- */
+
 void Expression::sign_ins(char* destination, char* arg, const bool& get_negative){
-	cout<<pad<<"lw"<<"$t0, "<<arg<<endl;
+	load_rhs(arg, "$t0");
+	//cout<<pad<<"lw"<<"$t0, "<<arg<<endl;
 	if(get_negative){
 		cout<<pad<<"li"<<"$t1, 0xFFFFFFFF"<<endl;
 		cout<<pad<<"xor"<<"$t0, $t0, $t1"<<endl;					// Invert
@@ -348,9 +371,9 @@ void Expression::sign_ins(char* destination, char* arg, const bool& get_negative
 	cout<<pad<<"sw"<<"$t0, "<<destination<<endl;
 }
 
-
 void Expression::bitwise_not_ins(char* destination, char* arg){
-	cout<<pad<<"lw"<<"$t0, "<<arg<<endl;
+	load_rhs(arg, "$t0");
+	//cout<<pad<<"lw"<<"$t0, "<<arg<<endl;
 	cout<<pad<<"li"<<"$t1, 0xFFFFFFFF"<<endl;
 	cout<<pad<<"xor"<<"$t2, $t0, $t1"<<endl;
 	cout<<pad<<"sw"<<"$t2, "<<destination<<endl;
@@ -361,12 +384,22 @@ void Expression::sizeof_ins(char* destination, char* arg){
 	cout<<pad<<"sw"<<"$t1, "<<destination<<endl;
 }
 
-void Expression::div_rem_ins(char* destination, char* arg1, char* arg2, const string& instruction){
-	cout<<pad<<"lw"<<"$t0, "<<arg1<<endl;
-	cout<<pad<<"lw"<<"$t1, "<<arg2<<endl;
-	cout<<pad<<"teq"<<"$t1, $0, 7"<<endl;
-	cout<<pad<<"div"<<"$t0, $t1"<<endl;
-	cout<<pad<<instruction<<"$t2"<<endl;
-	cout<<pad<<"sw"<<"$t2, "<<destination<<endl;
+
+/* ---------------------------------------------- LOADING OPERANDS ---------------------------------------------- */
+
+
+void Expression::load_lhs(char* arg, const string& dest_reg, const string& lhs_reg /*="$t8"*/){
+	if(!lhs_global) cout<<pad<<"lw"<<dest_reg<<", "<<arg<<endl;
+	else{
+		cout<<pad<<"lui"<<lhs_reg<<", %hi("<<arg<<")"<<endl;
+		cout<<pad<<"lw"<<dest_reg<<", %lo("<<arg<<")("<<lhs_reg<<")"<<endl;
+	}
 }
 
+void Expression::load_rhs(char* arg, const string& dest_reg, const string& rhs_reg /*="$t9"*/){
+	if(!rhs_global) cout<<pad<<"lw"<<dest_reg<<", "<<arg<<endl;
+	else{
+		cout<<pad<<"lui"<<rhs_reg<<", %hi("<<arg<<")"<<endl;
+		cout<<pad<<"lw"<<dest_reg<<", %lo("<<arg<<")("<<rhs_reg<<")"<<endl;
+	}
+}

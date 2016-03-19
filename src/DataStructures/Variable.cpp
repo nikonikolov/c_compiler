@@ -3,24 +3,24 @@
 bool Variable::first_global = true;
 
 Variable::Variable(char* name_in) :
-	type_name(NULL), init_val(NULL), dereferencer(NULL), initialized(false), location(NULL), global_locations(NULL) {
+	type_name(NULL), init_val(NULL), dereferencer(NULL), initialized(false), location(NULL) {
 		name = strdup(name_in);
 }
 
 Variable::Variable(char* type_name_in, char* name_in, list<PtrDeref>* dereferencer_in/*=NULL*/) :
-	init_val(NULL), dereferencer(dereferencer_in), initialized(false), location(NULL), global_locations(NULL) {
+	init_val(NULL), dereferencer(dereferencer_in), initialized(false), location(NULL) {
 	type_name = strdup(type_name_in);
 	if(name_in!=NULL) name = strdup(name_in);
 }
 
-Variable::Variable(char* name_in, const int& line_in, const string& src_file_in) : global_locations(NULL)
+Variable::Variable(char* name_in, const int& line_in, const string& src_file_in) :
 	type_name(NULL), init_val(NULL), dereferencer(NULL), initialized(false), location(NULL), line(line_in), src_file(src_file_in) {
 		name = strdup(name_in);
 }
 
 Variable::Variable(char* type_name_in, char* name_in, const int& line_in, const string& src_file_in, 
 	list<PtrDeref>* dereferencer_in /*=NULL*/) : line(line_in), src_file(src_file_in),
-	init_val(NULL), dereferencer(dereferencer_in), initialized(false), location(NULL), global_locations(NULL) {
+	init_val(NULL), dereferencer(dereferencer_in), initialized(false), location(NULL) {
 	type_name = strdup(type_name_in);
 	if(name_in!=NULL) name = strdup(name_in);
 }
@@ -41,13 +41,13 @@ Variable::~Variable(){
 	}
 
 	// Note that there won't be any clashed with ASMhandle
-	if(global_locations!=NULL){
+	/*if(global_locations!=NULL){
 		list<pair<char*, int>>::iterator it;
 		for(it=global_locations->begin(); it!=global_locations->end(); ++it){
 			free (*it).first;
 		}
 		delete global_locations;
-	} 
+	} */
 }
 
 /* ================================================== GETTERS AND SETTERS ================================================== */
@@ -82,8 +82,14 @@ void Variable::set_asm_location(char* str_in){
 }
 
 char* Variable::get_asm_location(ASMhandle& context, bool& global_var /*=false*/){
-	if(!global) return location;
-	else return get_global_asm_location(context, global_var);
+	if(!global){
+		global_var=false;
+		return location;
+	} 
+	else {
+		global_var=true;
+		return name;
+	}
 }
 
 
@@ -180,7 +186,7 @@ void Variable::renderasm_global(ASMhandle& context){
 		cout<<endl;
 	}
 }
-
+/*
 char* Variable::get_global_asm_location(ASMhandle& context, bool& global_var){
 	global_var=true;
 	if(global_locations==NULL) global_locations = new list<pair<char*,int>>;
@@ -218,7 +224,7 @@ void Variable::sync_global_value(char* location){
 	cout<<pad<<"lw"<<"$t1, "<<location<<endl;
 	cout<<pad<<"sw"<<"$t1, %lo("<<name<<")($t0)"<<endl;
 }
-
+*/
 
 /* ================================================== POINTER RELATED ================================================== */
 

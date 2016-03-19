@@ -18,24 +18,21 @@ AssignmentExpression::~AssignmentExpression(){
 void AssignmentExpression::renderasm(ASMhandle& context, char** destination /*=NULL*/){
 
 	char **lhs_dest, **rhs_dest;
-	Variable* var=NULL;
+	//Variable* var=NULL;
+	//lhs_global=false;
+	//rhs_global=false;
+
 	if(lhs!=NULL){
 		if(lhs->get_expr_type()!=EXPR_tmp_var) lhs_dest = new char*(context.allocate_var());
 		else lhs_dest=new char*;
-		try{
-			lhs->renderasm(context, lhs_dest);
-		}
-		catch(Variable* var_in){
-			var=var_in;
-		}
+		try 					{ lhs->renderasm(context, lhs_dest); }
+		catch(const bool& glob) { lhs_global=glob; }
 	} 
 	if(rhs!=NULL){
 		if(rhs->get_expr_type()!=EXPR_tmp_var) rhs_dest = new char*(context.allocate_var());
 		else rhs_dest=new char*;
-		try{
-			rhs->renderasm(context, rhs_dest);
-		}
-		catch(Variable* var_in){}
+		try 					{ rhs->renderasm(context, rhs_dest); }
+		catch(const bool& glob) { rhs_global=glob; }
 	} 
 
 	if(lhs!=NULL && rhs!=NULL){
@@ -64,41 +61,77 @@ void AssignmentExpression::renderasm(ASMhandle& context, char** destination /*=N
 		if(!strcmp(oper,"--")) 	inc_dec_ins(destination, *lhs_dest, -1, true);
 	}
 
-	if(var!=NULL) var->sync_global_value(*lhs_dest); 
-
 }
 
 
 void AssignmentExpression::assignment_ins(char** destination, char* lhs_dest, char* rhs_dest, const string& instruction /*=""*/){
+	bool lhs_loaded=true;
+
 	// Arithmetic operation required
 	if(!instruction.empty()) arithmetic_ins(lhs_dest, rhs_dest, instruction);
 	// Simple assignment
-	else cout<<pad<<"lw"<<"$t0, "<<rhs_dest<<endl;
-	
-	cout<<pad<<"sw"<<"$t0, "<<lhs_dest<<endl;
+	else{
+		load_rhs(rhs_dest, "$t0");
+		lhs_loaded=false;
+		//cout<<pad<<"lw"<<"$t0, "<<rhs_dest<<endl;
+	} 
+
+	store_lhs(lhs_dest, "$t0", lhs_loaded);
+	//cout<<pad<<"sw"<<"$t0, "<<lhs_dest<<endl;
 	if(destination!=NULL)	cout<<pad<<"sw"<<"$t0, "<<*destination<<endl;
 }
 
 void AssignmentExpression::arithmetic_ins(char* lhs_dest, char* rhs_dest, const string& instruction){
-	cout<<pad<<"lw"<<"$t0, "<<lhs_dest<<endl;
-	cout<<pad<<"lw"<<"$t1, "<<rhs_dest<<endl;
+	load_lhs(lhs_dest, "$t0");
+	//cout<<pad<<"lw"<<"$t0, "<<lhs_dest<<endl;
+	load_rhs(rhs_dest, "$t1");
+	//cout<<pad<<"lw"<<"$t1, "<<rhs_dest<<endl;
 	cout<<pad<<instruction<<"$t0, $t0, $t1"<<endl;
 }
 
 void AssignmentExpression::inc_dec_ins(char** destination, char* arg, const int& val, const bool& post_inc){
-	cout<<pad<<"lw"<<"$t0, "<<arg<<endl;
+	if(post_inc) 	load_lhs(arg, "$t0");
+	else			load_rhs(arg, "$t0");
+	//cout<<pad<<"lw"<<"$t0, "<<arg<<endl;
+	
 	if(destination!=NULL && post_inc) cout<<pad<<"sw"<<"$t0, "<<*destination<<endl;	// Assign the old value to the destination
 	cout<<pad<<"addiu"<<"$t0, $t0, "<<val<<endl;
-	cout<<pad<<"sw"<<"$t0, "<<arg<<endl;											// Assign the new value to the variable
+	
+	// Assign the new value to the variable
+	if(post_inc) 	store_lhs(arg, "$t0", true);
+	else			store_rhs(arg, "$t0", true);
+	//cout<<pad<<"sw"<<"$t0, "<<arg<<endl;											// Assign the new value to the variable
 	if(destination!=NULL && !post_inc) cout<<pad<<"sw"<<"$t0, "<<*destination<<endl;	// Assign the new value to the destination
 }
 
 void AssignmentExpression::div_rem_ins(char** destination, char* lhs_dest, char* rhs_dest, const string& instruction){
-	cout<<pad<<"lw"<<"$t0, "<<lhs_dest<<endl;
-	cout<<pad<<"lw"<<"$t1, "<<rhs_dest<<endl;
+	load_lhs(lhs_dest, "$t0");
+	//cout<<pad<<"lw"<<"$t0, "<<lhs_dest<<endl;
+	load_rhs(rhs_dest, "$t1");
+	//cout<<pad<<"lw"<<"$t1, "<<rhs_dest<<endl;
 	cout<<pad<<"teq"<<"$t1, $0, 7"<<endl;
 	cout<<pad<<"div"<<"$t0, $t1"<<endl;
 	cout<<pad<<instruction<<"$t2"<<endl;
-	cout<<pad<<"sw"<<"$t2, "<<lhs_dest<<endl;
+	store_lhs(lhs_dest, "$t2", true);
+	//cout<<pad<<"sw"<<"$t2, "<<lhs_dest<<endl;
 	if(destination!=NULL)	cout<<pad<<"sw"<<"$t2, "<<*destination<<endl;
+}
+
+
+/* ---------------------------------------------- STORING OPERANDS ---------------------------------------------- */
+
+void AssignmentExpression::store_lhs(char* arg, const string& dest_reg, const bool& loaded, const string& lhs_reg /*="$t8"*/){
+	if(!lhs_global) cout<<pad<<"sw"<<dest_reg<<", "<<arg<<endl;	
+	else{
+		if(!loaded) cout<<pad<<"lui"<<lhs_reg<<", %hi("<<arg<<")"<<endl;
+		cout<<pad<<"sw"<<dest_reg<<", %lo("<<arg<<")("<<lhs_reg<<")"<<endl;
+	} 
+}
+
+void AssignmentExpression::store_rhs(char* arg, const string& dest_reg, const bool& loaded, const string& rhs_reg /*="$t9"*/){
+	if(!rhs_global) cout<<pad<<"sw"<<dest_reg<<", "<<arg<<endl;	
+	else{
+		if(!loaded) cout<<pad<<"lui"<<rhs_reg<<", %hi("<<arg<<")"<<endl;
+		cout<<pad<<"sw"<<dest_reg<<", %lo("<<arg<<")("<<rhs_reg<<")"<<endl;
+	} 
 }

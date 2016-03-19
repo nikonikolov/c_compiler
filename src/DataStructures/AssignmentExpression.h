@@ -29,6 +29,9 @@ private:
 	void inc_dec_ins(char** destination, char* arg, const int& val, const bool& post_inc);
 	void div_rem_ins(char** destination, char* lhs_dest, char* rhs_dest, const string& instruction);
 
+	void store_lhs(char* arg, const string& dest_reg, const bool& loaded, const string& lhs_reg ="$t8");
+	void store_rhs(char* arg, const string& dest_reg, const bool& loaded, const string& rhs_reg ="$t9");
+
 };
 
 

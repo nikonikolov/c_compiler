@@ -34,7 +34,7 @@ ASMhandle::ASMhandle(ASMhandle& orig){
 	}
 	
 	return_address = new stack<string>(*(orig.return_address));
-	global_vars_in_scope = new map<string, pair<Variable*,int>>;
+	//global_vars_in_scope = new map<string, pair<Variable*,int>>;
 
 	sp_offset=orig.sp_offset;
 	allocated_mem=orig.allocated_mem;
@@ -49,7 +49,7 @@ ASMhandle::ASMhandle(map<string, Function*>* functions_in) :
 	local_vars = new map<string, Variable*>;
 	return_address = new stack<string>;
 	
-	global_vars_in_scope = new map<string, pair<Variable*,int>>;
+	//global_vars_in_scope = new map<string, pair<Variable*,int>>;
 	
 	sp_offset = 0;
 	allocated_mem = 0;
@@ -63,7 +63,7 @@ ASMhandle::~ASMhandle(){
 	if(global_vars!=NULL) delete global_vars; 
 	if(functions!=NULL) delete functions; 
 	if(return_address!=NULL) delete return_address; 
-	if(global_vars_in_scope!=NULL) delete global_vars_in_scope; 
+	//if(global_vars_in_scope!=NULL) delete global_vars_in_scope; 
 }
 
 /* ----------------------------------------------- SUBROUTINES AND SCOPES ----------------------------------------------- */
@@ -205,8 +205,8 @@ void ASMhandle::insert_global_var(pair<string, Variable*>& var_in){
 	if(it!=functions->end()) throw ERROR_fn_var_clash;
 
 }
-
-char* ASMhandle::allocate_global_var(pair<string, pair<Variable*,int>>& var_in, const int& mem_amount /*= 4*/){
+/*
+char* ASMhandle::allocate_global_var(pair<string, pair<Variable*,int>>& var_in, const int& mem_amount /*= 4*){
 	// Check if global variable has been referenced in the current scope
 	pair<map<string, pair<Variable*,int>>::iterator,bool> ret;
 	ret = global_vars_in_scope->insert(var_in);									// Put Variable* in global_vars
@@ -225,6 +225,8 @@ char* ASMhandle::allocate_global_var(pair<string, pair<Variable*,int>>& var_in, 
 	fp_offset+=mem_amount;														// Increment fp_offset
 	return address;
 }
+*/
+
 
 /* ----------------------------------------------- GETTERS AND SETTERS ----------------------------------------------- */
 

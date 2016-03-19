@@ -32,7 +32,7 @@ public:
 	void set_init_val(BaseExpression* init_val_in);
 	void set_asm_location(const string& str_in);
 	void set_asm_location(char* str_in);
-	char* get_asm_location(ASMhandle& context, bool& global_var=false);
+	char* get_asm_location(ASMhandle& context, bool& global_var);
 
 	/* ------------------------------------------------- GLOBALLY USED METHODS ------------------------------------------------- */
 
@@ -40,9 +40,9 @@ public:
 	void renderasm(ASMhandle& context, const bool& local = true);
 
 	/* ------------------------------------------------- GLOBAL SCOPE RELATED ------------------------------------------------- */
-	char* get_global_asm_location(ASMhandle& context, bool& global_var);
+	//char* get_global_asm_location(ASMhandle& context, bool& global_var);
 	void renderasm_global(ASMhandle& context);
-	void sync_global_value(const int& location_idx); 
+	//void sync_global_value(const int& location_idx); 
 
 	/* ------------------------------------------------- POINTER RELATED ------------------------------------------------- */
 
@@ -88,8 +88,6 @@ private:
 	char* location;						// Holds the location of the variable, e.g. 4($sp) or $t0
 	bool initialized;
 	
-	list<pair<char*,int>>* global_locations;	// If the Variable is global, holds the ($fp) locations for different scopes
-
 	bool global;
 	static bool first_global;			// Needed to identify when to print .data
 

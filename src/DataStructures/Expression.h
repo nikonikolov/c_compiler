@@ -10,6 +10,7 @@
 		1. Support for all types of variables
 		2. Cast variables and manage the returned struct properly
 		3. Operators not yet supported: all pointer related such as . -> & * and sizeof. Note that [] translates to a variable
+		4. Sizeof operator returning constant result
 */	
 
 
@@ -32,6 +33,9 @@ public:
 	virtual void renderasm(ASMhandle& context, char** destination=NULL);
 
 protected:
+	void load_lhs(char* arg, const string& dest_reg, const string& lhs_reg ="$t8");
+	void load_rhs(char* arg, const string& dest_reg, const string& rhs_reg ="$t9");
+
 
 	void arithmetic_ins(char* destination, char* arg1, char* arg2, const string& instruction);
 	void logical_or_ins(ASMhandle& context, char* destination, char* arg1, char* arg2);
@@ -48,6 +52,9 @@ protected:
 	char* oper;
 	BaseExpression* lhs;
 	BaseExpression* rhs;
+
+	bool lhs_global;
+	bool rhs_global;
 };
 
 

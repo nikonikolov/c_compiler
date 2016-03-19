@@ -75,7 +75,7 @@ void Program::renderasm(){
 	// Create ASMhandle that manages the stack and the function calls
 	ASMhandle context(functions);
 	
-	// Render assembly for global variables. Global variables initialize their assembly names on their own
+	// Render assembly for global variables. Note that name clashes with functions are performed at insertion
 	if(global_vars_decl!=NULL){
 		vector<VarDeclaration*>::iterator it;
 		for(it=global_vars_decl->begin(); it!=global_vars_decl->end(); ++it){
@@ -85,9 +85,6 @@ void Program::renderasm(){
 
 	cout<<pad<<".text"<<endl;
 	
-	// Check for clashes between global variables and function names
-	context.clash_check();
-
 	if(functions!=NULL){
 		map<string, Function*>::iterator it;
 		// Render assembly for functions	

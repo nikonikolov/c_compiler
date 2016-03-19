@@ -67,8 +67,6 @@ void CompoundStatement::renderasm(ASMhandle& context){
 		}
 	}
 
-	new_context.redefinition_check();
-
 	// Execute the statements
 	if(statements!=NULL){
 		vector<Statement*>::iterator it;

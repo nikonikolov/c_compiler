@@ -79,8 +79,6 @@ void Function::renderasm(ASMhandle& context){
 
 	init_args(new_context);
 
-	new_context.redefinition_check();
-		
 	fn_body->renderasm(new_context);
 
 	/* Function end assembly */

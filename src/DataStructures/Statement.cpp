@@ -211,17 +211,10 @@ string ASMhandle::get_assembly_label(){
 }
 
 
-/* ----------------------------------------------- ERROR CHECKERS ----------------------------------------------- */
 
-void ASMhandle::redefinition_check(){
-	// Check for global variable name matching local variable name
-}
-
-void ASMhandle::clash_check(){
-	// Check for global variable name matching function name
-}
-
+/* =============================================================================================================== */
 /* =============================================== STATEMENT CLASS =============================================== */
+/* =============================================================================================================== */
 
 
 

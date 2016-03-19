@@ -55,12 +55,6 @@ public:
 
 	string get_assembly_label();
 
-
-	/* ----------------------------------------------- ERROR CHECKERS ----------------------------------------------- */
-
-	void redefinition_check();
-	void clash_check();
-
 	/* ----------------------------------------------- PUBLIC MEMBERS ----------------------------------------------- */
 
 	map<string, Variable*>* global_vars;

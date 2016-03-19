@@ -34,11 +34,9 @@ void VarExpr::renderasm(ASMhandle& context, char** destination /*=NULL*/){
 	catch(const int& error){
 		generate_error("variable \""+string(name)+"\" not defined for the current scope");
 	}
-	//char* var_location = result->get_asm_location();
-	//cout<<pad<<"lw"<<"$t0, "<<var_location<<endl;
-	//cout<<pad<<"sw"<<"$t0, "<<*destination<<endl;
-
-	*destination=result->get_asm_location();
+	bool global_var=false;
+	*destination=result->get_asm_location(context, global_var);
+	if(global_var) throw result;
 }
 
 

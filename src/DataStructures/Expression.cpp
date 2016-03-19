@@ -71,12 +71,18 @@ void Expression::renderasm(ASMhandle& context, char** destination /*=NULL*/){
 	if(lhs!=NULL){
 		if(lhs->get_expr_type()!=EXPR_tmp_var) lhs_dest = new char*(context.allocate_var());
 		else lhs_dest=new char*;
-		lhs->renderasm(context, lhs_dest);
+		try{
+			lhs->renderasm(context, lhs_dest);
+		}
+		catch(Variable* var_in){}
 	} 
 	if(rhs!=NULL){
 		if(rhs->get_expr_type()!=EXPR_tmp_var) rhs_dest = new char*(context.allocate_var());
 		else rhs_dest=new char*;
-		rhs->renderasm(context, rhs_dest);
+		try{
+			rhs->renderasm(context, rhs_dest);
+		}
+		catch(Variable* var_in){}
 	} 
 
 
@@ -253,7 +259,7 @@ void Expression::logical_or_ins(ASMhandle& context, char* destination, char* arg
 	cout<<pad<<"b"<<continued_exec<<endl;
 	cout<<pad<<"nop"<<endl;
 	cout<<non_default_action<<":"<<endl;
-	cout<<pad<<"li"<<"$t2, 1"<<endl; 								// non-default action reached, result is 1
+	cout<<pad<<"li"<<"$t2, 1"<<endl; 							// non-default action reached, result is 1
 	cout<<pad<<"sw"<<"$t2, "<<destination<<endl;
 	cout<<pad<<"b"<<continued_exec<<endl;
 	cout<<pad<<"nop"<<endl;
@@ -271,7 +277,7 @@ void Expression::logical_and_ins(ASMhandle& context, char* destination, char* ar
 	cout<<pad<<"lw"<<"$t1, "<<arg2<<endl;
 	cout<<pad<<"beq"<<"$0, $t1, "<<non_default_action<<endl; 	// If arg2 is 0, go to non_default action
 	cout<<pad<<"nop"<<endl;
-	cout<<pad<<"li"<<"$t2, 1"<<endl; 								// Default action reached, result is 1
+	cout<<pad<<"li"<<"$t2, 1"<<endl; 							// Default action reached, result is 1
 	cout<<pad<<"sw"<<"$t2, "<<destination<<endl;
 	cout<<pad<<"b"<<continued_exec<<endl;
 	cout<<pad<<"nop"<<endl;

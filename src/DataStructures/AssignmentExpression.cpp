@@ -18,15 +18,24 @@ AssignmentExpression::~AssignmentExpression(){
 void AssignmentExpression::renderasm(ASMhandle& context, char** destination /*=NULL*/){
 
 	char **lhs_dest, **rhs_dest;
+	Variable* var=NULL;
 	if(lhs!=NULL){
 		if(lhs->get_expr_type()!=EXPR_tmp_var) lhs_dest = new char*(context.allocate_var());
 		else lhs_dest=new char*;
-		lhs->renderasm(context, lhs_dest);
+		try{
+			lhs->renderasm(context, lhs_dest);
+		}
+		catch(Variable* var_in){
+			var=var_in;
+		}
 	} 
 	if(rhs!=NULL){
 		if(rhs->get_expr_type()!=EXPR_tmp_var) rhs_dest = new char*(context.allocate_var());
 		else rhs_dest=new char*;
-		rhs->renderasm(context, rhs_dest);
+		try{
+			rhs->renderasm(context, rhs_dest);
+		}
+		catch(Variable* var_in){}
 	} 
 
 	if(lhs!=NULL && rhs!=NULL){
@@ -55,6 +64,7 @@ void AssignmentExpression::renderasm(ASMhandle& context, char** destination /*=N
 		if(!strcmp(oper,"--")) 	inc_dec_ins(destination, *lhs_dest, -1, true);
 	}
 
+	if(var!=NULL) var->sync_global_value(*lhs_dest); 
 
 }
 

@@ -11,6 +11,8 @@ class Variable{
 
 public:
 	// NOTE: you need to overload constructor to build dereferencepretty_print(const int& indent)r
+	
+	/* ------------------------------------------------- CONSTRUCTORS ------------------------------------------------- */
 
 	Variable(char* name_in);
 	Variable(char* type_name_in, char* name_in, list<PtrDeref>* dereferencer_in=NULL);
@@ -20,6 +22,8 @@ public:
 
 	~Variable();
 
+	/* ------------------------------------------------- GETTERS AND SETTERS ------------------------------------------------- */
+
 	const char* get_name() const;
 	string get_name_str() const;
 	bool get_initialized() const;
@@ -28,13 +32,17 @@ public:
 	void set_init_val(BaseExpression* init_val_in);
 	void set_asm_location(const string& str_in);
 	void set_asm_location(char* str_in);
-	char* get_asm_location();
-	void init_asm_name();
+	char* get_asm_location(ASMhandle& context, bool& global_var=false);
 
-	void generate_error(const string& msg_out);
+	/* ------------------------------------------------- GLOBALLY USED METHODS ------------------------------------------------- */
 
 	void pretty_print(const int& indent);
 	void renderasm(ASMhandle& context, const bool& local = true);
+
+	/* ------------------------------------------------- GLOBAL SCOPE RELATED ------------------------------------------------- */
+	char* get_global_asm_location(ASMhandle& context, bool& global_var);
+	void renderasm_global(ASMhandle& context);
+	void sync_global_value(const int& location_idx); 
 
 	/* ------------------------------------------------- POINTER RELATED ------------------------------------------------- */
 
@@ -43,10 +51,13 @@ public:
 	void dereference_back(BaseExpression* expr_in, const int& size=INTNAN);
 	void dereference_front(BaseExpression* expr_in, const int& size=INTNAN);
 
+	/* ------------------------------------------------- ERROR GENERATION ------------------------------------------------- */
+
+	void generate_error(const string& msg_out);
 
 private:
 	void simplify_init_val();
-	void renderasm_global(ASMhandle& context);
+	
 
 	/* 	Template version instead of using var_type would not be a good idea since you would not know the types of Variables
 		appearing in BaseExpressions. Enum type instead of string would not be useful as well because you won't be able to
@@ -74,12 +85,13 @@ private:
 
 
 	/* Fields for assembly */
-	char* location;				// Holds the location of the variable, e.g. 4($sp) or $t0
+	char* location;						// Holds the location of the variable, e.g. 4($sp) or $t0
 	bool initialized;
-	char* asm_name;
 	
+	list<pair<char*,int>>* global_locations;	// If the Variable is global, holds the ($fp) locations for different scopes
+
 	bool global;
-	static bool first_global;		// Needed to identify when to print .data
+	static bool first_global;			// Needed to identify when to print .data
 
 	int line;
 	string src_file;

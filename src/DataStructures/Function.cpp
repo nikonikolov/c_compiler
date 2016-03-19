@@ -31,8 +31,14 @@ string Function::get_name() const{
 	return string(name);
 }
 
-void Function::generate_error() const{
-	
+void Function::generate_error(const string& msg_out) const{
+	cerr<<endl;
+  	cerr<<"========================================= ERROR ========================================="<<endl;
+  	cerr<<endl;
+	//if(src_file.empty()) 	cerr<<"Error in source file at line ";
+	//else 					cerr<<"Error in file "<<src_file<<" at line ";
+	cerr<<line<<"Error : "<<msg_out<<" \""<<name<<"\""<<endl;
+	exit(EXIT_FAILURE);
 }
 
 
@@ -52,19 +58,7 @@ void Function::pretty_print(const int& indent){
 
 }
 
-void Function::init_asm_name(){
-	/*if(strcmp(name,"main")){
-		asm_name=strdup("abcdefg");
-		strcat(asm_name, name);
-	} 
-	else asm_name=name;
-	*/
-	asm_name=name;
-}
-
 void Function::renderasm(ASMhandle& context){
-	// Initialize assembly name
-	init_asm_name();
 
 	/* Function header assembly */
 	cout<<"\t.align	2"<<endl;

@@ -34,7 +34,6 @@ ASMhandle::ASMhandle(ASMhandle& orig){
 	}
 	
 	return_address = new stack<string>(*(orig.return_address));
-	//global_vars_in_scope = new map<string, pair<Variable*,int>>;
 
 	sp_offset=orig.sp_offset;
 	allocated_mem=orig.allocated_mem;
@@ -49,8 +48,6 @@ ASMhandle::ASMhandle(map<string, Function*>* functions_in) :
 	local_vars = new map<string, Variable*>;
 	return_address = new stack<string>;
 	
-	//global_vars_in_scope = new map<string, pair<Variable*,int>>;
-	
 	sp_offset = 0;
 	allocated_mem = 0;
 	fp_offset = 0;
@@ -63,7 +60,6 @@ ASMhandle::~ASMhandle(){
 	if(global_vars!=NULL) delete global_vars; 
 	if(functions!=NULL) delete functions; 
 	if(return_address!=NULL) delete return_address; 
-	//if(global_vars_in_scope!=NULL) delete global_vars_in_scope; 
 }
 
 /* ----------------------------------------------- SUBROUTINES AND SCOPES ----------------------------------------------- */
@@ -205,27 +201,6 @@ void ASMhandle::insert_global_var(pair<string, Variable*>& var_in){
 	if(it!=functions->end()) throw ERROR_fn_var_clash;
 
 }
-/*
-char* ASMhandle::allocate_global_var(pair<string, pair<Variable*,int>>& var_in, const int& mem_amount /*= 4*){
-	// Check if global variable has been referenced in the current scope
-	pair<map<string, pair<Variable*,int>>::iterator,bool> ret;
-	ret = global_vars_in_scope->insert(var_in);									// Put Variable* in global_vars
-  	// If referenced, throw the index that it is supposed to contain in the Variable container
-  	if(ret.second==false){
-		map<string, pair<Variable*, int>>::iterator it;
-		it=global_vars_in_scope->find(var_in.first);
-		throw (it.second).second;
-  	} 
-
-  	// If not referenced, allocate memory on the stack if necessary and return a location
-  	if( (fp_offset+mem_amount)>allocated_mem ) 
-		allocate_mem(fp_offset + mem_amount - allocated_mem + 24);				// Allocate memory if necessary
-
-	char* address=strdup(string(std::to_string(-fp_offset)+"($fp)").c_str());	// Get a location for the global var
-	fp_offset+=mem_amount;														// Increment fp_offset
-	return address;
-}
-*/
 
 
 /* ----------------------------------------------- GETTERS AND SETTERS ----------------------------------------------- */
@@ -258,6 +233,9 @@ StatementT Statement::get_stat_type() const{
 }
 
 void Statement::generate_error(const string& msg_out){
+  	cerr<<endl;
+  	cerr<<"========================================= ERROR ========================================="<<endl;
+  	cerr<<endl;
 	if(src_file.empty()) 	cerr<<"Error in source file at line ";
 	else 					cerr<<"Error in file "<<src_file<<" at line ";
 	cerr<<line<<" : "<<msg_out<<endl;

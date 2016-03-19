@@ -1,7 +1,13 @@
+int glob1=10;
+int glob2=67;
+int glob3=80;
+int a=57;
 int f(int a, int b, int c, int d, int e, int f, int g){
  	c=b--;
  	c=e--;
  	c=f--;
  	c=g--;
+  	glob3=c--;
+  	c=glob3--;
   	return c;
 }

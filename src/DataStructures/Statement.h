@@ -50,7 +50,6 @@ public:
 	/* ----------------------------------------------- GLOBAL VARIABLES ----------------------------------------------- */
 
 	void insert_global_var(pair<string, Variable*>& var_in);
-	//char* allocate_global_var(pair<string, pair<Variable*,int>>& var_in, const int& mem_amount = 4);
 
 	/* ----------------------------------------------- GETTERS AND SETTERS ----------------------------------------------- */
 
@@ -69,9 +68,6 @@ private:
 	int fp_offset; 					// Indicates how much of the currently allocated stack memory is used
 
 	int stack_args_offset;			// Used to allocate locations for parameters to functions with index bigger than 4
-
-	// Contains global variables which have been referenced in the current scope and can be found on the stack
-	//map<string, pair<Variable*,int>>* global_vars_in_scope;
 
 	stack<string>* return_address;
 	static uint32_t label_idx;

@@ -39,15 +39,6 @@ Variable::~Variable(){
 		}
 		delete dereferencer;
 	}
-
-	// Note that there won't be any clashed with ASMhandle
-	/*if(global_locations!=NULL){
-		list<pair<char*, int>>::iterator it;
-		for(it=global_locations->begin(); it!=global_locations->end(); ++it){
-			free (*it).first;
-		}
-		delete global_locations;
-	} */
 }
 
 /* ================================================== GETTERS AND SETTERS ================================================== */
@@ -92,16 +83,10 @@ char* Variable::get_asm_location(ASMhandle& context, bool& global_var /*=false*/
 	}
 }
 
-
-
-
-bool Variable::get_initialized() const{
+/*bool Variable::initialized() const{
 	return initialized;
 }
-
-
-
-
+*/
 /* ================================================== GLOBALLY USED METHODS ================================================== */
 
 
@@ -177,6 +162,7 @@ void Variable::renderasm_global(ASMhandle& context){
 	if(first_global){
 		first_global=false;
 		cout<<pad<<".data"<<endl;
+	}
 		cout<<pad<<".align"<<2<<endl;
 		cout<<pad<<".type"<<name<<", @object"<<endl;
 		cout<<pad<<".size"<<name<<", 4"<<endl;
@@ -184,47 +170,8 @@ void Variable::renderasm_global(ASMhandle& context){
 		cout<<pad<<".word";
 		if(init_val!=NULL) init_val->pretty_print(0);
 		cout<<endl;
-	}
-}
-/*
-char* Variable::get_global_asm_location(ASMhandle& context, bool& global_var){
-	global_var=true;
-	if(global_locations==NULL) global_locations = new list<pair<char*,int>>;
-	list<pair<char*,int>>::reverse_iterator rit;
-	try{
-		int next_index=0;
-		rit=global_locations->rbegin();
-		if(rit!=global_locations->rend()) next_index=(*rit).second.second;
-		pair<Variable*, int> tmp_sub(this,next_index)
-		pair<string, pair<Variable*, int>> tmp(string(name), tmp_sub);
-		char* current_scope = context.allocate_global_var(tmp);
-		global_locations->push_back(pair<char*, int>(current_scope, next_index));
-		cout<<pad<<"lui"<<"$t0, %hi("<<name<<")"<<endl;
-		cout<<pad<<"lw"<<"$t1, %lo("<<name<<")($t0)"<<endl;
-		cout<<pad<<"sw"<<$"$t1, "<<current_scope<<endl;
-		return current_scope;
-	}
-	catch(const int& idx){
-		for(rit=global_locations->rbegin(); rit!=global_locations->rend(); ++rit){
-			if((*rit).second==idx){
-				// Make sure the memory location contains the same value as the global variable, in case it was updated
-				cout<<pad<<"lui"<<"$t0, %hi("<<name<<")"<<endl;
-				cout<<pad<<"lw"<<"$t1, %lo("<<name<<")($t0)"<<endl;
-				cout<<pad<<"sw"<<$"$t1, "<<(*rit).first<<endl;
-				return (*rit).first;
-			} 
-			else erase(rit);
-		}
-	}
 
 }
-
-void Variable::sync_global_value(char* location){
-	cout<<pad<<"lui"<<"$t0, %hi("<<name<<")"<<endl;
-	cout<<pad<<"lw"<<"$t1, "<<location<<endl;
-	cout<<pad<<"sw"<<"$t1, %lo("<<name<<")($t0)"<<endl;
-}
-*/
 
 /* ================================================== POINTER RELATED ================================================== */
 
@@ -244,6 +191,9 @@ void Variable::dereference_front(BaseExpression* expr_in, const int& size/*=INTN
 /* ================================================== ERROR GENERATIONS ================================================== */
 
 void Variable::generate_error(const string& msg_out){
+	cerr<<endl;
+  	cerr<<"========================================= ERROR ========================================="<<endl;
+  	cerr<<endl;
 	if(src_file.empty()) 	cerr<<"Error in source file at line ";
 	else 					cerr<<"Error in file "<<src_file<<" at line ";
 	cerr<<line<<" : "<<msg_out<<endl;

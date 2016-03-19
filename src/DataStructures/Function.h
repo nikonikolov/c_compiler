@@ -21,14 +21,12 @@ public:
 	~Function();
 
 	string get_name() const;
-	void generate_error() const;
+	void generate_error(const string& msg_out) const;
 
 	void renderasm(ASMhandle& context);
 	void pretty_print(const int& indent);
 
-	void init_asm_name();
 private:
-	
 	void init_args(ASMhandle& context);
 
 	

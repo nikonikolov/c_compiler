@@ -42,7 +42,7 @@ void Program::insert_fn(Function* fn_in){
 	
 	pair<map<string, Function*>::iterator,bool> ret;
   	ret = functions->insert( pair<string, Function*>(fn_in->get_name(),fn_in) );
-  	if (ret.second==false) fn_in->generate_error();
+  	if(ret.second==false) fn_in->generate_error("redefinition of function");
 }
 
 void Program::push_var_back(VarDeclaration* var_in){

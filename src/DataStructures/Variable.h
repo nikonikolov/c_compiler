@@ -26,7 +26,7 @@ public:
 
 	const char* get_name() const;
 	string get_name_str() const;
-	bool get_initialized() const;
+	//bool initialized() const;
 
 	void set_type_name(char* type_name_in);
 	void set_init_val(BaseExpression* init_val_in);
@@ -40,9 +40,7 @@ public:
 	void renderasm(ASMhandle& context, const bool& local = true);
 
 	/* ------------------------------------------------- GLOBAL SCOPE RELATED ------------------------------------------------- */
-	//char* get_global_asm_location(ASMhandle& context, bool& global_var);
 	void renderasm_global(ASMhandle& context);
-	//void sync_global_value(const int& location_idx); 
 
 	/* ------------------------------------------------- POINTER RELATED ------------------------------------------------- */
 

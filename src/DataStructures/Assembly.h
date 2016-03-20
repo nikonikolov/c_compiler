@@ -1,7 +1,17 @@
 #ifndef ASSEMBLY_H
 #define ASSEMBLY_H
 
-#include "include.h"
+#include <iostream>
+#include <sstream>
+#include <list>
+#include <string>
+
+using std::string;
+using std::stringstream;
+using std::list;
+using std::cout;
+using std::endl;
+
 
 class Assembly{
 

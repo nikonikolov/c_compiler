@@ -13,6 +13,7 @@
 #include <string.h>
 #include <cstdlib>
 #include <sstream>
+#include "Assembly.h"
 
 using std::list;
 using std::vector;
@@ -29,6 +30,10 @@ using std::pair;
 #define INTNAN std::numeric_limits<int>::quiet_NaN()
 
 std::ostream& pad(std::ostream& os);
+
+/* =============================================== DECLARE ASSEMBLY OBJECT =============================================== */
+
+Assembly assembler;
 
 /* =============================================== STATEMENT TYPES =============================================== */
 

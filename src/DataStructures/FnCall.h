@@ -11,7 +11,7 @@
 		2. Move function arguments on the stack
 */
 
-
+/*
 class FnCall{
 
 public:
@@ -30,9 +30,6 @@ private:
 	void init_args(ASMhandle& context);
 
 	
-	/* 	return_type specifies what type the return value should be. This structure allows for handling pointers as well. 
-		Not sure about function pointers
-	*/
 	Variable* return_type;					
 	
 	snum_t return_val;						// Holds the result of the return value for the function
@@ -48,7 +45,7 @@ private:
 	int line;
 	string src_file;
 };
-
+*/
 
 
 #endif

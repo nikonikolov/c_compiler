@@ -55,7 +55,8 @@ void CompoundStatement::pretty_print(const int& indent){
 }
 
 
-
+// Used by single scope appearing without any other statement. It should copy the context and call exit_scope to restore proper
+// $sp on its own
 void CompoundStatement::renderasm(ASMhandle& context){
 
 	ASMhandle new_context(context);
@@ -75,6 +76,33 @@ void CompoundStatement::renderasm(ASMhandle& context){
 		}
 	}
 
-	// Make sure that if the CompoundStatemtent appears as a scope(not a function) the prover values for $fp and $sp are kept
 	context.exit_scope(new_context);
 }
+
+// For subroutines, conditionals, loops
+// NOTE: Correction of $sp is performed by the caller for IF/FOR statements
+void CompoundStatement::renderasm(ASMhandle& context, const bool& function){
+
+	// Not needed by any of the callers - they copy it on their own
+	// ASMhandle new_context(context);
+
+	if(declarations!=NULL){
+		vector<VarDeclaration*>::iterator it;
+		for(it=declarations->begin(); it!=declarations->end(); ++it){
+			(*it)->renderasm(context, true);
+		}
+	}
+
+	bool return_stat=false;
+	// Execute the statements
+	if(statements!=NULL){
+		vector<Statement*>::iterator it;
+		for(it=statements->begin(); it!=statements->end(); ++it){
+			if((*it)->get_stat_type()==ST_return) return_stat=true;
+			(*it)->renderasm(context);
+		}
+	}
+
+	if(!return_stat && function) context.subroutine_exit(NULL);
+}
+

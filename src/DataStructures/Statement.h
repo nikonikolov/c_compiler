@@ -70,7 +70,8 @@ private:
 	int stack_args_offset;			// Used to allocate locations for parameters to functions with index bigger than 4
 
 	stack<string>* return_address;
-	static uint32_t label_idx;
+	static uint64_t label_idx;
+	static string label; 
 	//static int mem_amount_default;
 };
 

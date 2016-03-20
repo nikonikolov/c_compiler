@@ -8,6 +8,11 @@
 /*
 	ConditionalCase: Represents a single if, else if, else, case or default statement as part of a bigger block of if or switch 
 	statement. You can think of it as a single branch condition and body opposed to a block of branches
+
+	NOTE: single_statement_in might be a ConditionalCase itself. This combined with condition_in==NULL means you have an else if
+	statement. If condition_in==NULL and single_statement is NULL or is not ConditionalCase, then you have the else statement
+
+	NOTE: it is possible that you have else and then else if. You have to analyze that and generate_error if this happens
 */
 
 class ConditionalCase : public Statement{
@@ -24,6 +29,8 @@ public:
 
 	void pretty_print(const int& indent);
 	void renderasm(ASMhandle& context);
+	void renderasm(ASMhandle& context, const string& continued_execution, const string& next_jump);
+	
 private:
 
 	BaseExpression* condition;				// Condition for the block to be executed. If NULL, then the you have else statement
@@ -47,8 +54,8 @@ public:
 
 	void pretty_print(const int& indent);
 	void renderasm(ASMhandle& context);
-private:
 
+private:
 	vector<ConditionalCase*>* conditions;			// Pointer to a vector that keeps the order of the conditions checked
 
 };

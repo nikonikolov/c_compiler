@@ -6,7 +6,8 @@
 
 /* ----------------------------------------------- CONSTRUCTION ----------------------------------------------- */
 
-uint32_t ASMhandle::label_idx = 3;
+uint64_t ASMhandle::label_idx = 3;
+string ASMhandle::label = "$LKDHGF";
 
 ASMhandle::ASMhandle(ASMhandle& orig){
 	local_vars = new map<string, Variable*>;
@@ -85,10 +86,10 @@ void ASMhandle::subroutine_enter(const int& mem_amount /*= 24*/){
 }
 
 void ASMhandle::subroutine_exit(char* return_val){
-	cout<<pad<<"lw"<<"$v0, "<<return_val<<endl;								// Load return value
+	if(return_val!=NULL) cout<<pad<<"lw"<<"$v0, "<<return_val<<endl;		// Load return value
 
-	string ret_address = return_address->top();								// Ger return address
-	return_address->pop();
+	string ret_address = return_address->top();								// Get return address
+	//return_address->pop(); // Not actually needed, because a subroutine will make a copy of the ASMhandle object 
 
 	// Load return address
 	cout<<pad<<"lw"<<"$ra, "<<ret_address<<"\t\t# Load return address in register 31"<<endl;
@@ -116,9 +117,10 @@ char* ASMhandle::allocate_subroutine_stack_param(pair<string, Variable*>& var_in
 
 // Used at the exit of a scope so that newly allocated memory will be accounted for
 void ASMhandle::exit_scope(const ASMhandle& new_context){
-	allocated_mem = new_context.allocated_mem;
-	sp_offset=new_context.sp_offset;
-	fp_offset=new_context.fp_offset;
+	if(allocated_mem!=new_context.allocated_mem) cout<<pad<<"addiu"<<"$sp, $sp, "<<new_context.allocated_mem-allocated_mem<<endl;
+	//allocated_mem = new_context.allocated_mem;
+	//sp_offset=new_context.sp_offset;
+	//fp_offset=new_context.fp_offset;
 }
 
 /* ----------------------------------------------- LOCAL VARIABLES ----------------------------------------------- */
@@ -139,7 +141,7 @@ char* ASMhandle::allocate_var(pair<string, Variable*>& var_in, const int& mem_am
 	return address;
 }
 
-// Used for temporaries only
+// Used for temporaries mainly
 char* ASMhandle::allocate_var(const int& mem_amount /*= 4*/){
 	if( (fp_offset+mem_amount)>allocated_mem ) 
 		allocate_mem(fp_offset + mem_amount - allocated_mem + 24);			// Allocate memory if necessary
@@ -157,7 +159,7 @@ string ASMhandle::allocate_str_var(pair<string, Variable*>& var_in, const int& m
 	return address;
 }
 
-// Used for temporaries only
+// Used for temporaries mainly
 string ASMhandle::allocate_str_var(const int& mem_amount /*= 4*/){
 	if( (fp_offset+mem_amount)>allocated_mem ) 
 		allocate_mem(fp_offset + mem_amount - allocated_mem + 24);			// Allocate memory if necessary
@@ -206,8 +208,8 @@ void ASMhandle::insert_global_var(pair<string, Variable*>& var_in){
 /* ----------------------------------------------- GETTERS AND SETTERS ----------------------------------------------- */
 
 string ASMhandle::get_assembly_label(){
-	label_idx++;
-	return string("$LKDHGF"+std::to_string(label_idx-1));
+	if(label_idx==0) label=string(label+std::to_string(label_idx));
+	return string(label+std::to_string(label_idx++));
 }
 
 

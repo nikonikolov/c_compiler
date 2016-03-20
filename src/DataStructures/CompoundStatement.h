@@ -14,6 +14,8 @@ public:
 
 	void renderasm(ASMhandle& context);
 	void pretty_print(const int& indent);
+	void renderasm(ASMhandle& context, const bool& function);
+	
 private:
 	
 	vector<VarDeclaration*>* declarations;	// Pointer to a vector of the declarations in the CompoundStatement

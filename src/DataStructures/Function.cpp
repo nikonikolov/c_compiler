@@ -73,7 +73,7 @@ void Function::renderasm(ASMhandle& context){
 
 	init_args(new_context);
 
-	fn_body->renderasm(new_context);
+	fn_body->renderasm(new_context, true);
 
 	/* Function end assembly */
 	cout<<endl<<"\t.end "<<name<<endl<<endl;

@@ -23,6 +23,8 @@ protected:
 	ExprT expr_type;	
 	int line;
 	string src_file;
+
+	stringstream ss;
 };
 
 

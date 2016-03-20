@@ -26,6 +26,8 @@ private:
 	ASMhandle* context;
 	map<string, Function*>* functions;			// Pointer to a map of all the functions defined. The MAIN is included here
 	map<string, Variable*>* global_vars; 		// Pointer to a map of all the global variables defined
+
+	stringstream ss;
 };
 
 

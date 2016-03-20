@@ -239,19 +239,17 @@ void Expression::renderasm(ASMhandle& context, char** destination /*=NULL*/){
 void Expression::arithmetic_ins(char* destination, char* arg1, char* arg2, const string& instruction){
 	load_lhs(arg1, "$t0");
 	load_rhs(arg2, "$t1");
-	cout<<pad<<instruction<<"$t2, $t0, $t1"<<endl;
-	cout<<pad<<"sw"<<"$t2, "<<destination<<endl;
+	assembler.push_back(ss<<pad<<instruction<<"$t2, $t0, $t1"<<endl);
+	assembler.push_back(ss<<pad<<"sw"<<"$t2, "<<destination<<endl);
 }
 
 void Expression::div_rem_ins(char* destination, char* arg1, char* arg2, const string& instruction){
 	load_lhs(arg1, "$t0");
-	//cout<<pad<<"lw"<<"$t0, "<<arg1<<endl;
 	load_rhs(arg2, "$t1");
-	//cout<<pad<<"lw"<<"$t1, "<<arg2<<endl;
-	cout<<pad<<"teq"<<"$t1, $0, 7"<<endl;
-	cout<<pad<<"div"<<"$t0, $t1"<<endl;
-	cout<<pad<<instruction<<"$t2"<<endl;
-	cout<<pad<<"sw"<<"$t2, "<<destination<<endl;
+	assembler.push_back(ss<<pad<<"teq"<<"$t1, $0, 7"<<endl);
+	assembler.push_back(ss<<pad<<"div"<<"$t0, $t1"<<endl);
+	assembler.push_back(ss<<pad<<instruction<<"$t2"<<endl);
+	assembler.push_back(ss<<pad<<"sw"<<"$t2, "<<destination<<endl);
 }
 
 
@@ -262,23 +260,21 @@ void Expression::logical_or_ins(ASMhandle& context, char* destination, char* arg
 	string continued_exec = context.get_assembly_label();		
 	
 	load_lhs(arg1, "$t0");
-	//cout<<pad<<"lw"<<"$t0, "<<arg1<<endl;
-	cout<<pad<<"bne"<<"$0, $t0, "<<non_default_action<<endl;	// If arg1 is not 0, go to non_default action
-	cout<<pad<<"nop"<<endl;
+	assembler.push_back(ss<<pad<<"bne"<<"$0, $t0, "<<non_default_action<<endl);	// If arg1 is not 0, go to non_default action
+	assembler.push_back(ss<<pad<<"nop"<<endl);
 	load_rhs(arg2, "$t1");
-	//cout<<pad<<"lw"<<"$t1, "<<arg2<<endl;
-	cout<<pad<<"bne"<<"$0, $t1, "<<non_default_action<<endl; 	// If arg2 is not 0, go to non_default action
-	cout<<pad<<"nop"<<endl;
-	cout<<pad<<"move"<<"$t2"<<", $0"<<endl; 					// Default action reached, result is 0
-	cout<<pad<<"sw"<<"$t2, "<<destination<<endl;
-	cout<<pad<<"b"<<continued_exec<<endl;
-	cout<<pad<<"nop"<<endl;
-	cout<<non_default_action<<":"<<endl;
-	cout<<pad<<"li"<<"$t2, 1"<<endl; 							// non-default action reached, result is 1
-	cout<<pad<<"sw"<<"$t2, "<<destination<<endl;
-	cout<<pad<<"b"<<continued_exec<<endl;
-	cout<<pad<<"nop"<<endl;
-	cout<<continued_exec<<":"<<endl; 							// continue execution of the program
+	assembler.push_back(ss<<pad<<"bne"<<"$0, $t1, "<<non_default_action<<endl); 	// If arg2 is not 0, go to non_default action
+	assembler.push_back(ss<<pad<<"nop"<<endl);
+	assembler.push_back(ss<<pad<<"move"<<"$t2"<<", $0"<<endl); 					// Default action reached, result is 0
+	assembler.push_back(ss<<pad<<"sw"<<"$t2, "<<destination<<endl);
+	assembler.push_back(ss<<pad<<"b"<<continued_exec<<endl);
+	assembler.push_back(ss<<pad<<"nop"<<endl);
+	assembler.push_back(ss<<non_default_action<<":"<<endl);
+	assembler.push_back(ss<<pad<<"li"<<"$t2, 1"<<endl); 							// non-default action reached, result is 1
+	assembler.push_back(ss<<pad<<"sw"<<"$t2, "<<destination<<endl);
+	assembler.push_back(ss<<pad<<"b"<<continued_exec<<endl);
+	assembler.push_back(ss<<pad<<"nop"<<endl);
+	assembler.push_back(ss<<continued_exec<<":"<<endl); 							// continue execution of the program
 }
 
 
@@ -287,23 +283,21 @@ void Expression::logical_and_ins(ASMhandle& context, char* destination, char* ar
 	string continued_exec = context.get_assembly_label();		
 	
 	load_lhs(arg1, "$t0");
-	//cout<<pad<<"lw"<<"$t0, "<<arg1<<endl;
-	cout<<pad<<"beq"<<"$0, $t0, "<<non_default_action<<endl;	// If arg1 is 0, go to non_default action
-	cout<<pad<<"nop"<<endl;
+	assembler.push_back(ss<<pad<<"beq"<<"$0, $t0, "<<non_default_action<<endl);	// If arg1 is 0, go to non_default action
+	assembler.push_back(ss<<pad<<"nop"<<endl);
 	load_rhs(arg2, "$t1");
-	//cout<<pad<<"lw"<<"$t1, "<<arg2<<endl;
-	cout<<pad<<"beq"<<"$0, $t1, "<<non_default_action<<endl; 	// If arg2 is 0, go to non_default action
-	cout<<pad<<"nop"<<endl;
-	cout<<pad<<"li"<<"$t2, 1"<<endl; 							// Default action reached, result is 1
-	cout<<pad<<"sw"<<"$t2, "<<destination<<endl;
-	cout<<pad<<"b"<<continued_exec<<endl;
-	cout<<pad<<"nop"<<endl;
-	cout<<non_default_action<<":"<<endl;
-	cout<<pad<<"move"<<"$t2"<<", $0"<<endl; 					// non-default action reached, result is 0
-	cout<<pad<<"sw"<<"$t2, "<<destination<<endl;
-	cout<<pad<<"b"<<continued_exec<<endl;
-	cout<<pad<<"nop"<<endl;
-	cout<<continued_exec<<":"<<endl; 							// continue execution of the program
+	assembler.push_back(ss<<pad<<"beq"<<"$0, $t1, "<<non_default_action<<endl); 	// If arg2 is 0, go to non_default action
+	assembler.push_back(ss<<pad<<"nop"<<endl);
+	assembler.push_back(ss<<pad<<"li"<<"$t2, 1"<<endl); 							// Default action reached, result is 1
+	assembler.push_back(ss<<pad<<"sw"<<"$t2, "<<destination<<endl);
+	assembler.push_back(ss<<pad<<"b"<<continued_exec<<endl);
+	assembler.push_back(ss<<pad<<"nop"<<endl);
+	assembler.push_back(ss<<non_default_action<<":"<<endl);
+	assembler.push_back(ss<<pad<<"move"<<"$t2"<<", $0"<<endl); 					// non-default action reached, result is 0
+	assembler.push_back(ss<<pad<<"sw"<<"$t2, "<<destination<<endl);
+	assembler.push_back(ss<<pad<<"b"<<continued_exec<<endl);
+	assembler.push_back(ss<<pad<<"nop"<<endl);
+	assembler.push_back(ss<<continued_exec<<":"<<endl); 							// continue execution of the program
 }
 
 
@@ -312,18 +306,17 @@ void Expression::logical_not_ins(ASMhandle& context, char* destination, char* ar
 	string continued_exec = context.get_assembly_label();		
 	
 	load_rhs(arg, "$t0");
-	//cout<<pad<<"lw"<<"$t0, "<<arg<<endl;
-	cout<<pad<<"bne"<<"$0, $t0, "<<non_default_action<<endl;	// If arg1 is not 0, go to non_default action
-	cout<<pad<<"nop"<<endl;
-	cout<<pad<<"li"<<"$t2, 1"<<endl; 							// non-default action reached, result is 1
-	cout<<pad<<"sw"<<"$t2, "<<destination<<endl;
-	cout<<pad<<"b"<<continued_exec<<endl;
-	cout<<pad<<"nop"<<endl;
-	cout<<non_default_action<<":"<<endl;
-	cout<<pad<<"sw"<<"$0, "<<destination<<endl;					// non-default action reached, result is 0
-	cout<<pad<<"b"<<continued_exec<<endl;
-	cout<<pad<<"nop"<<endl;
-	cout<<continued_exec<<":"<<endl; 							// continue execution of the program
+	assembler.push_back(ss<<pad<<"bne"<<"$0, $t0, "<<non_default_action<<endl);	// If arg1 is not 0, go to non_default action
+	assembler.push_back(ss<<pad<<"nop"<<endl);
+	assembler.push_back(ss<<pad<<"li"<<"$t2, 1"<<endl); 							// non-default action reached, result is 1
+	assembler.push_back(ss<<pad<<"sw"<<"$t2, "<<destination<<endl);
+	assembler.push_back(ss<<pad<<"b"<<continued_exec<<endl);
+	assembler.push_back(ss<<pad<<"nop"<<endl);
+	assembler.push_back(ss<<non_default_action<<":"<<endl);
+	assembler.push_back(ss<<pad<<"sw"<<"$0, "<<destination<<endl);					// non-default action reached, result is 0
+	assembler.push_back(ss<<pad<<"b"<<continued_exec<<endl);
+	assembler.push_back(ss<<pad<<"nop"<<endl);
+	assembler.push_back(ss<<continued_exec<<":"<<endl); 							// continue execution of the program
 }
 
 // if comparison of arg1-arg2 is true, then 1, otherwise 0
@@ -334,27 +327,25 @@ void Expression::logical_comparison_ins(ASMhandle& context, char* destination, c
 	
 	load_lhs(arg1, "$t0");
 	load_rhs(arg2, "$t1");
-	//cout<<pad<<"lw"<<"$t0, "<<arg1<<endl;
-	//cout<<pad<<"lw"<<"$t1, "<<arg2<<endl;
 	
 	if(subtract){
-	 	cout<<pad<<"subu"<<"$t2, $t0, $t1"<<endl;
-		cout<<pad<<instruction<<"$t2, "<<non_default_action<<endl;			// Branch if comparison is true
+	 	assembler.push_back(ss<<pad<<"subu"<<"$t2, $t0, $t1"<<endl);
+		assembler.push_back(ss<<pad<<instruction<<"$t2, "<<non_default_action<<endl);			// Branch if comparison is true
 	}
 	
-	else cout<<pad<<instruction<<"$t0, $t1, "<<non_default_action<<endl; 	// Branch if comparison is true
-	cout<<pad<<"nop"<<endl;
+	else assembler.push_back(ss<<pad<<instruction<<"$t0, $t1, "<<non_default_action<<endl); 	// Branch if comparison is true
+	assembler.push_back(ss<<pad<<"nop"<<endl);
 
-	cout<<pad<<"move"<<"$t2"<<", $0"<<endl; 						// Default action reached, result is 0
-	cout<<pad<<"sw"<<"$t2, "<<destination<<endl;
-	cout<<pad<<"b"<<continued_exec<<endl;
-	cout<<pad<<"nop"<<endl;
-	cout<<non_default_action<<":"<<endl;
-	cout<<pad<<"li"<<"$t2, 1"<<endl; 								// non-default action reached, result is 1
-	cout<<pad<<"sw"<<"$t2, "<<destination<<endl;
-	cout<<pad<<"b"<<continued_exec<<endl;
-	cout<<pad<<"nop"<<endl;
-	cout<<continued_exec<<":"<<endl; 								// continue execution of the program
+	assembler.push_back(ss<<pad<<"move"<<"$t2"<<", $0"<<endl); 						// Default action reached, result is 0
+	assembler.push_back(ss<<pad<<"sw"<<"$t2, "<<destination<<endl);
+	assembler.push_back(ss<<pad<<"b"<<continued_exec<<endl);
+	assembler.push_back(ss<<pad<<"nop"<<endl);
+	assembler.push_back(ss<<non_default_action<<":"<<endl);
+	assembler.push_back(ss<<pad<<"li"<<"$t2, 1"<<endl); 								// non-default action reached, result is 1
+	assembler.push_back(ss<<pad<<"sw"<<"$t2, "<<destination<<endl);
+	assembler.push_back(ss<<pad<<"b"<<continued_exec<<endl);
+	assembler.push_back(ss<<pad<<"nop"<<endl);
+	assembler.push_back(ss<<continued_exec<<":"<<endl); 								// continue execution of the program
 }
 
 
@@ -362,26 +353,24 @@ void Expression::logical_comparison_ins(ASMhandle& context, char* destination, c
 
 void Expression::sign_ins(char* destination, char* arg, const bool& get_negative){
 	load_rhs(arg, "$t0");
-	//cout<<pad<<"lw"<<"$t0, "<<arg<<endl;
 	if(get_negative){
-		cout<<pad<<"li"<<"$t1, 0xFFFFFFFF"<<endl;
-		cout<<pad<<"xor"<<"$t0, $t0, $t1"<<endl;					// Invert
-		cout<<pad<<"addi"<<"$t0, $t0, 1"<<endl;						// Add 1
+		assembler.push_back(ss<<pad<<"li"<<"$t1, 0xFFFFFFFF"<<endl);
+		assembler.push_back(ss<<pad<<"xor"<<"$t0, $t0, $t1"<<endl);					// Invert
+		assembler.push_back(ss<<pad<<"addi"<<"$t0, $t0, 1"<<endl);						// Add 1
 	}
-	cout<<pad<<"sw"<<"$t0, "<<destination<<endl;
+	assembler.push_back(ss<<pad<<"sw"<<"$t0, "<<destination<<endl);
 }
 
 void Expression::bitwise_not_ins(char* destination, char* arg){
 	load_rhs(arg, "$t0");
-	//cout<<pad<<"lw"<<"$t0, "<<arg<<endl;
-	cout<<pad<<"li"<<"$t1, 0xFFFFFFFF"<<endl;
-	cout<<pad<<"xor"<<"$t2, $t0, $t1"<<endl;
-	cout<<pad<<"sw"<<"$t2, "<<destination<<endl;
+	assembler.push_back(ss<<pad<<"li"<<"$t1, 0xFFFFFFFF"<<endl);
+	assembler.push_back(ss<<pad<<"xor"<<"$t2, $t0, $t1"<<endl);
+	assembler.push_back(ss<<pad<<"sw"<<"$t2, "<<destination<<endl);
 }
 
 void Expression::sizeof_ins(char* destination, char* arg){
-	cout<<pad<<"li"<<"$t1, 4"<<endl;
-	cout<<pad<<"sw"<<"$t1, "<<destination<<endl;
+	assembler.push_back(ss<<pad<<"li"<<"$t1, 4"<<endl);
+	assembler.push_back(ss<<pad<<"sw"<<"$t1, "<<destination<<endl);
 }
 
 
@@ -389,17 +378,17 @@ void Expression::sizeof_ins(char* destination, char* arg){
 
 
 void Expression::load_lhs(char* arg, const string& dest_reg, const string& lhs_reg /*="$t8"*/){
-	if(!lhs_global) cout<<pad<<"lw"<<dest_reg<<", "<<arg<<endl;
+	if(!lhs_global) assembler.push_back(ss<<pad<<"lw"<<dest_reg<<", "<<arg<<endl);
 	else{
-		cout<<pad<<"lui"<<lhs_reg<<", %hi("<<arg<<")"<<endl;
-		cout<<pad<<"lw"<<dest_reg<<", %lo("<<arg<<")("<<lhs_reg<<")"<<endl;
+		assembler.push_back(ss<<pad<<"lui"<<lhs_reg<<", %hi("<<arg<<")"<<endl);
+		assembler.push_back(ss<<pad<<"lw"<<dest_reg<<", %lo("<<arg<<")("<<lhs_reg<<")"<<endl);
 	}
 }
 
 void Expression::load_rhs(char* arg, const string& dest_reg, const string& rhs_reg /*="$t9"*/){
-	if(!rhs_global) cout<<pad<<"lw"<<dest_reg<<", "<<arg<<endl;
+	if(!rhs_global) assembler.push_back(ss<<pad<<"lw"<<dest_reg<<", "<<arg<<endl);
 	else{
-		cout<<pad<<"lui"<<rhs_reg<<", %hi("<<arg<<")"<<endl;
-		cout<<pad<<"lw"<<dest_reg<<", %lo("<<arg<<")("<<rhs_reg<<")"<<endl;
+		assembler.push_back(ss<<pad<<"lui"<<rhs_reg<<", %hi("<<arg<<")"<<endl);
+		assembler.push_back(ss<<pad<<"lw"<<dest_reg<<", %lo("<<arg<<")("<<rhs_reg<<")"<<endl);
 	}
 }

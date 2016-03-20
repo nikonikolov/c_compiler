@@ -19,7 +19,7 @@ public:
 	Assembly();
 	~Assembly();
 
-	void push_back(stringstream& ss);
+	void push_back(std::ostream& out);
 
 	void print();
 

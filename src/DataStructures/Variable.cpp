@@ -111,7 +111,6 @@ void Variable::renderasm(ASMhandle& context, const bool& local /*=true*/){
 		try{	// Allocate variable on the stack
 			pair<string, Variable*> tmp(string(name), this);
 			location = context.allocate_var(tmp);
-		//	location = context.allocate_var(&location, tmp);
 		}
 		catch(const ErrorgenT& error_in){
 			generate_error("Redefinition of variable \""+string(name)+"\"");
@@ -158,18 +157,21 @@ void Variable::renderasm_global(ASMhandle& context){
 		}
 	}
 
-	cout<<pad<<".globl"<<name<<endl;
+	assembler.push_back(ss<<pad<<".globl"<<name<<endl);
 	if(first_global){
 		first_global=false;
-		cout<<pad<<".data"<<endl;
+		assembler.push_back(ss<<pad<<".data"<<endl);
 	}
-		cout<<pad<<".align"<<2<<endl;
-		cout<<pad<<".type"<<name<<", @object"<<endl;
-		cout<<pad<<".size"<<name<<", 4"<<endl;
-		cout<<name<<":"<<endl;
-		cout<<pad<<".word";
-		if(init_val!=NULL) init_val->pretty_print(0);
-		cout<<endl;
+	
+	assembler.push_back(ss<<pad<<".align"<<2<<endl);
+	assembler.push_back(ss<<pad<<".type"<<name<<", @object"<<endl);
+	assembler.push_back(ss<<pad<<".size"<<name<<", 4"<<endl);
+	assembler.push_back(ss<<name<<":"<<endl);
+	if(init_val!=NULL && init_val->get_expr_type()==EXPR_constant){
+		Constant<int>* value = static_cast<Constant<int>*>(init_val);		
+		assembler.push_back(ss<<pad<<".word"<<value->get_value()<<endl);
+	} 
+	assembler.push_back(ss<<endl);
 
 }
 

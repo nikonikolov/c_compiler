@@ -8,11 +8,16 @@ Assembly::~Assembly(){
 	if(instructions!=NULL)	delete instructions;	
 }
 
-void Assembly::push_back(stringstream& ss){
-	string line;
+void Assembly::push_back(std::ostream& out){
+	stringstream ss;
+	ss << out.rdbuf();
+    instructions->push_back(ss.str());
+
+/*	string line;
 	while( getline(ss, line, '\n') ){
     	instructions->push_back(line+"\n");
 	}
+*/
 }
 
 void Assembly::print(){

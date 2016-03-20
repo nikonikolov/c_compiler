@@ -73,6 +73,7 @@ private:
 	static uint64_t label_idx;
 	static string label; 
 	//static int mem_amount_default;
+	stringstream ss;
 };
 
 
@@ -99,6 +100,8 @@ protected:
 	StatementT stat_type;
 	int line;
 	string src_file;
+
+	stringstream ss;
 };
 
 

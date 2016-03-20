@@ -61,11 +61,11 @@ void Function::pretty_print(const int& indent){
 void Function::renderasm(ASMhandle& context){
 
 	/* Function header assembly */
-	cout<<"\t.align	2"<<endl;
-	cout<<"\t.globl "<<name<<endl;		// This has to be ommitted for functions declared static
-	cout<<"\t.ent "<<name<<endl;
-	cout<<"\t.type "<<name<<", @function"<<endl;
-	cout<<name<<":"<<endl;
+	assembler.push_back(ss<<"\t.align	2"<<endl);
+	assembler.push_back(ss<<"\t.globl "<<name<<endl);		// This has to be ommitted for functions declared static
+	assembler.push_back(ss<<"\t.ent "<<name<<endl);
+	assembler.push_back(ss<<"\t.type "<<name<<", @function"<<endl);
+	assembler.push_back(ss<<name<<":"<<endl);
 
 	ASMhandle new_context(context);
 
@@ -76,7 +76,7 @@ void Function::renderasm(ASMhandle& context){
 	fn_body->renderasm(new_context, true);
 
 	/* Function end assembly */
-	cout<<endl<<"\t.end "<<name<<endl<<endl;
+	assembler.push_back(ss<<endl<<"\t.end "<<name<<endl<<endl);
 }
 
 
@@ -90,7 +90,7 @@ void Function::init_args(ASMhandle& context){
 			pair<string, Variable*> tmp((*params)[i]->get_name_str(), (*params)[i]);
 			char* asm_location = context.allocate_var(tmp);
 			(*params)[i]->set_asm_location(asm_location);
-			cout<<pad<<"sw"<<"$a"<<i<<", "<<asm_location<<endl;
+			assembler.push_back(ss<<pad<<"sw"<<"$a"<<i<<", "<<asm_location<<endl);
 		}
 		catch(const ErrorgenT& error_in){
 			(*params)[i]->generate_error("Function parameters cannot have the same name");

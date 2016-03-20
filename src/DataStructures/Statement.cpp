@@ -72,34 +72,34 @@ void ASMhandle::subroutine_enter(const int& mem_amount /*= 24*/){
 	fp_offset = 0;
 
 	// Allocate memory on the stack
-	cout<<pad<<"addiu"<<"$sp, $sp, "<<-mem_amount<<"\t\t# Allocate memory on the stack"<<endl; 		
+	assembler.push_back(ss<<pad<<"addiu"<<"$sp, $sp, "<<-mem_amount<<"\t\t# Allocate memory on the stack"<<endl); 		
 	// Store the value of the frame pointer on the bottom of the stack
-	cout<<pad<<"sw"<<"$fp, "<<mem_amount-4<<"($sp)"<<"\t\t# Store value of fp on the bottom of the stack"<<endl; 		
+	assembler.push_back(ss<<pad<<"sw"<<"$fp, "<<mem_amount-4<<"($sp)"<<"\t\t# Store value of $fp on the bottom of the stack"<<endl); 		
 
 	// Modify the frame pointer to point to the memory location above the one that stores its previous value
-	cout<<pad<<"addiu"<<"$fp, $sp, "<<mem_amount-8<<"\t\t# Modify fp to point to the the bottom of the available stack memory"<<endl; 			
+	assembler.push_back(ss<<pad<<"addiu"<<"$fp, $sp, "<<mem_amount-8<<"\t\t# Point $fp to the bottom of the available memory"<<endl); 			
 
 	// You should push this to a new method that gets called only on function calls
 	string ret_address = allocate_str_var();
-	cout<<pad<<"sw"<<"$ra, "<<ret_address<<"\t\t# Store the return address for the current subroutine"<<endl;
+	assembler.push_back(ss<<pad<<"sw"<<"$ra, "<<ret_address<<"\t\t# Store the return address for the current subroutine"<<endl);
 	return_address->push(ret_address);
 }
 
 void ASMhandle::subroutine_exit(char* return_val){
-	if(return_val!=NULL) cout<<pad<<"lw"<<"$v0, "<<return_val<<endl;		// Load return value
+	if(return_val!=NULL) assembler.push_back(ss<<pad<<"lw"<<"$v0, "<<return_val<<endl);		// Load return value
 
 	string ret_address = return_address->top();								// Get return address
 	//return_address->pop(); // Not actually needed, because a subroutine will make a copy of the ASMhandle object 
 
 	// Load return address
-	cout<<pad<<"lw"<<"$ra, "<<ret_address<<"\t\t# Load return address in register 31"<<endl;
+	assembler.push_back(ss<<pad<<"lw"<<"$ra, "<<ret_address<<"\t\t# Load return address in register 31"<<endl);
 	// Restore frame pointer. This should be load and should be -4
-	cout<<pad<<"lw"<<"$fp, 4($fp)"<<"\t\t# Restore the value of the frame pointer"<<endl; 								
+	assembler.push_back(ss<<pad<<"lw"<<"$fp, 4($fp)"<<"\t\t# Restore the value of the frame pointer"<<endl); 								
 	// Restore stack pointer		
-	cout<<pad<<"addiu"<<"$sp, $sp, "<<sp_offset<<"\t\t# Restore the value of the stack pointer"<<endl; 						
+	assembler.push_back(ss<<pad<<"addiu"<<"$sp, $sp, "<<sp_offset<<"\t\t# Restore the value of the stack pointer"<<endl); 						
 	// Go back to caller
-	cout<<pad<<"j"<<"$ra"<<endl;											
-	cout<<pad<<"nop"<<endl;
+	assembler.push_back(ss<<pad<<"j"<<"$ra"<<endl);											
+	assembler.push_back(ss<<pad<<"nop"<<endl);
 }
 
 
@@ -117,7 +117,8 @@ char* ASMhandle::allocate_subroutine_stack_param(pair<string, Variable*>& var_in
 
 // Used at the exit of a scope so that newly allocated memory will be accounted for
 void ASMhandle::exit_scope(const ASMhandle& new_context){
-	if(allocated_mem!=new_context.allocated_mem) cout<<pad<<"addiu"<<"$sp, $sp, "<<new_context.allocated_mem-allocated_mem<<endl;
+	if(allocated_mem!=new_context.allocated_mem) 
+					assembler.push_back(ss<<pad<<"addiu"<<"$sp, $sp, "<<new_context.allocated_mem-allocated_mem<<endl);
 	//allocated_mem = new_context.allocated_mem;
 	//sp_offset=new_context.sp_offset;
 	//fp_offset=new_context.fp_offset;
@@ -127,7 +128,7 @@ void ASMhandle::exit_scope(const ASMhandle& new_context){
 
 void ASMhandle::allocate_mem(const int& mem_amount /*= 24*/){
 	// Allocate memory
-	cout<<pad<<"addiu"<<"$sp, $sp, "<<-mem_amount<<"\t\t# Allocate more memory"<<endl;
+	assembler.push_back(ss<<pad<<"addiu"<<"$sp, $sp, "<<-mem_amount<<"\t\t# Allocate more memory"<<endl);
 	allocated_mem+=mem_amount;
 	sp_offset+=mem_amount;
 }

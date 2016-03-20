@@ -83,7 +83,8 @@ void Program::renderasm(){
 		}
 	} 
 
-	cout<<pad<<".text"<<endl;
+	assembler.push_back(ss<<pad<<".text"<<endl);
+	
 	
 	if(functions!=NULL){
 		map<string, Function*>::iterator it;
@@ -93,6 +94,7 @@ void Program::renderasm(){
 		}
 	}
 
+	assembler.print();
 	cerr<<"Code Generation Successful"<<endl;
 }
 

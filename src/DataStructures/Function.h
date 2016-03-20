@@ -47,6 +47,8 @@ private:
 
 	int line;
 	string src_file;
+
+	stringstream ss;
 };
 
 

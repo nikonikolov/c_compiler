@@ -4,8 +4,14 @@
 #include <cstdint>
 #include "include.h"
 #include "BaseExpression.h"
+#include "Constant.h"
 
 typedef std::pair<BaseExpression*,int> PtrDeref;
+
+/*	FIX:
+		1. Currently only integers assumed. Don't forger to account for template type at 
+		casting to Constant in renderasm_global_var as well
+*/
 
 class Variable{
 
@@ -91,6 +97,8 @@ private:
 
 	int line;
 	string src_file;
+
+	stringstream ss;
 };
 
 

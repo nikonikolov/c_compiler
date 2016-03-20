@@ -33,7 +33,7 @@ std::ostream& pad(std::ostream& os);
 
 /* =============================================== DECLARE ASSEMBLY OBJECT =============================================== */
 
-Assembly assembler;
+extern Assembly assembler;
 
 /* =============================================== STATEMENT TYPES =============================================== */
 

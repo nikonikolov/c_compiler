@@ -63,6 +63,7 @@ void AssignmentExpression::renderasm(ASMhandle& context, char** destination /*=N
 
 }
 
+/* =============================================== CODEGEN METHODS =============================================== */
 
 void AssignmentExpression::assignment_ins(char** destination, char* lhs_dest, char* rhs_dest, const string& instruction /*=""*/){
 	bool lhs_loaded=true;
@@ -73,65 +74,56 @@ void AssignmentExpression::assignment_ins(char** destination, char* lhs_dest, ch
 	else{
 		load_rhs(rhs_dest, "$t0");
 		lhs_loaded=false;
-		//cout<<pad<<"lw"<<"$t0, "<<rhs_dest<<endl;
 	} 
 
 	store_lhs(lhs_dest, "$t0", lhs_loaded);
-	//cout<<pad<<"sw"<<"$t0, "<<lhs_dest<<endl;
-	if(destination!=NULL)	cout<<pad<<"sw"<<"$t0, "<<*destination<<endl;
+	if(destination!=NULL)	assembler.push_back(ss<<pad<<"sw"<<"$t0, "<<*destination<<endl);
 }
 
 void AssignmentExpression::arithmetic_ins(char* lhs_dest, char* rhs_dest, const string& instruction){
 	load_lhs(lhs_dest, "$t0");
-	//cout<<pad<<"lw"<<"$t0, "<<lhs_dest<<endl;
 	load_rhs(rhs_dest, "$t1");
-	//cout<<pad<<"lw"<<"$t1, "<<rhs_dest<<endl;
-	cout<<pad<<instruction<<"$t0, $t0, $t1"<<endl;
+	assembler.push_back(ss<<pad<<instruction<<"$t0, $t0, $t1"<<endl);
 }
 
 void AssignmentExpression::inc_dec_ins(char** destination, char* arg, const int& val, const bool& post_inc){
 	if(post_inc) 	load_lhs(arg, "$t0");
 	else			load_rhs(arg, "$t0");
-	//cout<<pad<<"lw"<<"$t0, "<<arg<<endl;
 	
-	if(destination!=NULL && post_inc) cout<<pad<<"sw"<<"$t0, "<<*destination<<endl;	// Assign the old value to the destination
-	cout<<pad<<"addiu"<<"$t0, $t0, "<<val<<endl;
+	if(destination!=NULL && post_inc) assembler.push_back(ss<<pad<<"sw"<<"$t0, "<<*destination<<endl);	// Assign the old value to the destination
+	assembler.push_back(ss<<pad<<"addiu"<<"$t0, $t0, "<<val<<endl);
 	
 	// Assign the new value to the variable
 	if(post_inc) 	store_lhs(arg, "$t0", true);
 	else			store_rhs(arg, "$t0", true);
-	//cout<<pad<<"sw"<<"$t0, "<<arg<<endl;											// Assign the new value to the variable
-	if(destination!=NULL && !post_inc) cout<<pad<<"sw"<<"$t0, "<<*destination<<endl;	// Assign the new value to the destination
+	if(destination!=NULL && !post_inc) assembler.push_back(ss<<pad<<"sw"<<"$t0, "<<*destination<<endl);	// Assign the new value to the destination
 }
 
 void AssignmentExpression::div_rem_ins(char** destination, char* lhs_dest, char* rhs_dest, const string& instruction){
 	load_lhs(lhs_dest, "$t0");
-	//cout<<pad<<"lw"<<"$t0, "<<lhs_dest<<endl;
 	load_rhs(rhs_dest, "$t1");
-	//cout<<pad<<"lw"<<"$t1, "<<rhs_dest<<endl;
-	cout<<pad<<"teq"<<"$t1, $0, 7"<<endl;
-	cout<<pad<<"div"<<"$t0, $t1"<<endl;
-	cout<<pad<<instruction<<"$t2"<<endl;
+	assembler.push_back(ss<<pad<<"teq"<<"$t1, $0, 7"<<endl);
+	assembler.push_back(ss<<pad<<"div"<<"$t0, $t1"<<endl);
+	assembler.push_back(ss<<pad<<instruction<<"$t2"<<endl);
 	store_lhs(lhs_dest, "$t2", true);
-	//cout<<pad<<"sw"<<"$t2, "<<lhs_dest<<endl;
-	if(destination!=NULL)	cout<<pad<<"sw"<<"$t2, "<<*destination<<endl;
+	if(destination!=NULL)	assembler.push_back(ss<<pad<<"sw"<<"$t2, "<<*destination<<endl);
 }
 
 
 /* ---------------------------------------------- STORING OPERANDS ---------------------------------------------- */
 
 void AssignmentExpression::store_lhs(char* arg, const string& dest_reg, const bool& loaded, const string& lhs_reg /*="$t8"*/){
-	if(!lhs_global) cout<<pad<<"sw"<<dest_reg<<", "<<arg<<endl;	
+	if(!lhs_global) assembler.push_back(ss<<pad<<"sw"<<dest_reg<<", "<<arg<<endl);	
 	else{
-		if(!loaded) cout<<pad<<"lui"<<lhs_reg<<", %hi("<<arg<<")"<<endl;
-		cout<<pad<<"sw"<<dest_reg<<", %lo("<<arg<<")("<<lhs_reg<<")"<<endl;
+		if(!loaded) assembler.push_back(ss<<pad<<"lui"<<lhs_reg<<", %hi("<<arg<<")"<<endl);
+		assembler.push_back(ss<<pad<<"sw"<<dest_reg<<", %lo("<<arg<<")("<<lhs_reg<<")"<<endl);
 	} 
 }
 
 void AssignmentExpression::store_rhs(char* arg, const string& dest_reg, const bool& loaded, const string& rhs_reg /*="$t9"*/){
-	if(!rhs_global) cout<<pad<<"sw"<<dest_reg<<", "<<arg<<endl;	
+	if(!rhs_global) assembler.push_back(ss<<pad<<"sw"<<dest_reg<<", "<<arg<<endl);	
 	else{
-		if(!loaded) cout<<pad<<"lui"<<rhs_reg<<", %hi("<<arg<<")"<<endl;
-		cout<<pad<<"sw"<<dest_reg<<", %lo("<<arg<<")("<<rhs_reg<<")"<<endl;
+		if(!loaded) assembler.push_back(ss<<pad<<"lui"<<rhs_reg<<", %hi("<<arg<<")"<<endl);
+		assembler.push_back(ss<<pad<<"sw"<<dest_reg<<", %lo("<<arg<<")("<<rhs_reg<<")"<<endl);
 	} 
 }

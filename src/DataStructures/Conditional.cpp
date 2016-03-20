@@ -45,15 +45,15 @@ void ConditionalCase::renderasm(ASMhandle& context, const string& continued_exec
 		bool global_var=false;
 		try{ condition->renderasm(context, &result_condtion); }
 		catch(const bool& global_var_in){ global_var=global_var_in; }
-		if(!global_var)	cout<<pad<<"lw"<<"$t0, "<<result_condtion<<endl;
+		if(!global_var)	assembler.push_back(ss<<pad<<"lw"<<"$t0, "<<result_condtion<<endl);
 		else{
-			cout<<pad<<"lui"<<"$t1"<<", %hi("<<result_condtion<<")"<<endl;
-			cout<<pad<<"lw"<<"$t0"<<", %lo("<<result_condtion<<")($t1)"<<endl;
+			assembler.push_back(ss<<pad<<"lui"<<"$t1"<<", %hi("<<result_condtion<<")"<<endl);
+			assembler.push_back(ss<<pad<<"lw"<<"$t0"<<", %lo("<<result_condtion<<")($t1)"<<endl);
 		}
 
 		// If condition is false jump to the next CondtionalCase or to the end of the Conditional
-		if(!next_jump.empty()) 	cout<<pad<<"beq"<<"$t0, $0, "<<next_jump<<endl;		 
-		else 					cout<<pad<<"beq"<<"$t0, $0, "<<continued_execution<<endl;	
+		if(!next_jump.empty()) 	assembler.push_back(ss<<pad<<"beq"<<"$t0, $0, "<<next_jump<<endl);		 
+		else 					assembler.push_back(ss<<pad<<"beq"<<"$t0, $0, "<<continued_execution<<endl);	
 		context.exit_scope(new_context);				// Correct $sp in branch delay slot if necessary
 		
 		// IF/ELSE IF COMPOUND STATEMENT
@@ -61,7 +61,7 @@ void ConditionalCase::renderasm(ASMhandle& context, const string& continued_exec
 		// IF/ELSE IF single statement
 		else						single_statement->renderasm(new_context);
 		
-		cout<<pad<<"b"<<continued_execution<<endl;		// Branch to continued execution
+		assembler.push_back(ss<<pad<<"b"<<continued_execution<<endl);		// Branch to continued execution
 		context.exit_scope(new_context);				// Correct $sp in branch delay slot if necessary
 	}
 	// ELSE or ELSE IF statement
@@ -134,11 +134,11 @@ void Conditional::renderasm(ASMhandle& context){
 				// jump_next is the label to jump if condition is not true, i.e. the next else if
 				// continued_execution it the label to jump after executing the block in the case that the condition evaluates to true
 				(*it)->renderasm(context, continued_execution, jump_next);
-				cout<<jump_next<<":"<<endl;
+				assembler.push_back(ss<<jump_next<<":"<<endl);
 			}
 			// Last ELSE/ELSE IF statement
 			else (*it)->renderasm(context, continued_execution, "");
 		}
 	}
-	cout<<continued_execution<<":"<<endl;
+	assembler.push_back(ss<<continued_execution<<":"<<endl);
 }

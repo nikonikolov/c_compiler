@@ -12,6 +12,7 @@
 #include <string>
 #include <string.h>
 #include <cstdlib>
+#include <sstream>
 
 using std::list;
 using std::vector;
@@ -21,6 +22,7 @@ using std::cout;
 using std::cerr;
 using std::endl;
 using std::string;
+using std::stringstream;
 using std::pair;
 
 //#define MOD "\t"<<left<<setfill(' ')<< setw(8)

@@ -14,6 +14,7 @@ public:
 	~Program();
 
 	void insert_fn(Function* fn_in);
+	void insert_fn_prototype(Function* fn_in);
 	void push_var_back(VarDeclaration* var_in);
 
 	void pretty_print(const int& indent);
@@ -26,6 +27,8 @@ private:
 	ASMhandle* context;
 	map<string, Function*>* functions;			// Pointer to a map of all the functions defined. The MAIN is included here
 	map<string, Variable*>* global_vars; 		// Pointer to a map of all the global variables defined
+
+	map<string, Function*>* fn_prototypes;		// Pointer to a map of all the function prototypes defined
 
 	stringstream ss;
 };

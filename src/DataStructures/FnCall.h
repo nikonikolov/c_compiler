@@ -7,45 +7,34 @@
 
 
 /*	FIX:
-		1. Currently only 32bit wide arguments and INTs only assumed as function parameters
-		2. Move function arguments on the stack
+		1. Currently only 32bit wide arguments and INTs only assumed as function parameters - you have to compare whether 
+		function call and function definition match
+		2. Probably best to add a member function for Variable load_variable which can load any type of variable in register or 
+		in memory instead of doing it in ASMhandle. You still need asm handle to figure out how much memory you need to allocate 
+		though
 */
 
-/*
-class FnCall{
+
+class FnCall : public BaseExpression{
 
 public:
-	FnCall(Variable* return_type_in, char* name_in, vector<Variable*>* params_in, CompoundStatement* fn_body_in);
-	FnCall(Variable* return_type_in, char* name_in, vector<Variable*>* params_in, CompoundStatement* fn_body_in, 
-																				const int& line_in, const string& src_file_in);
+	FnCall(char* name_in, vector<BaseExpression*>* arguments_in, const int& line_in, const string& src_file_in);
 	~FnCall();
 
 	string get_name() const;
-	void generate_error(const string& msg_out) const;
 
-	void renderasm(ASMhandle& context);
+	void renderasm(ASMhandle& context, char** destination =NULL);
 	void pretty_print(const int& indent);
+	BaseExpression* simplify();
 
 private:
 	void init_args(ASMhandle& context);
 
-	
-	Variable* return_type;					
-	
-	snum_t return_val;						// Holds the result of the return value for the function
+	vector<BaseExpression*>* arguments;
 
-	char* name;								// Name given to the function in the source code
-	vector<Variable*>* params;				// Pointer to a vector of the parameters the function takes in the exact order specified
-	vector<Statement*>* statements;			// Pointer to a vector of the statements appearing in the scope of the function
-
-	CompoundStatement* fn_body;				// CompoundStatement corresponding to function body
-
-	char* asm_name;
-
-	int line;
-	string src_file;
+	char* name;								// Name of the function called
 };
-*/
+
 
 
 #endif

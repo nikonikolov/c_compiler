@@ -1,7 +1,7 @@
 #include "Program.h"
 
 Program::Program() :
-	global_vars_decl(NULL), functions(NULL), context(NULL), global_vars(NULL) {}
+	global_vars_decl(NULL), functions(NULL), fn_prototypes(NULL), context(NULL), global_vars(NULL) {}
 
 /*
 Program::Program(vector<VarDeclaration*>* global_vars_decl_in, vector<Function*>* functions_in) :
@@ -37,6 +37,16 @@ Program::~Program(){
 	}
 }
 
+
+void Program::insert_fn_prototype(Function* fn_in){
+	if(fn_prototypes==NULL) fn_prototypes = new map<string, Function*>;
+	
+	pair<map<string, Function*>::iterator,bool> ret;
+  	ret = fn_prototypes->insert( pair<string, Function*>(fn_in->get_name(),fn_in) );
+  	if(ret.second==false) fn_in->generate_error("redefinition of function");
+}
+
+
 void Program::insert_fn(Function* fn_in){
 	if(functions==NULL) functions = new map<string, Function*>;
 	
@@ -60,21 +70,32 @@ void Program::pretty_print(const int& indent){
 		}
 	} 
 
-	if(functions==NULL) return;
+	if(fn_prototypes!=NULL){
+		// Print Function declarations
+		map<string, Function*>::iterator it;
+		for(it=fn_prototypes->begin(); it!=fn_prototypes->end(); ++it){
+			(*it).second->pretty_print(indent);
+		}
+	} 
 
-	// Print Function declarations
-	map<string, Function*>::iterator it;
-	for(it=functions->begin(); it!=functions->end(); ++it){
-		(*it).second->pretty_print(indent);
-	}
+	if(functions!=NULL){
+		// Print Function declarations
+		map<string, Function*>::iterator it;
+		for(it=functions->begin(); it!=functions->end(); ++it){
+			(*it).second->pretty_print(indent);
+		}
+	} 
 }
 
 
 void Program::renderasm(){
+	if(debug) cerr<<"Program: renderasm enter"<<endl;
 
 	// Create ASMhandle that manages the stack and the function calls
-	ASMhandle context(functions);
+	ASMhandle context(functions, fn_prototypes);
 	
+	if(debug) cerr<<"Program: Global Vars renderasm start"<<endl;
+
 	// Render assembly for global variables. Note that name clashes with functions are performed at insertion
 	if(global_vars_decl!=NULL){
 		vector<VarDeclaration*>::iterator it;
@@ -83,8 +104,12 @@ void Program::renderasm(){
 		}
 	} 
 
+	if(debug) cerr<<"Program: Global Vars renderasm successful"<<endl;
+
 	assembler.push_back(ss<<pad<<".text"<<endl);
 	
+
+	if(debug) cerr<<"Program: Functions renderasm start"<<endl;
 	
 	if(functions!=NULL){
 		map<string, Function*>::iterator it;
@@ -93,6 +118,8 @@ void Program::renderasm(){
 			(*it).second->renderasm(context);
 		}
 	}
+
+	if(debug) cerr<<"Program: Functions renderasm successful"<<endl;
 
 	assembler.print();
 	cerr<<"Code Generation Successful"<<endl;

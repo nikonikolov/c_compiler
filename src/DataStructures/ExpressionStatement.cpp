@@ -61,12 +61,11 @@ void ExpressionStatement::renderasm(ASMhandle& context){
 void ExpressionStatement::simplify(){
 	if(expr_list!=NULL){
 		BaseExpression* tmp_expr=NULL;
-		snum_t tmp;
 		vector<BaseExpression*>::iterator it;
 		for(it=expr_list->begin(); it!=expr_list->end(); ++it){
 			try{
 				if(*it!=NULL){
-					tmp_expr = (*it)->simplify(tmp);
+					tmp_expr = (*it)->simplify();
 					if(tmp_expr!=NULL){
 						delete *it;
 						*it = tmp_expr;

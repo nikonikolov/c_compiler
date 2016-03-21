@@ -58,6 +58,7 @@ void CompoundStatement::pretty_print(const int& indent){
 // Used by single scope appearing without any other statement. It should copy the context and call exit_scope to restore proper
 // $sp on its own
 void CompoundStatement::renderasm(ASMhandle& context){
+	if(debug) cerr<<"CompoundStatement: renderasm enter"<<endl;
 
 	ASMhandle new_context(context);
 
@@ -68,6 +69,8 @@ void CompoundStatement::renderasm(ASMhandle& context){
 		}
 	}
 
+	if(debug) cerr<<"CompoundStatement: renderasm declarations successful"<<endl;
+
 	// Execute the statements
 	if(statements!=NULL){
 		vector<Statement*>::iterator it;
@@ -75,6 +78,8 @@ void CompoundStatement::renderasm(ASMhandle& context){
 			(*it)->renderasm(new_context);
 		}
 	}
+
+	if(debug) cerr<<"CompoundStatement: renderasm statements successful"<<endl;
 
 	context.exit_scope(new_context);
 }

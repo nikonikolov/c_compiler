@@ -29,10 +29,10 @@ a:
 
 	.text   
 	.align	2
-	.globl f
-	.ent f
-	.type f, @function
-f:
+	.globl fn
+	.ent fn
+	.type fn, @function
+fn:
 	addiu   $sp, $sp, -24		# Allocate memory on the stack
 	sw      $fp, 20($sp)		# Store value of $fp on the bottom of the stack
 	addiu   $fp, $sp, 16		# Point $fp to the bottom of the available memory
@@ -104,5 +104,5 @@ f:
 	j       $ra
 	nop     
 
-	.end f
+	.end fn
 

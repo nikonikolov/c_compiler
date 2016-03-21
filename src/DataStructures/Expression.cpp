@@ -70,38 +70,40 @@ void Expression::pretty_print(const int& indent){
 	Returns:
 		1. NULL means a Constant => no need to change the pointer
 		2. Exception thrown means no optimization currently possible for this expression
+		3. Meaningful pointer means optimization performed
 */
-BaseExpression* Expression::simplify(snum_t& value){
+BaseExpression* Expression::simplify(){
+	if(debug) cerr<<"Expression: simplify enter"<<endl;
 	
-	snum_t lhs_val, rhs_val;
 	BaseExpression* tmp_expr=NULL;
 	int exception = 0;
-	// Optimize LHS
-	try{
+
+	try{									// Optimize LHS
 		if(lhs!=NULL){
-			tmp_expr = lhs->simplify(lhs_val);
+			tmp_expr = lhs->simplify();
 			if(tmp_expr!=NULL){
 				delete lhs;
-				lhs = tmp_expr;			// In case RHS cannot be simplified
+				lhs = tmp_expr;				// In case RHS cannot be simplified
 			}
 		} 
 	}
 	catch(const int& exception_in){
 		exception = exception_in;
 	}
-	// Optimize RHS
-	try{
+	if(debug) cerr<<"Expression: simplify LHS successful"<<endl;
+	try{ 									// Optimize RHS
 		if(rhs!=NULL){
-			tmp_expr = rhs->simplify(rhs_val);
+			tmp_expr = rhs->simplify();
 			if(tmp_expr!=NULL){
 				delete rhs;
-				rhs = tmp_expr; 		// In case LHS was not simplified
+				rhs = tmp_expr; 			// In case LHS was not simplified
 			}
 		} 
 	}
 	catch(const int& exception_in){
 		exception = exception_in;
 	}
+	if(debug) cerr<<"Expression: simplify RHS successful"<<endl;
 
 	if(exception) throw exception;
 
@@ -110,28 +112,35 @@ BaseExpression* Expression::simplify(snum_t& value){
 		value, you cannot assign integer to a struct, etc.
 	*/
 
+	if(debug) cerr<<"Expression: simplify : casting pointers"<<endl;
+
 	Constant<int>* res_ptr=NULL;
+	Constant<int>* lhs_ptr = static_cast<Constant<int>*>(lhs);
+	Constant<int>* rhs_ptr = static_cast<Constant<int>*>(rhs);
+	int lhs_val=lhs_ptr->get_value(), rhs_val=rhs_ptr->get_value();
 	
+	if(debug) cerr<<"Expression: simplify : calculating new result"<<endl;
+
 	/* ----------------------------------- TWO OPERANDS ----------------------------------- */
 	if(lhs!=NULL && rhs!=NULL){
-		if(!strcmp(oper,"+")) 	res_ptr = new Constant<int>(lhs_val.numval.intmem + rhs_val.numval.intmem); 	
-		if(!strcmp(oper,"-")) 	res_ptr = new Constant<int>(lhs_val.numval.intmem - rhs_val.numval.intmem); 	
-		if(!strcmp(oper,"*")) 	res_ptr = new Constant<int>(lhs_val.numval.intmem * rhs_val.numval.intmem); 	
-		if(!strcmp(oper,"%")) 	res_ptr = new Constant<int>(lhs_val.numval.intmem % rhs_val.numval.intmem); 	
-		if(!strcmp(oper,"/")) 	res_ptr = new Constant<int>(lhs_val.numval.intmem / rhs_val.numval.intmem); 	
-		if(!strcmp(oper,"|")) 	res_ptr = new Constant<int>(lhs_val.numval.intmem | rhs_val.numval.intmem); 	
-		if(!strcmp(oper,"&")) 	res_ptr = new Constant<int>(lhs_val.numval.intmem & rhs_val.numval.intmem); 	
-		if(!strcmp(oper,"^")) 	res_ptr = new Constant<int>(lhs_val.numval.intmem ^ rhs_val.numval.intmem); 	
-		if(!strcmp(oper,"||")) 	res_ptr = new Constant<int>(lhs_val.numval.intmem || rhs_val.numval.intmem); 	
-		if(!strcmp(oper,"&&")) 	res_ptr = new Constant<int>(lhs_val.numval.intmem && rhs_val.numval.intmem); 	
-		if(!strcmp(oper,"<<")) 	res_ptr = new Constant<int>(lhs_val.numval.intmem << rhs_val.numval.intmem); 	
-		if(!strcmp(oper,">>")) 	res_ptr = new Constant<int>(lhs_val.numval.intmem >> rhs_val.numval.intmem); 	
-		if(!strcmp(oper,"<=")) 	res_ptr = new Constant<int>(lhs_val.numval.intmem <= rhs_val.numval.intmem); 	
-		if(!strcmp(oper,">=")) 	res_ptr = new Constant<int>(lhs_val.numval.intmem >= rhs_val.numval.intmem); 	
-		if(!strcmp(oper,">")) 	res_ptr = new Constant<int>(lhs_val.numval.intmem > rhs_val.numval.intmem); 	
-		if(!strcmp(oper,"<")) 	res_ptr = new Constant<int>(lhs_val.numval.intmem < rhs_val.numval.intmem); 	
-		if(!strcmp(oper,"==")) 	res_ptr = new Constant<int>(lhs_val.numval.intmem == rhs_val.numval.intmem); 	
-		if(!strcmp(oper,"!=")) 	res_ptr = new Constant<int>(lhs_val.numval.intmem != rhs_val.numval.intmem); 
+		if(!strcmp(oper,"+")) 	res_ptr = new Constant<int>(lhs_val + rhs_val); 	
+		if(!strcmp(oper,"-")) 	res_ptr = new Constant<int>(lhs_val - rhs_val); 	
+		if(!strcmp(oper,"*")) 	res_ptr = new Constant<int>(lhs_val * rhs_val); 	
+		if(!strcmp(oper,"%")) 	res_ptr = new Constant<int>(lhs_val % rhs_val); 	
+		if(!strcmp(oper,"/")) 	res_ptr = new Constant<int>(lhs_val / rhs_val); 	
+		if(!strcmp(oper,"|")) 	res_ptr = new Constant<int>(lhs_val | rhs_val); 	
+		if(!strcmp(oper,"&")) 	res_ptr = new Constant<int>(lhs_val & rhs_val); 	
+		if(!strcmp(oper,"^")) 	res_ptr = new Constant<int>(lhs_val ^ rhs_val); 	
+		if(!strcmp(oper,"||")) 	res_ptr = new Constant<int>(lhs_val || rhs_val); 	
+		if(!strcmp(oper,"&&")) 	res_ptr = new Constant<int>(lhs_val && rhs_val); 	
+		if(!strcmp(oper,"<<")) 	res_ptr = new Constant<int>(lhs_val << rhs_val); 	
+		if(!strcmp(oper,">>")) 	res_ptr = new Constant<int>(lhs_val >> rhs_val); 	
+		if(!strcmp(oper,"<=")) 	res_ptr = new Constant<int>(lhs_val <= rhs_val); 	
+		if(!strcmp(oper,">=")) 	res_ptr = new Constant<int>(lhs_val >= rhs_val); 	
+		if(!strcmp(oper,">")) 	res_ptr = new Constant<int>(lhs_val > rhs_val); 	
+		if(!strcmp(oper,"<")) 	res_ptr = new Constant<int>(lhs_val < rhs_val); 	
+		if(!strcmp(oper,"==")) 	res_ptr = new Constant<int>(lhs_val == rhs_val); 	
+		if(!strcmp(oper,"!=")) 	res_ptr = new Constant<int>(lhs_val != rhs_val); 
 	
 		if(!strcmp(oper,"=")) 	throw 1; 	
 		if(!strcmp(oper,"+=")) 	throw 1; 	
@@ -145,17 +154,15 @@ BaseExpression* Expression::simplify(snum_t& value){
 	}
 	/* ----------------------------------- SINGLE OPERAND ----------------------------------- */
 	if(lhs==NULL && rhs!=NULL){
-		if(!strcmp(oper,"+"))	res_ptr = new Constant<int>(+(rhs_val.numval.intmem));
-		if(!strcmp(oper,"-"))	res_ptr = new Constant<int>(-(rhs_val.numval.intmem));
-		if(!strcmp(oper,"!")) 	res_ptr = new Constant<int>(!(rhs_val.numval.intmem));
-		if(!strcmp(oper,"~")) 	res_ptr = new Constant<int>(~(rhs_val.numval.intmem));
-		if(!strcmp(oper,"sizeof")) 	res_ptr = new Constant<int>(sizeof(rhs_val.numval.intmem));
+		if(!strcmp(oper,"+"))	res_ptr = new Constant<int>(+(rhs_val));
+		if(!strcmp(oper,"-"))	res_ptr = new Constant<int>(-(rhs_val));
+		if(!strcmp(oper,"!")) 	res_ptr = new Constant<int>(!(rhs_val));
+		if(!strcmp(oper,"~")) 	res_ptr = new Constant<int>(~(rhs_val));
+		if(!strcmp(oper,"sizeof")) 	res_ptr = new Constant<int>(sizeof(rhs_val));
 	}
 	/* ----------------------------------- RETURN DECISION ----------------------------------- */
 	
 	if(res_ptr!=NULL){
-		value.numval.intmem = res_ptr->get_value();
-		value.tname = tint;
 		tmp_expr = res_ptr;
 		return tmp_expr;
 	} 

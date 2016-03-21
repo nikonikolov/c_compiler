@@ -83,6 +83,6 @@ void TerneryExpression::pretty_print(const int& indent){
 void TerneryExpression::renderasm(ASMhandle& context, char** destination /*=NULL*/){
 }
 
-BaseExpression* TerneryExpression::simplify(snum_t& value){
+BaseExpression* TerneryExpression::simplify(){
 	//return mid->eval();
 }

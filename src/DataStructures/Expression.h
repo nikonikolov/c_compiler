@@ -28,7 +28,7 @@ public:
 	void set_lhs(Expression* lhs_in);	
 	void set_rhs(Expression* rhs_in);
 
-	BaseExpression* simplify(snum_t& value);
+	BaseExpression* simplify();
 	void pretty_print(const int& indent);
 	virtual void renderasm(ASMhandle& context, char** destination=NULL);
 
@@ -53,8 +53,8 @@ protected:
 	BaseExpression* lhs;
 	BaseExpression* rhs;
 
-	bool lhs_global;
-	bool rhs_global;
+	bool lhs_global = false;
+	bool rhs_global = false;
 };
 
 

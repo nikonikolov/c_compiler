@@ -4,14 +4,17 @@
   #include "helper.hpp"
   #include "DataStructures/Program.h"
   #include "DataStructures/Function.h"
-  #include "DataStructures/Loop.h"
   #include "DataStructures/Variable.h"
-  #include "DataStructures/Constant.h"
+
+  #include "DataStructures/Loop.h"
   #include "DataStructures/Conditional.h"
   #include "DataStructures/VarDeclaration.h"
-  #include "DataStructures/VarExpr.h"
   #include "DataStructures/ReturnStatement.h"
   #include "DataStructures/CompoundStatement.h"
+
+  #include "DataStructures/Constant.h"
+  #include "DataStructures/VarExpr.h"
+  #include "DataStructures/FnCall.h"
   #include "DataStructures/BaseExpression.h"
   #include "DataStructures/TerneryExpression.h"
   #include "DataStructures/Expression.h"
@@ -42,7 +45,8 @@
   vector<Statement*>*       vector_statement_pointers_ptr;
   vector<Expression*>*      vector_expr_pointers_ptr;
   vector<ConditionalCase*>* vector_conditional_case_pointers_ptr;
-  vector<VarDeclaration*>* vector_var_declarations_ptrs_ptr;
+  vector<VarDeclaration*>*  vector_var_declarations_ptrs_ptr;
+  vector<BaseExpression*>*  vector_base_expression_ptrs_ptr;
   
   Function* fn_ptr;
   Statement* statement_ptr;
@@ -93,7 +97,7 @@
 %type <vector_var_declarations_ptrs_ptr> declaration_list
 %type <var_declaration_ptr> declaration
 
-%type <fn_ptr> fn_declaration
+%type <fn_ptr> fn_declaration fn_prototype
 
 
 /* ---------------------------------------------- STATEMENT TYPES -------------------------------------------- */
@@ -118,6 +122,7 @@
 %type <base_expr_ptr> and_expression inclusive_or_expression exclusive_or_expression logical_and_expression logical_or_expression
 %type <base_expr_ptr> conditional_expression assignment_expression 
 %type <expr_statement_ptr> expression_list 
+%type <vector_base_expression_ptrs_ptr> argument_expression_list
 
 %type <statement_ptr> expression_statement 
 
@@ -171,8 +176,10 @@
 
 program : fn_declaration                                   { root = new Program(); root->insert_fn($1);}
         | declaration                                      { root = new Program(); root->push_var_back($1);}
+        | fn_prototype                                     { root = new Program(); root->insert_fn_prototype($1);}
         | program fn_declaration                           { root->insert_fn($2); }
         | program declaration                              { root->push_var_back($2); }
+        | program fn_prototype                             { root->insert_fn_prototype($2);}
         ;
         
 /* ===================================================================================================================== */
@@ -328,15 +335,24 @@ primary_expression  // Identifier
 
 /* ---------------------------------------------- 3.3.2 POSTFIX OPERATORS -------------------------------------------- */
 
+/*
+  ORIGINAL
+                    | postfix_expression LBRACKET argument_expression_list RBRACKET {$$ = new FnCall($1,$3,source_file,source_file);} 
+                    // Function call with no arguments
+                    | postfix_expression LBRACKET RBRACKET                       { $$ = new FnCall($1,NULL,source_file,source_file);}
+
+*/
+
 // Level 1 Precedence
 postfix_expression  // Reduction to Level 0 
                     : primary_expression                                                { $$ = $1; }
                     // Array access
                     | postfix_expression LSQUARE expression RSQUARE     
                     // Function call
-                    | postfix_expression LBRACKET argument_expression_list RBRACKET     
+                    | bracketed_identifier LBRACKET argument_expression_list RBRACKET 
+                                                                                  { $$ = new FnCall($1,$3,source_line,source_file); } 
                     // Function call with no arguments
-                    | postfix_expression LBRACKET RBRACKET
+                    | bracketed_identifier LBRACKET RBRACKET                    { $$ = new FnCall($1,NULL,source_line,source_file); }
                     // Structs and Unions member access
                     | postfix_expression DOT IDENTIFIER                                 //{ Expression* tmp = new VarExpr($3);
                                                                                         //  $$ = new Expression($1, $2, tmp);}
@@ -350,8 +366,8 @@ postfix_expression  // Reduction to Level 0
                     ;
 
 // Note: Arguments to functions can be expressions. If so, the evaluation is executed
-argument_expression_list  : assignment_expression
-                          | argument_expression_list COMMA assignment_expression
+argument_expression_list  : expression                                  { $$ = new vector<BaseExpression*>; $$->push_back($1); }
+                          | argument_expression_list COMMA expression   { $$->push_back($3); }
                           ;
 
 /* ---------------------------------------------- 3.3.3 UNARY OPERATORS -------------------------------------------- */
@@ -579,6 +595,11 @@ expression_list // Reduction to Level 14
   Try to make function pointers work. Try const, long, etc.. Actually in the end you should have one rule that defines 
   a variable and change only that one */
 
+fn_prototype  : INT IDENTIFIER LBRACKET fn_params_list RBRACKET SEMI_COLON          
+                                                      { $$ = new Function(new Variable($1, NULL), $2, $4, NULL); }
+                ;
+
+
 // You need to modify the grammar for return type and Variable* to be returned from the reduction of the rule
 fn_declaration  : INT IDENTIFIER LBRACKET fn_params_list RBRACKET compound_statement          
                                                       { $$ = new Function(new Variable($1, NULL), $2, $4, $6); }
@@ -654,15 +675,6 @@ if_statement  : IF LBRACKET expression_list RBRACKET compound_statement
               | IF LBRACKET expression_list RBRACKET statement
                 { $$ = new vector<ConditionalCase*>; $$->push_back(new ConditionalCase($5,$3->get_last(), source_line, source_file)); }
               ;
-
-/*
-// if_statement can be reduced to a statement so basically the first rule is useless
-else_statement  : ELSE if_statement           { $$ = $2; }
-                | ELSE compound_statement     { $$ = new vector<ConditionalCase*>; $$->push_back(new ConditionalCase($2)); }
-                | ELSE statement              { $$ = new vector<ConditionalCase*>; $$->push_back(new ConditionalCase($2)); }
-                ;
-*/
-
 
 else_statement  : ELSE compound_statement     
                   { $$ = new vector<ConditionalCase*>; $$->push_back(new ConditionalCase($2, NULL, source_line, source_file)); }

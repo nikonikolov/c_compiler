@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int f(int a, int b, int c, int d, int e, int f, int g);
+int fn(int a, int b, int c, int d, int e, int f, int g);
 
 int main()
 {
@@ -11,7 +11,7 @@ int main()
 
    for(int i=0;i<ns;i++){
      for(int j=0;j<ns;j++){
-       int r=f(vs[i],vs[j],vs[i],vs[j],vs[i],vs[j],vs[j]);
+       int r=fn(vs[i],vs[j],vs[i],vs[j],vs[i],vs[j],vs[j]);
        fprintf(stdout, "%d,%d,%d\n", vs[i],vs[j],r);
      }
    }

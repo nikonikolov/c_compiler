@@ -7,7 +7,7 @@
 
 
 /*	FIX:
-		1. Currently only 32bit wide arguments assumed as function parameters
+		1. Currently only 32bit wide arguments assumed as function parameters and return type
 		2. Move function arguments on the stack
 */
 
@@ -39,16 +39,12 @@ private:
 
 	char* name;								// Name given to the function in the source code
 	vector<Variable*>* params;				// Pointer to a vector of the parameters the function takes in the exact order specified
-	vector<Statement*>* statements;			// Pointer to a vector of the statements appearing in the scope of the function
-
 	CompoundStatement* fn_body;				// CompoundStatement corresponding to function body
 
-	char* asm_name;
+	stringstream ss;
 
 	int line;
 	string src_file;
-
-	stringstream ss;
 };
 
 

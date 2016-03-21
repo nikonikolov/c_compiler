@@ -18,7 +18,7 @@ public:
 	void push_back_lhs(BaseExpression* expr_in);
 	void push_back_rhs(BaseExpression* expr_in);
 
-	BaseExpression* simplify(snum_t& value);
+	BaseExpression* simplify();
 	void pretty_print(const int& indent);
 	void renderasm(ASMhandle& context, char** destination=NULL);
 

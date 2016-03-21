@@ -11,6 +11,9 @@ class Function;
 /*	TO FIX:
 	1. Only 4byte wide variables assumed
 	3. Insertion of global variables - check vs other global variables and vs function names 
+
+	4. Think about making fn_prototypes and functions static - this would however make it difficult to track static function
+		declarations - if you ever decide to do them
 */
 
 class ASMhandle{
@@ -20,24 +23,25 @@ public:
 
 	ASMhandle();
 	ASMhandle(ASMhandle& orig);
-	ASMhandle(map<string, Function*>* functions_in);
+	ASMhandle(map<string, Function*>* functions_in, map<string, Function*>* fn_prototypes_in);
 	~ASMhandle();
-	ASMhandle& operator=(ASMhandle& orig);
 
 
 	/* ----------------------------------------------- SUBROUTINES AND SCOPES ----------------------------------------------- */
 
-	void subroutine_enter(const int& mem_amount = 24);
+	void subroutine_enter(const int& mem_amount = default_mem_increase);
 	void subroutine_exit(char* return_val);
 	
 	char* allocate_subroutine_stack_param(pair<string, Variable*>& var_in, const int& mem_amount = 4);
 
 	void exit_scope(const ASMhandle& new_context);
 
-	// void pass_stack_arguments(); - have to start from the last argument
+	void push_subroutine_stack_params(vector<pair<char**, bool>>& params);
+
+	Function* find_function_definition(char* name_in);
 
 	/* ----------------------------------------------- LOCAL VARIABLES ----------------------------------------------- */
-	void allocate_mem(const int& mem_amount = 24);
+	void allocate_mem(const int& mem_amount = default_mem_increase);
 	char* allocate_var(pair<string, Variable*>& var_in, const int& mem_amount = 4);
 	char* allocate_var(const int& mem_amount = 4);
 	string allocate_str_var(pair<string, Variable*>& var_in, const int& mem_amount = 4);
@@ -59,10 +63,11 @@ public:
 
 	map<string, Variable*>* global_vars;
 	map<string, Variable*>* local_vars;
-	map<string, Function*>* functions;		
+	static map<string, Function*>* functions;		
+	static map<string, Function*>* fn_prototypes;		
 
 private:
-	// Indicates how much memory is allocated for the current subroutine. Needs to be incremented when frame_offset becomes equal
+	// Indicates how much memory is allocated for the current subroutine. Needs to be incremented when fp_offset becomes equal
 	int allocated_mem;					
 	int sp_offset; 					// Indicates by how much of the stack pointer needs to be incremented on subroutine exit
 	int fp_offset; 					// Indicates how much of the currently allocated stack memory is used
@@ -72,6 +77,8 @@ private:
 	stack<string>* return_address;
 	static uint64_t label_idx;
 	static string label; 
+
+	static int default_mem_increase;
 	//static int mem_amount_default;
 	stringstream ss;
 };

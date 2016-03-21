@@ -15,7 +15,7 @@ public:
 
 	void pretty_print(const int& indent);
 	void renderasm(ASMhandle& context, char** destination=NULL);
-	BaseExpression* simplify(snum_t& value);
+	BaseExpression* simplify();
 
 	Type get_value();
 	/*template<class T>
@@ -55,9 +55,10 @@ void Constant<Type>::renderasm(ASMhandle& context, char** destination /*=NULL*/)
 }
 
 template<class Type>
-BaseExpression* Constant<Type>::simplify(snum_t& value){
-	value.tname = tint;
+BaseExpression* Constant<Type>::simplify(){
+	/*value.tname = tint;
 	value.numval.intmem = (int)num_val;
+	*/
 	return NULL;
 }
 

@@ -13,7 +13,12 @@
 #include <string.h>
 #include <cstdlib>
 #include <sstream>
+
+#include <stdio.h>
+#include <stdlib.h>
+
 #include "Assembly.h"
+
 
 using std::list;
 using std::vector;
@@ -34,6 +39,7 @@ std::ostream& pad(std::ostream& os);
 /* =============================================== DECLARE ASSEMBLY OBJECT =============================================== */
 
 extern Assembly assembler;
+extern bool debug;
 
 /* =============================================== STATEMENT TYPES =============================================== */
 
@@ -71,14 +77,23 @@ enum ExprT{
 	EXPR_constant = 22,
 	EXPR_assignment_expr = 23,
 	EXPR_tmp_var = 24,
-	EXPR_ternery_expr = 28
+	EXPR_ternery_expr = 28,
+	EXPR_fn_call = 29
 };
 
+/* =============================================== FUNCTION TYPES =============================================== */
+/*
+enum FnT{
+	FN_declaration = 1,
+	FN_prototype = 2
+}
+*/
 /* =============================================== ERROR TYPES =============================================== */
 
 enum ErrorgenT{
 	ERROR_redefinition = 1,
-	ERROR_fn_var_clash = 2 
+	ERROR_fn_var_clash = 2,
+	ERROR_fn_undefined = 3
 };
 
 /* =============================================== VARIOUS EXPRESSION RETURN TYPE =============================================== */

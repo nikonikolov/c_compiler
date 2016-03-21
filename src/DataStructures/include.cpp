@@ -2,6 +2,8 @@
 
 Assembly assembler;
 
+bool debug=false;
+
 std::ostream& pad(std::ostream& os) {
 	return os <<"\t"<<std::left<< std::setfill(' ') << std::setw(8);
 }

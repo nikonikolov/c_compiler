@@ -25,6 +25,8 @@ Function::~Function(){
 	}
 
 	if(fn_body!=NULL) delete fn_body;
+	if(return_type!=NULL) delete return_type;
+	free(name);
 }
 
 string Function::get_name() const{
@@ -59,6 +61,7 @@ void Function::pretty_print(const int& indent){
 }
 
 void Function::renderasm(ASMhandle& context){
+	if(debug) cerr<<"Function: renderasm start"<<endl;
 
 	/* Function header assembly */
 	assembler.push_back(ss<<"\t.align	2"<<endl);
@@ -73,8 +76,13 @@ void Function::renderasm(ASMhandle& context){
 
 	init_args(new_context);
 
-	fn_body->renderasm(new_context, true);
+	if(debug) cerr<<"Function: renderasm of parameters successful"<<endl;
 
+	if(fn_body!=NULL) fn_body->renderasm(new_context, true);
+	else	context.subroutine_exit(NULL);
+
+	if(debug) cerr<<"Function: renderasm of body successful"<<endl;
+	
 	/* Function end assembly */
 	assembler.push_back(ss<<endl<<"\t.end "<<name<<endl<<endl);
 }

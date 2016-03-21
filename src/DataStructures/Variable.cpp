@@ -103,6 +103,8 @@ void Variable::pretty_print(const int& indent){
 
 
 void Variable::renderasm(ASMhandle& context, const bool& local /*=true*/){
+	if(debug) cerr<<"Variable: renderasm start"<<endl;
+	
 	if(initialized) return;
 	initialized = true;
 	// Variable local
@@ -119,15 +121,20 @@ void Variable::renderasm(ASMhandle& context, const bool& local /*=true*/){
 		if(init_val->get_expr_type()==EXPR_assignment_expr) generate_error("Invalid syntax for variable initialization value");
 		simplify_init_val();
 		init_val->renderasm(context, &location);
+	
+		if(debug) cerr<<"Variable: renderasm successful"<<endl;
 	}
 
 	// Variable global
 	else renderasm_global(context);
+
 }
 
 /* ================================================== GLOBAL SCOPE RELATED ================================================== */
 
 void Variable::renderasm_global(ASMhandle& context){
+	if(debug) cerr<<"Variable: renderasm_global start"<<endl;
+	
 	global=true;
 	try{
 		pair<string, Variable*> tmp(string(name), this);
@@ -138,13 +145,15 @@ void Variable::renderasm_global(ASMhandle& context){
 		if(error_in == ERROR_fn_var_clash) generate_error("\""+string(name)+"\" redeclared as different kind of symbol");
 	}
 
+	if(debug) cerr<<"Variable: renderasm_global(): variable inserted in ASMhandle"<<endl;
+
 	if(init_val!=NULL){
+		if(debug) cerr<<"Variable: renderasm_global(): starting initializer optimization"<<endl;
 		// Try to optimize the expression if not already a Constant
 		if(init_val->get_expr_type()!=EXPR_constant){
 			BaseExpression* tmp_expr=NULL;
-			snum_t tmp;
 			try{
-				tmp_expr = init_val->simplify(tmp);
+				tmp_expr = init_val->simplify();
 				if(tmp_expr!=NULL){			
 					if(tmp_expr->get_expr_type()!=EXPR_constant) generate_error("Initializer for global variable not constant");
 					delete init_val;
@@ -156,6 +165,8 @@ void Variable::renderasm_global(ASMhandle& context){
 			}
 		}
 	}
+
+	if(debug) cerr<<"Variable: renderasm_global : initializer expression optimized"<<endl;
 
 	assembler.push_back(ss<<pad<<".globl"<<name<<endl);
 	if(first_global){
@@ -173,6 +184,7 @@ void Variable::renderasm_global(ASMhandle& context){
 	} 
 	assembler.push_back(ss<<endl);
 
+	if(debug) cerr<<"Variable: renderasm_global successful"<<endl;
 }
 
 /* ================================================== POINTER RELATED ================================================== */
@@ -208,8 +220,7 @@ void Variable::simplify_init_val(){
 	BaseExpression* tmp_expr=NULL;
 	try{
 		if(init_val!=NULL){
-			snum_t tmp;
-			tmp_expr = init_val->simplify(tmp);
+			tmp_expr = init_val->simplify();
 			if(tmp_expr!=NULL){
 				delete init_val;
 				init_val = tmp_expr; 		// In case LHS was not simplified

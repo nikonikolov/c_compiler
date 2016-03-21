@@ -9,6 +9,8 @@ if [ $# -eq 0 ]; then
   for i in input/*.c; do
     FILENAME=$(basename $i .c);
 
+    echo "FILE: " $FILENAME
+
     ###################################
     ## Compile everything using gcc to get a reference (native) version
 

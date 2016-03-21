@@ -7,7 +7,12 @@
 /* ----------------------------------------------- CONSTRUCTION ----------------------------------------------- */
 
 uint64_t ASMhandle::label_idx = 3;
+int ASMhandle::default_mem_increase = 24;
 string ASMhandle::label = "$LKDHGF";
+
+map<string, Function*>* ASMhandle::functions=NULL;		
+map<string, Function*>* ASMhandle::fn_prototypes=NULL;		
+
 
 ASMhandle::ASMhandle(ASMhandle& orig){
 	local_vars = new map<string, Variable*>;
@@ -25,7 +30,7 @@ ASMhandle::ASMhandle(ASMhandle& orig){
 			(global_vars)->insert(*it);
 		}
 	}
-	
+	/*
 	functions = new map<string, Function*>;
 	if(orig.functions!=NULL){
 		map<string, Function*>::iterator it;
@@ -34,6 +39,14 @@ ASMhandle::ASMhandle(ASMhandle& orig){
 		}
 	}
 	
+	fn_prototypes = new map<string, Function*>;
+	if(orig.fn_prototypes!=NULL){
+		map<string, Function*>::iterator it;
+		for(it=(orig.fn_prototypes)->begin(); it!=(orig.fn_prototypes)->end(); ++it){
+			(fn_prototypes)->insert(*it);
+		}
+	}
+	*/
 	return_address = new stack<string>(*(orig.return_address));
 
 	sp_offset=orig.sp_offset;
@@ -43,8 +56,9 @@ ASMhandle::ASMhandle(ASMhandle& orig){
 }
 
 
-ASMhandle::ASMhandle(map<string, Function*>* functions_in) :
-	functions(functions_in) {
+ASMhandle::ASMhandle(map<string, Function*>* functions_in, map<string, Function*>* fn_prototypes_in){
+	functions=functions_in;
+	fn_prototypes=fn_prototypes_in;
 	global_vars = new map<string, Variable*>;
 	local_vars = new map<string, Variable*>;
 	return_address = new stack<string>;
@@ -59,7 +73,8 @@ ASMhandle::ASMhandle(map<string, Function*>* functions_in) :
 ASMhandle::~ASMhandle(){
 	if(local_vars!=NULL) delete local_vars; 
 	if(global_vars!=NULL) delete global_vars; 
-	if(functions!=NULL) delete functions; 
+	//if(functions!=NULL) delete functions; 
+	//if(fn_prototypes!=NULL) delete fn_prototypes; 
 	if(return_address!=NULL) delete return_address; 
 }
 
@@ -103,6 +118,7 @@ void ASMhandle::subroutine_exit(char* return_val){
 }
 
 
+// For subroutine definition assembly
 char* ASMhandle::allocate_subroutine_stack_param(pair<string, Variable*>& var_in, const int& mem_amount /*= 4*/){
 	insert_local_var(var_in);
 	/* 	Get the location of the argument on the stack. NOTE that the convention says: arg5 will be at 16($sp), arg6 at 20($sp),
@@ -114,6 +130,24 @@ char* ASMhandle::allocate_subroutine_stack_param(pair<string, Variable*>& var_in
 	return address;
 }
 
+// For subroutine definition assembly
+void ASMhandle::push_subroutine_stack_params(vector<pair<char**, bool>>& params){
+	// Note params includes all arguments, including the ones already in registers
+	int more_memory=(params.size()-4)*4+16, free_memory=allocated_mem-fp_offset;
+	// Allocate more memory if necessary
+	if(more_memory>free_memory) allocate_mem(more_memory-free_memory+16);
+	for(int i=4, param_offset=16; i<params.size(); i++, param_offset+=4){
+		if(!params[i].second){
+			assembler.push_back(ss<<pad<<"lw"<<"$t0"<<", "<<*(params[i].first)<<endl);
+			assembler.push_back(ss<<pad<<"sw"<<"$t0"<<","<<param_offset<<"($sp)"<<endl);
+		} 
+		else{
+			assembler.push_back(ss<<pad<<"lui"<<"$t0"<<", %hi("<<*(params[i].first)<<")"<<endl);
+			assembler.push_back(ss<<pad<<"lw"<<"$t1"<<", %lo("<<*(params[i].first)<<")($t0)"<<endl);
+			assembler.push_back(ss<<pad<<"sw"<<"$t1"<<","<<param_offset<<"($sp)"<<endl);
+		}
+	}
+}
 
 // Used at the exit of a scope so that newly allocated memory will be accounted for
 void ASMhandle::exit_scope(const ASMhandle& new_context){
@@ -123,6 +157,21 @@ void ASMhandle::exit_scope(const ASMhandle& new_context){
 	//sp_offset=new_context.sp_offset;
 	//fp_offset=new_context.fp_offset;
 }
+/* ----------------------------------------------- FUNCTION CALLS ----------------------------------------------- */
+
+Function* ASMhandle::find_function_definition(char* name_in){
+	map<string, Function*>::iterator it;
+	it=functions->find(string(name_in));
+	if(it!=functions->end()) return (*it).second;
+	
+	if(fn_prototypes!=NULL){
+		it=fn_prototypes->find(string(name_in));
+		if(it!=fn_prototypes->end()) return (*it).second;
+	}
+
+	throw ERROR_fn_undefined;
+}
+
 
 /* ----------------------------------------------- LOCAL VARIABLES ----------------------------------------------- */
 
@@ -194,15 +243,26 @@ void ASMhandle::insert_local_var(pair<string, Variable*>& var_in){
 /* ----------------------------------------------- GLOBAL VARIABLES ----------------------------------------------- */
 
 void ASMhandle::insert_global_var(pair<string, Variable*>& var_in){
+	if(debug) cerr<<"ASMhandle: insert_global_var(): start"<<endl;
+	
 	pair<map<string, Variable*>::iterator,bool> ret;
 	ret = global_vars->insert(var_in);									// Put Variable* in global_vars
   	if(ret.second==false) throw ERROR_redefinition;
 	
+	if(debug) cerr<<"ASMhandle: insert_global_var(): no clash with other globals"<<endl;
 	// Check for name clashes with functions
 	map<string, Function*>::iterator it;
 	it=functions->find(var_in.first);
 	if(it!=functions->end()) throw ERROR_fn_var_clash;
-
+	
+	if(debug) cerr<<"ASMhandle: insert_global_var(): no clash with function definitions"<<endl;
+	
+	// Check for name clashes with function prototypes
+	if(fn_prototypes!=NULL){
+		it=fn_prototypes->find(var_in.first);
+		if(it!=fn_prototypes->end()) throw ERROR_fn_var_clash;
+	}
+	if(debug) cerr<<"ASMhandle: insert_global_var(): no clash with function prototypes"<<endl;
 }
 
 

@@ -15,7 +15,7 @@ public:
 
 	virtual void pretty_print(const int& indent) =0;		// parameter specifies the starting column for the printing
 	virtual void renderasm(ASMhandle& context, char** destination=NULL)=0;
-	virtual BaseExpression* simplify(snum_t& value) =0;
+	virtual BaseExpression* simplify() =0;
 
 	virtual void generate_error(const string& msg_out);
 

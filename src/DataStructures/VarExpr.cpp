@@ -40,7 +40,7 @@ void VarExpr::renderasm(ASMhandle& context, char** destination /*=NULL*/){
 }
 
 
-BaseExpression* VarExpr::simplify(snum_t& value){
+BaseExpression* VarExpr::simplify(){
 	throw 1;
 }
 

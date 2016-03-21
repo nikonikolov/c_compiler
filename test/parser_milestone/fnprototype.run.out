@@ -1,0 +1,28 @@
+VARIABLE : g
+VARIABLE : b
+VARIABLE : d
+VARIABLE : f
+FUNCTION : x
+FUNCTION : zz
+    PARAM : a
+    PARAM : b
+    PARAM : c
+FUNCTION : zz
+    PARAM : a
+    PARAM : b
+    PARAM : c
+SCOPE
+    VARIABLE : a
+    VARIABLE : b
+    VARIABLE : c
+    (a)=((~(b))*(zz(b, c, d)))
+    (a)=(zz(b, zz(c, f, g), d))
+    (a)=(b)
+    SCOPE
+        VARIABLE : fsdfsdfs
+        RETURN (a)==(b)
+    SCOPE
+        (a)=(b)
+    SCOPE
+        (a)=(b)
+    RETURN (a)==(b)

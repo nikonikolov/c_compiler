@@ -21,7 +21,7 @@ public:
 	
 	void pretty_print(const int& indent);
 	void renderasm(ASMhandle& context, char** destination=NULL);
-	BaseExpression* simplify(snum_t& value);
+	BaseExpression* simplify();
 
 private:
 	char* name;

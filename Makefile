@@ -34,12 +34,6 @@ ctest: syntaxtest.c
 $(DATA_STRUCTURE_OBJS): src/DataStructures/%.o : src/DataStructures/%.cpp
 	g++ $(CPPFLAGS) -c $< -o $@
 
-# For testing functionality of expressions
-#bin/parser_expr: src_tmp/parser_expr.tab.cpp src_tmp/parser_expr.tab.hpp src/c_lexer.yy.cpp src/helper.cpp src/helper.hpp $(DATA_STRUCTURE_OBJS)
-#	g++ $(CPPFLAGS) src_tmp/parser_expr.tab.cpp src/helper.cpp src/c_lexer.yy.cpp $(DATA_STRUCTURE_OBJS) -o bin/parser_expr
-
-#src_tmp/parser_expr.tab.cpp src_tmp/parser_expr.tab.hpp: src_tmp/parser_expr.y
-#	bison -d src_tmp/parser_expr.y -o src_tmp/parser_expr.tab.cpp
 
 clean:
 #	if [ -e src/c_lexer.yy.cpp ]; then 

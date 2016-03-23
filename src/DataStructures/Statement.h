@@ -61,20 +61,26 @@ public:
 
 	/* ----------------------------------------------- PUBLIC MEMBERS ----------------------------------------------- */
 
+
+private:
+	/* ----------------------------------------------- STACK AND FRAME ----------------------------------------------- */
+
+	int allocated_mem;		// Indicates memory amount allocated for current subroutine. Has to be increas when ==fp_offset
+	int sp_offset; 			// Indicates by how much of the stack pointer needs to be incremented on subroutine exit
+	int fp_offset; 			// Indicates how much of the currently allocated stack memory is used
+	int stack_args_offset;	// Used to allocate locations for parameters to functions with index bigger than 4
+	
+	/* ----------------------------------------------- DATA STRUCTURES ----------------------------------------------- */
+	
 	map<string, Variable*>* global_vars;
 	map<string, Variable*>* local_vars;
 	static map<string, Function*>* functions;		
 	static map<string, Function*>* fn_prototypes;		
 
-private:
-	// Indicates how much memory is allocated for the current subroutine. Needs to be incremented when fp_offset becomes equal
-	int allocated_mem;					
-	int sp_offset; 					// Indicates by how much of the stack pointer needs to be incremented on subroutine exit
-	int fp_offset; 					// Indicates how much of the currently allocated stack memory is used
-
-	int stack_args_offset;			// Used to allocate locations for parameters to functions with index bigger than 4
-
 	stack<string>* return_address;
+
+	/* ----------------------------------------------- LABELS AND MEMORY AMOUNT ----------------------------------------------- */
+	
 	static uint64_t label_idx;
 	static string label; 
 

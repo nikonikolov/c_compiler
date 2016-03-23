@@ -17,8 +17,7 @@
 #include <string>
 #include <sstream>
 #include <cstdlib>
-//#include "c_parser.tab.hpp"
-#include "../src_tmp/parser_expr.tab.hpp"
+#include "c_parser.tab.hpp"
 
 using namespace std;
 

@@ -44,15 +44,12 @@ fn:
 	sw      $a3, -16($fp)
 	lw      $t0, -8($fp)
 	bne     $0, $t0, $LKDHGF3
-	nop     
 	li      $t2, 1
 	sw      $t2, -20($fp)
 	b       $LKDHGF4
 	nop     
 $LKDHGF3:
 	sw      $0, -20($fp)
-	b       $LKDHGF4
-	nop     
 $LKDHGF4:
 	lw      $v0, -20($fp)
 	lw      $ra, 0($fp)		# Load return address in register 31

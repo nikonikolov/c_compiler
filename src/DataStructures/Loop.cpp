@@ -27,5 +27,3 @@ void Loop::pretty_print(const int& indent){
 
 void Loop::renderasm(ASMhandle& context){
 }
-
-

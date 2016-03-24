@@ -50,6 +50,7 @@ extern int yydebug;
   #include "DataStructures/Variable.h"
 
   #include "DataStructures/Loop.h"
+  #include "DataStructures/ForLoop.h"
   #include "DataStructures/Conditional.h"
   #include "DataStructures/VarDeclaration.h"
   #include "DataStructures/ReturnStatement.h"
@@ -71,7 +72,6 @@ extern int yydebug;
   int yyerror(const char* s);
 
   extern Program* root;
-
 
 
 #line 78 "src/c_parser.tab.hpp" /* yacc.c:1909  */
@@ -198,7 +198,9 @@ union YYSTYPE
   ExpressionStatement* expr_statement_ptr;
   VarDeclaration* var_declaration_ptr;
 
-#line 202 "src/c_parser.tab.hpp" /* yacc.c:1909  */
+  ForLoopTuple* fl_tuple;
+
+#line 204 "src/c_parser.tab.hpp" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;

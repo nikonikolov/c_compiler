@@ -7,6 +7,7 @@
   #include "DataStructures/Variable.h"
 
   #include "DataStructures/Loop.h"
+  #include "DataStructures/ForLoop.h"
   #include "DataStructures/Conditional.h"
   #include "DataStructures/VarDeclaration.h"
   #include "DataStructures/ReturnStatement.h"
@@ -28,7 +29,6 @@
   int yyerror(const char* s);
 
   extern Program* root;
-
 
 }
 
@@ -54,6 +54,8 @@
   BaseExpression* base_expr_ptr;
   ExpressionStatement* expr_statement_ptr;
   VarDeclaration* var_declaration_ptr;
+
+  ForLoopTuple* fl_tuple;
 }
 
 /* --------------------------------------------------- TOKENS KEYWORDS --------------------------------------------------- */
@@ -104,8 +106,7 @@
 
 %type <strval> bracketed_identifier
 
-%type <statement_ptr> loop for_loop while_loop do_while_loop if_block_statement statement 
-%type <statement_ptr> semi_colon_statement return_statement 
+%type <statement_ptr> if_block_statement statement semi_colon_statement return_statement 
 
 %type <vector_statement_pointers_ptr> statement_list
 
@@ -115,14 +116,19 @@
 
 %type <compound_statement_ptr> compound_statement
 
+/* ---------------------------------------------- LOOPS -------------------------------------------- */
+
+%type <statement_ptr> loop for_loop while_loop do_while_loop
+
+%type <fl_tuple> for_loop_decl_statement
+
 /* ---------------------------------------------- EXPRESSION TYPES -------------------------------------------- */
 
 %type <base_expr_ptr> CONSTANT primary_expression postfix_expression unary_expression cast_expression expression
 %type <base_expr_ptr> multiplicative_expression additive_expression shift_expression relational_expression equality_expression
 %type <base_expr_ptr> and_expression inclusive_or_expression exclusive_or_expression logical_and_expression logical_or_expression
 %type <base_expr_ptr> conditional_expression assignment_expression 
-%type <expr_statement_ptr> expression_list 
-%type <vector_base_expression_ptrs_ptr> argument_expression_list
+%type <vector_base_expression_ptrs_ptr> argument_expression_list expression_list
 
 %type <statement_ptr> expression_statement 
 
@@ -569,7 +575,7 @@ expression  : assignment_expression               { $$ = $1;}
 
 // Level 15 Precedence
 expression_list // Reduction to Level 14
-                : expression                                        { $$ = new ExpressionStatement($1);}                                    
+                : expression                                        { $$ = new vector<BaseExpression*>; $$->push_back($1);}                                    
                 // List of expressions
                 | expression_list COMMA expression                  { $$->push_back($3);}
                 ;
@@ -627,20 +633,39 @@ do_while_loop : DO compound_statement WHILE LBRACKET expression_list RBRACKET SE
               | DO statement WHILE LBRACKET expression_list RBRACKET SEMI_COLON;
               ;
 
-for_loop  : FOR LBRACKET for_loop_decl_statement RBRACKET compound_statement     { $$ = new Loop($5); }
-          | FOR LBRACKET for_loop_decl_statement RBRACKET statement              { $$ = new Loop($5); }
+// Memory leak tuple
+for_loop  : FOR LBRACKET for_loop_decl_statement RBRACKET compound_statement     { $$ = new ForLoop($3, $5); }
+          | FOR LBRACKET for_loop_decl_statement RBRACKET statement              { $$ = new ForLoop($3, $5); }
           ;
-
+/*
 for_loop_decl_statement : expression_list SEMI_COLON expression_list SEMI_COLON expression_list 
+                          { int last = $3->size()-1; $$ = new ForLoopTuple($1, ((*($3))[last]), $5); }
                         | expression_list SEMI_COLON expression_list SEMI_COLON
+                          { int last = $3->size()-1; $$ = new ForLoopTuple($1, ((*($3))[last]), NULL); }
                         | expression_list SEMI_COLON SEMI_COLON expression_list
+                          { $$ = new ForLoopTuple($1, NULL, $4); }
                         | SEMI_COLON expression_list SEMI_COLON expression_list
+                          { int last = $2->size()-1; $$ = new ForLoopTuple(NULL, ((*($2))[last]), $4); }
                         | expression_list SEMI_COLON SEMI_COLON
+                          { $$ = new ForLoopTuple($1, NULL, NULL); }
                         | SEMI_COLON SEMI_COLON expression_list
+                          { $$ = new ForLoopTuple(NULL, NULL, $3); }
                         | SEMI_COLON expression_list SEMI_COLON
+                          { int last = $2->size()-1; $$ = new ForLoopTuple(NULL, ((*($2))[last]), NULL); }
                         | SEMI_COLON SEMI_COLON
+                          { $$ = new ForLoopTuple(NULL, NULL, NULL); }
                         ;
+*/
 
+for_loop_decl_statement : expression_list SEMI_COLON expression_list SEMI_COLON expression_list { $$ = new ForLoopTuple($1, $3, $5); }
+                        | expression_list SEMI_COLON expression_list SEMI_COLON               { $$ = new ForLoopTuple($1, $3, NULL); }
+                        | expression_list SEMI_COLON SEMI_COLON expression_list               { $$ = new ForLoopTuple($1, NULL, $4); }
+                        | SEMI_COLON expression_list SEMI_COLON expression_list               { $$ = new ForLoopTuple(NULL, $2, $4); }
+                        | expression_list SEMI_COLON SEMI_COLON                             { $$ = new ForLoopTuple($1, NULL, NULL); }
+                        | SEMI_COLON SEMI_COLON expression_list                             { $$ = new ForLoopTuple(NULL, NULL, $3); }
+                        | SEMI_COLON expression_list SEMI_COLON                             { $$ = new ForLoopTuple(NULL, $2, NULL); }
+                        | SEMI_COLON SEMI_COLON                                           { $$ = new ForLoopTuple(NULL, NULL, NULL); }
+                        ;
 while_loop  : WHILE LBRACKET expression_list RBRACKET compound_statement                { $$ = new Loop($5); }
             | WHILE LBRACKET expression_list RBRACKET statement                         { $$ = new Loop($5); }
             ;
@@ -669,11 +694,13 @@ else_statement_list : else_statement                          { $$ = $1; }
                     | else_statement_list else_statement      { $$ = vec_append($1, $2); }
                     ;
 
-// Memory leak
+// Memory leak for expression_list
 if_statement  : IF LBRACKET expression_list RBRACKET compound_statement               
-                { $$ = new vector<ConditionalCase*>; $$->push_back(new ConditionalCase($5,$3->get_last(), source_line, source_file)); }
+                { $$ = new vector<ConditionalCase*>; int last = $3->size()-1;
+                  $$->push_back(new ConditionalCase($5,((*($3))[last]), source_line, source_file)); }
               | IF LBRACKET expression_list RBRACKET statement
-                { $$ = new vector<ConditionalCase*>; $$->push_back(new ConditionalCase($5,$3->get_last(), source_line, source_file)); }
+                { $$ = new vector<ConditionalCase*>; int last = $3->size()-1;
+                  $$->push_back(new ConditionalCase($5,((*($3))[last]), source_line, source_file)); }
               ;
 
 else_statement  : ELSE compound_statement     
@@ -681,7 +708,6 @@ else_statement  : ELSE compound_statement
                 | ELSE statement              
                   { $$ = new vector<ConditionalCase*>; $$->push_back(new ConditionalCase($2, NULL, source_line, source_file)); }
                 ;
-
 
 /* ===================================================================================================================== */
        
@@ -719,7 +745,7 @@ statement : loop                                                    { $$=$1; }
 
 
 /* ---------------------------------------------- EXPRESSION STATEMENT -------------------------------------------- */
-expression_statement  : expression_list SEMI_COLON                  { $$ = $1;}
+expression_statement  : expression_list SEMI_COLON                  { $$ = new ExpressionStatement($1);}
                       ;
 
 /* ---------------------------------------------- SEMI COLON STATEMENTS -------------------------------------------- */

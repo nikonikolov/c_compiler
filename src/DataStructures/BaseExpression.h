@@ -31,6 +31,7 @@ protected:
 	stringstream ss;
 };
 
+//typedef tuple<vector<BaseExpression*>*, BaseExpression*, vector<BaseExpression*>*> ForLoopTuple;
 
 
 #endif

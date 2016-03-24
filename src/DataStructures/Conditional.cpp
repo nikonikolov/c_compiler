@@ -43,7 +43,8 @@ void ConditionalCase::renderasm(ASMhandle& context, const string& continued_exec
 	// IF or ELSE IF; NOTE that bison will not parse sth invalid such as if() else if() do sth;
 	if(condition!=NULL){
 		ExprResult** result_condtion = new ExprResult*(NULL);
-		condition->renderasm(context, result_condtion);
+		// ORIGINAL condition->renderasm(context, result_condtion);
+		condition->renderasm(new_context, result_condtion);
 
 		(*result_condtion)->load("$t0");
 

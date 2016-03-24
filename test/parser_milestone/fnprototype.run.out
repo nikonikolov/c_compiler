@@ -23,6 +23,12 @@ SCOPE
         RETURN (a)==(b)
     SCOPE
         (a)=(b)
+    FOR LOOP
+    INIT BLOCK:
+(i)=(a)
+    CONDITION BLOCK: (i)<(a)
+    UPDATE BLOCK:
+(i)=(b)
     SCOPE
         (a)=(b)
     RETURN (a)==(b)

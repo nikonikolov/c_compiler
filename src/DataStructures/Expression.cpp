@@ -274,16 +274,12 @@ void Expression::logical_or_ins(ExprResult* dest, ExprResult* lhs_result, ExprRe
 	assembler.push_back(ss<<pad<<"nop"<<endl);
 	rhs_result->load("$t1");
 	assembler.push_back(ss<<pad<<"bne"<<"$0, $t1, "<<non_default_action<<endl); 	// If arg2 is not 0, go to non_default action
-	assembler.push_back(ss<<pad<<"nop"<<endl);
 	assembler.push_back(ss<<pad<<"move"<<"$t2"<<", $0"<<endl); 						// Default action reached, result is 0
 	dest->store("$t2");
 	assembler.push_back(ss<<pad<<"b"<<continued_exec<<endl);
-	assembler.push_back(ss<<pad<<"nop"<<endl);
 	assembler.push_back(ss<<non_default_action<<":"<<endl);
 	assembler.push_back(ss<<pad<<"li"<<"$t2, 1"<<endl); 							// non-default action reached, result is 1
 	dest->store("$t2");
-	assembler.push_back(ss<<pad<<"b"<<continued_exec<<endl);
-	assembler.push_back(ss<<pad<<"nop"<<endl);
 	assembler.push_back(ss<<continued_exec<<":"<<endl); 							// continue execution of the program
 }
 
@@ -294,19 +290,14 @@ void Expression::logical_and_ins(ExprResult* dest, ExprResult* lhs_result, ExprR
 	
 	lhs_result->load("$t0");
 	assembler.push_back(ss<<pad<<"beq"<<"$0, $t0, "<<non_default_action<<endl);		// If arg1 is 0, go to non_default action
-	//assembler.push_back(ss<<pad<<"nop"<<endl);
 	rhs_result->load("$t1");
 	assembler.push_back(ss<<pad<<"beq"<<"$0, $t1, "<<non_default_action<<endl); 	// If arg2 is 0, go to non_default action
-	//assembler.push_back(ss<<pad<<"nop"<<endl);
 	assembler.push_back(ss<<pad<<"li"<<"$t2, 1"<<endl); 							// Default action reached, result is 1
 	dest->store("$t2");
 	assembler.push_back(ss<<pad<<"b"<<continued_exec<<endl);
-	//assembler.push_back(ss<<pad<<"nop"<<endl);
 	assembler.push_back(ss<<non_default_action<<":"<<endl);
 	assembler.push_back(ss<<pad<<"move"<<"$t2"<<", $0"<<endl); 						// non-default action reached, result is 0
 	dest->store("$t2");
-//	assembler.push_back(ss<<pad<<"b"<<continued_exec<<endl);
-//	assembler.push_back(ss<<pad<<"nop"<<endl);
 	assembler.push_back(ss<<continued_exec<<":"<<endl); 							// continue execution of the program
 
 }
@@ -318,15 +309,12 @@ void Expression::logical_not_ins(ExprResult* dest, ExprResult* arg, ASMhandle& c
 	
 	arg->load("$t0");
 	assembler.push_back(ss<<pad<<"bne"<<"$0, $t0, "<<non_default_action<<endl);		// If arg1 is not 0, go to non_default action
-	assembler.push_back(ss<<pad<<"nop"<<endl);
 	assembler.push_back(ss<<pad<<"li"<<"$t2, 1"<<endl); 							// non-default action reached, result is 1
 	dest->store("$t2");
 	assembler.push_back(ss<<pad<<"b"<<continued_exec<<endl);
 	assembler.push_back(ss<<pad<<"nop"<<endl);
 	assembler.push_back(ss<<non_default_action<<":"<<endl);
 	dest->store("$0");
-	assembler.push_back(ss<<pad<<"b"<<continued_exec<<endl);
-	assembler.push_back(ss<<pad<<"nop"<<endl);
 	assembler.push_back(ss<<continued_exec<<":"<<endl); 							// continue execution of the program
 }
 
@@ -345,17 +333,13 @@ void Expression::logical_comparison_ins(ExprResult* dest, ExprResult* lhs_result
 	}
 	
 	else assembler.push_back(ss<<pad<<instruction<<"$t0, $t1, "<<non_default_action<<endl); 	// Branch if comparison is true
-	assembler.push_back(ss<<pad<<"nop"<<endl);
 
 	assembler.push_back(ss<<pad<<"move"<<"$t2"<<", $0"<<endl); 							// Default action reached, result is 0
 	dest->store("$t2");
 	assembler.push_back(ss<<pad<<"b"<<continued_exec<<endl);
-	assembler.push_back(ss<<pad<<"nop"<<endl);
 	assembler.push_back(ss<<non_default_action<<":"<<endl);
 	assembler.push_back(ss<<pad<<"li"<<"$t2, 1"<<endl); 								// non-default action reached, result is 1
 	dest->store("$t2");
-	assembler.push_back(ss<<pad<<"b"<<continued_exec<<endl);
-	assembler.push_back(ss<<pad<<"nop"<<endl);
 	assembler.push_back(ss<<continued_exec<<":"<<endl); 								// continue execution of the program
 }
 

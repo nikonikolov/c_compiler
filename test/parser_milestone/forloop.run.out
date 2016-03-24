@@ -1,0 +1,23 @@
+VARIABLE : glob1
+VARIABLE : glob2
+VARIABLE : glob3
+VARIABLE : glob4
+FUNCTION : fn
+    PARAM : a
+    PARAM : b
+    PARAM : c
+    PARAM : d
+    PARAM : e
+    PARAM : f
+    PARAM : g
+SCOPE
+    VARIABLE : sum
+    FOR LOOP
+    INIT BLOCK:
+(a)=(0)
+    CONDITION BLOCK: (a)<(glob2)
+    UPDATE BLOCK:
+(a)++
+    SCOPE
+        (sum)+=(a)
+    RETURN sum

@@ -84,8 +84,11 @@ void CompoundStatement::renderasm(ASMhandle& context){
 	context.exit_scope(new_context);
 }
 
-// For subroutines, conditionals, loops
-// NOTE: Correction of $sp is performed by the caller for IF/FOR statements
+/* For subroutines, conditionals, loops - NOTE that these statements need to appear at the beginning and the end of their renderasm
+	ASMhandle new_context(context);
+	context.exit_scope(new_context);				// Correct $sp in branch delay slot if necessary
+	NOTE: Correction of $sp is performed by the caller for IF/FOR statements
+*/
 void CompoundStatement::renderasm(ASMhandle& context, const bool& function){
 
 	if(debug) cerr<<"CompoundStatement: renderasm enter"<<endl;

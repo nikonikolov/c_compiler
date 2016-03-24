@@ -16,6 +16,7 @@ AssignmentExpression::~AssignmentExpression(){
 /* =============================================== VIRTUAL METHODS IMPLEMENTATION =============================================== */
 
 void AssignmentExpression::renderasm(ASMhandle& context, ExprResult** dest /*=NULL*/){
+	if(debug) cerr<<"AssignmentExpression: renderasm : start"<<endl;
 
 	ExprResult** lhs_result = NULL;
 	ExprResult** rhs_result = NULL;
@@ -23,17 +24,28 @@ void AssignmentExpression::renderasm(ASMhandle& context, ExprResult** dest /*=NU
 		lhs_result = new ExprResult*(NULL);
 		lhs->renderasm(context, lhs_result);
 	} 
+	
+	if(debug) cerr<<"AssignmentExpression: renderasm : LHS renderasm successful"<<endl;
+
 	if(rhs!=NULL){
 		rhs_result = new ExprResult*(NULL);
 		rhs->renderasm(context, rhs_result);
 	} 
+
+	if(debug) cerr<<"AssignmentExpression: renderasm : RHS renderasm successful"<<endl;
 
 	if(dest!=NULL){
 		if(*dest!=NULL) generate_error("Assignment Expression cannot be RHS of another expression");
 		*dest = new Temporary(context.allocate_var());
 	} 
 
+	if(debug) cerr<<"AssignmentExpression: renderasm : dest check successful"<<endl;
+
 	if(lhs!=NULL && rhs!=NULL){
+		if(lhs_result!=NULL){
+			if((*lhs_result)->get_result_type()!=RESULT_var) generate_error("Assignment Expression must have a variable on LHS");
+		}
+
 		if(!strcmp(oper,"=")) 	assignment_ins 	(dest, *lhs_result, *rhs_result); 	
 		if(!strcmp(oper,"+=")) 	assignment_ins 	(dest, *lhs_result, *rhs_result, "addu"); 	
 		if(!strcmp(oper,"-=")) 	assignment_ins 	(dest, *lhs_result, *rhs_result, "subu"); 	
@@ -58,6 +70,8 @@ void AssignmentExpression::renderasm(ASMhandle& context, ExprResult** dest /*=NU
 		if(!strcmp(oper,"--")) 	inc_dec_ins 	(dest, *lhs_result, -1, true);
 	}
 
+	if(debug) cerr<<"AssignmentExpression: renderasm : result calculation successful"<<endl;
+
 	if(lhs_result!=NULL) {
 		if((*lhs_result)->get_result_type()==RESULT_tmp) delete *lhs_result;
 		delete lhs_result;
@@ -66,6 +80,8 @@ void AssignmentExpression::renderasm(ASMhandle& context, ExprResult** dest /*=NU
 		if((*rhs_result)->get_result_type()==RESULT_tmp) delete *rhs_result;
 		delete rhs_result;
 	} 
+
+	if(debug) cerr<<"AssignmentExpression: renderasm : successful"<<endl;
 }
 
 /* =============================================== CODEGEN METHODS =============================================== */

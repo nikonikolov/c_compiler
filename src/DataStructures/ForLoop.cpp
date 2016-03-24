@@ -21,11 +21,11 @@ ForLoopTuple::~ForLoopTuple(){}
 /* =============================================== ForLoop CLASS =============================================== */
 
 ForLoop::ForLoop(ForLoopTuple* tuple_in, Statement* single_statement_in) :
-	Statement(ST_loop), init_block(tuple_in->mem1), condition_block(tuple_in->mem2), update_block(tuple_in->mem3),
+	Statement(ST_for_loop), init_block(tuple_in->mem1), condition_block(tuple_in->mem2), update_block(tuple_in->mem3),
 	loop_body(NULL), single_statement(single_statement_in) {}
 
 ForLoop::ForLoop(ForLoopTuple* tuple_in, CompoundStatement* loop_body_in) :
-	Statement(ST_loop), init_block(tuple_in->mem1), condition_block(tuple_in->mem2), update_block(tuple_in->mem3),
+	Statement(ST_for_loop), init_block(tuple_in->mem1), condition_block(tuple_in->mem2), update_block(tuple_in->mem3),
 	loop_body(loop_body_in), single_statement(NULL) {}
 
 

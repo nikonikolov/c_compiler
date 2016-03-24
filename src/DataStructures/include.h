@@ -74,7 +74,8 @@ enum ExprT{
 	EXPR_assignment_expr = 23,
 	EXPR_tmp_var = 24,
 	EXPR_ternery_expr = 28,
-	EXPR_fn_call = 29
+	EXPR_fn_call = 29,
+	EXPR_conditional_expr = 30,
 };
 
 /* =============================================== EXPRRESULT TYPES =============================================== */

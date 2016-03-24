@@ -6,8 +6,8 @@
   #include "DataStructures/Function.h"
   #include "DataStructures/Variable.h"
 
-  #include "DataStructures/Loop.h"
   #include "DataStructures/ForLoop.h"
+  #include "DataStructures/WhileLoop.h"
   #include "DataStructures/Conditional.h"
   #include "DataStructures/VarDeclaration.h"
   #include "DataStructures/ReturnStatement.h"
@@ -629,33 +629,16 @@ loop  : for_loop                                                  { $$=$1; }
       | do_while_loop                                             { $$=$1; }
       ;
 
-do_while_loop : DO compound_statement WHILE LBRACKET expression_list RBRACKET SEMI_COLON;
-              | DO statement WHILE LBRACKET expression_list RBRACKET SEMI_COLON;
+// Memory leak tuple expression_list
+do_while_loop : DO compound_statement WHILE LBRACKET expression_list RBRACKET SEMI_COLON
+                { int last = $5->size()-1; $$ = new WhileLoop(((*($5))[last]), $2, ST_dowhile_loop); } 
+              | DO statement WHILE LBRACKET expression_list RBRACKET SEMI_COLON     
+                { int last = $5->size()-1; $$ = new WhileLoop(((*($5))[last]), $2, ST_dowhile_loop); }
               ;
 
-// Memory leak tuple
 for_loop  : FOR LBRACKET for_loop_decl_statement RBRACKET compound_statement     { $$ = new ForLoop($3, $5); }
           | FOR LBRACKET for_loop_decl_statement RBRACKET statement              { $$ = new ForLoop($3, $5); }
           ;
-/*
-for_loop_decl_statement : expression_list SEMI_COLON expression_list SEMI_COLON expression_list 
-                          { int last = $3->size()-1; $$ = new ForLoopTuple($1, ((*($3))[last]), $5); }
-                        | expression_list SEMI_COLON expression_list SEMI_COLON
-                          { int last = $3->size()-1; $$ = new ForLoopTuple($1, ((*($3))[last]), NULL); }
-                        | expression_list SEMI_COLON SEMI_COLON expression_list
-                          { $$ = new ForLoopTuple($1, NULL, $4); }
-                        | SEMI_COLON expression_list SEMI_COLON expression_list
-                          { int last = $2->size()-1; $$ = new ForLoopTuple(NULL, ((*($2))[last]), $4); }
-                        | expression_list SEMI_COLON SEMI_COLON
-                          { $$ = new ForLoopTuple($1, NULL, NULL); }
-                        | SEMI_COLON SEMI_COLON expression_list
-                          { $$ = new ForLoopTuple(NULL, NULL, $3); }
-                        | SEMI_COLON expression_list SEMI_COLON
-                          { int last = $2->size()-1; $$ = new ForLoopTuple(NULL, ((*($2))[last]), NULL); }
-                        | SEMI_COLON SEMI_COLON
-                          { $$ = new ForLoopTuple(NULL, NULL, NULL); }
-                        ;
-*/
 
 for_loop_decl_statement : expression_list SEMI_COLON expression_list SEMI_COLON expression_list { $$ = new ForLoopTuple($1, $3, $5); }
                         | expression_list SEMI_COLON expression_list SEMI_COLON               { $$ = new ForLoopTuple($1, $3, NULL); }
@@ -666,8 +649,12 @@ for_loop_decl_statement : expression_list SEMI_COLON expression_list SEMI_COLON 
                         | SEMI_COLON expression_list SEMI_COLON                             { $$ = new ForLoopTuple(NULL, $2, NULL); }
                         | SEMI_COLON SEMI_COLON                                           { $$ = new ForLoopTuple(NULL, NULL, NULL); }
                         ;
-while_loop  : WHILE LBRACKET expression_list RBRACKET compound_statement                { $$ = new Loop($5); }
-            | WHILE LBRACKET expression_list RBRACKET statement                         { $$ = new Loop($5); }
+
+// Memory leak tuple expression_list
+while_loop  : WHILE LBRACKET expression_list RBRACKET compound_statement              
+            { int last = $3->size()-1; $$ = new WhileLoop(((*($3))[last]), $5, ST_while_loop); }
+            | WHILE LBRACKET expression_list RBRACKET statement 
+            { int last = $3->size()-1; $$ = new WhileLoop(((*($3))[last]), $5, ST_while_loop); }
             ;
 
 /* -------------------------------------------- CONDITIONAL STATEMENTS ------------------------------------------ */

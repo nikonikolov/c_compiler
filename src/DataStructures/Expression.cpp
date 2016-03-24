@@ -4,7 +4,7 @@
 
 Expression::Expression(BaseExpression* lhs_in, char* oper_in, BaseExpression* rhs_in, const ExprT& expr_type_in) : 
 	BaseExpression(expr_type_in), lhs(lhs_in), rhs(rhs_in) {
-	oper = strdup(oper_in);
+	if(oper_in!=NULL) oper = strdup(oper_in);
 }
 
 Expression::Expression(BaseExpression* lhs_in, char* oper_in, BaseExpression* rhs_in, 

@@ -102,8 +102,8 @@ extern int yydebug;
   #include "DataStructures/Function.h"
   #include "DataStructures/Variable.h"
 
-  #include "DataStructures/Loop.h"
   #include "DataStructures/ForLoop.h"
+  #include "DataStructures/WhileLoop.h"
   #include "DataStructures/Conditional.h"
   #include "DataStructures/VarDeclaration.h"
   #include "DataStructures/ReturnStatement.h"
@@ -591,11 +591,11 @@ static const yytype_uint16 yyrline[] =
      521,   523,   531,   533,   541,   543,   551,   553,   557,   558,
      559,   560,   561,   562,   563,   564,   565,   566,   567,   571,
      578,   580,   604,   610,   614,   616,   617,   621,   622,   627,
-     628,   629,   632,   633,   637,   638,   660,   661,   662,   663,
-     664,   665,   666,   667,   669,   670,   689,   690,   693,   694,
-     698,   701,   706,   708,   722,   723,   724,   725,   729,   730,
-     733,   734,   739,   740,   741,   742,   743,   748,   752,   753,
-     764,   765
+     628,   629,   632,   634,   639,   640,   643,   644,   645,   646,
+     647,   648,   649,   650,   652,   654,   674,   675,   678,   679,
+     683,   686,   691,   693,   707,   708,   709,   710,   714,   715,
+     718,   719,   724,   725,   726,   727,   728,   733,   737,   738,
+     749,   750
 };
 #endif
 
@@ -2254,238 +2254,250 @@ yyreduce:
 #line 2255 "src/c_parser.tab.cpp" /* yacc.c:1646  */
     break;
 
-  case 114:
-#line 637 "src/c_parser.y" /* yacc.c:1646  */
-    { (yyval.statement_ptr) = new ForLoop((yyvsp[-2].fl_tuple), (yyvsp[0].compound_statement_ptr)); }
+  case 112:
+#line 633 "src/c_parser.y" /* yacc.c:1646  */
+    { int last = (yyvsp[-2].vector_base_expression_ptrs_ptr)->size()-1; (yyval.statement_ptr) = new WhileLoop(((*((yyvsp[-2].vector_base_expression_ptrs_ptr)))[last]), (yyvsp[-5].compound_statement_ptr), ST_dowhile_loop); }
 #line 2261 "src/c_parser.tab.cpp" /* yacc.c:1646  */
     break;
 
-  case 115:
-#line 638 "src/c_parser.y" /* yacc.c:1646  */
-    { (yyval.statement_ptr) = new ForLoop((yyvsp[-2].fl_tuple), (yyvsp[0].statement_ptr)); }
+  case 113:
+#line 635 "src/c_parser.y" /* yacc.c:1646  */
+    { int last = (yyvsp[-2].vector_base_expression_ptrs_ptr)->size()-1; (yyval.statement_ptr) = new WhileLoop(((*((yyvsp[-2].vector_base_expression_ptrs_ptr)))[last]), (yyvsp[-5].statement_ptr), ST_dowhile_loop); }
 #line 2267 "src/c_parser.tab.cpp" /* yacc.c:1646  */
     break;
 
-  case 116:
-#line 660 "src/c_parser.y" /* yacc.c:1646  */
-    { (yyval.fl_tuple) = new ForLoopTuple((yyvsp[-4].vector_base_expression_ptrs_ptr), (yyvsp[-2].vector_base_expression_ptrs_ptr), (yyvsp[0].vector_base_expression_ptrs_ptr)); }
+  case 114:
+#line 639 "src/c_parser.y" /* yacc.c:1646  */
+    { (yyval.statement_ptr) = new ForLoop((yyvsp[-2].fl_tuple), (yyvsp[0].compound_statement_ptr)); }
 #line 2273 "src/c_parser.tab.cpp" /* yacc.c:1646  */
     break;
 
-  case 117:
-#line 661 "src/c_parser.y" /* yacc.c:1646  */
-    { (yyval.fl_tuple) = new ForLoopTuple((yyvsp[-3].vector_base_expression_ptrs_ptr), (yyvsp[-1].vector_base_expression_ptrs_ptr), NULL); }
+  case 115:
+#line 640 "src/c_parser.y" /* yacc.c:1646  */
+    { (yyval.statement_ptr) = new ForLoop((yyvsp[-2].fl_tuple), (yyvsp[0].statement_ptr)); }
 #line 2279 "src/c_parser.tab.cpp" /* yacc.c:1646  */
     break;
 
-  case 118:
-#line 662 "src/c_parser.y" /* yacc.c:1646  */
-    { (yyval.fl_tuple) = new ForLoopTuple((yyvsp[-3].vector_base_expression_ptrs_ptr), NULL, (yyvsp[0].vector_base_expression_ptrs_ptr)); }
+  case 116:
+#line 643 "src/c_parser.y" /* yacc.c:1646  */
+    { (yyval.fl_tuple) = new ForLoopTuple((yyvsp[-4].vector_base_expression_ptrs_ptr), (yyvsp[-2].vector_base_expression_ptrs_ptr), (yyvsp[0].vector_base_expression_ptrs_ptr)); }
 #line 2285 "src/c_parser.tab.cpp" /* yacc.c:1646  */
     break;
 
-  case 119:
-#line 663 "src/c_parser.y" /* yacc.c:1646  */
-    { (yyval.fl_tuple) = new ForLoopTuple(NULL, (yyvsp[-2].vector_base_expression_ptrs_ptr), (yyvsp[0].vector_base_expression_ptrs_ptr)); }
+  case 117:
+#line 644 "src/c_parser.y" /* yacc.c:1646  */
+    { (yyval.fl_tuple) = new ForLoopTuple((yyvsp[-3].vector_base_expression_ptrs_ptr), (yyvsp[-1].vector_base_expression_ptrs_ptr), NULL); }
 #line 2291 "src/c_parser.tab.cpp" /* yacc.c:1646  */
     break;
 
-  case 120:
-#line 664 "src/c_parser.y" /* yacc.c:1646  */
-    { (yyval.fl_tuple) = new ForLoopTuple((yyvsp[-2].vector_base_expression_ptrs_ptr), NULL, NULL); }
+  case 118:
+#line 645 "src/c_parser.y" /* yacc.c:1646  */
+    { (yyval.fl_tuple) = new ForLoopTuple((yyvsp[-3].vector_base_expression_ptrs_ptr), NULL, (yyvsp[0].vector_base_expression_ptrs_ptr)); }
 #line 2297 "src/c_parser.tab.cpp" /* yacc.c:1646  */
     break;
 
-  case 121:
-#line 665 "src/c_parser.y" /* yacc.c:1646  */
-    { (yyval.fl_tuple) = new ForLoopTuple(NULL, NULL, (yyvsp[0].vector_base_expression_ptrs_ptr)); }
+  case 119:
+#line 646 "src/c_parser.y" /* yacc.c:1646  */
+    { (yyval.fl_tuple) = new ForLoopTuple(NULL, (yyvsp[-2].vector_base_expression_ptrs_ptr), (yyvsp[0].vector_base_expression_ptrs_ptr)); }
 #line 2303 "src/c_parser.tab.cpp" /* yacc.c:1646  */
     break;
 
-  case 122:
-#line 666 "src/c_parser.y" /* yacc.c:1646  */
-    { (yyval.fl_tuple) = new ForLoopTuple(NULL, (yyvsp[-1].vector_base_expression_ptrs_ptr), NULL); }
+  case 120:
+#line 647 "src/c_parser.y" /* yacc.c:1646  */
+    { (yyval.fl_tuple) = new ForLoopTuple((yyvsp[-2].vector_base_expression_ptrs_ptr), NULL, NULL); }
 #line 2309 "src/c_parser.tab.cpp" /* yacc.c:1646  */
     break;
 
-  case 123:
-#line 667 "src/c_parser.y" /* yacc.c:1646  */
-    { (yyval.fl_tuple) = new ForLoopTuple(NULL, NULL, NULL); }
+  case 121:
+#line 648 "src/c_parser.y" /* yacc.c:1646  */
+    { (yyval.fl_tuple) = new ForLoopTuple(NULL, NULL, (yyvsp[0].vector_base_expression_ptrs_ptr)); }
 #line 2315 "src/c_parser.tab.cpp" /* yacc.c:1646  */
     break;
 
-  case 124:
-#line 669 "src/c_parser.y" /* yacc.c:1646  */
-    { (yyval.statement_ptr) = new Loop((yyvsp[0].compound_statement_ptr)); }
+  case 122:
+#line 649 "src/c_parser.y" /* yacc.c:1646  */
+    { (yyval.fl_tuple) = new ForLoopTuple(NULL, (yyvsp[-1].vector_base_expression_ptrs_ptr), NULL); }
 #line 2321 "src/c_parser.tab.cpp" /* yacc.c:1646  */
     break;
 
-  case 125:
-#line 670 "src/c_parser.y" /* yacc.c:1646  */
-    { (yyval.statement_ptr) = new Loop((yyvsp[0].statement_ptr)); }
+  case 123:
+#line 650 "src/c_parser.y" /* yacc.c:1646  */
+    { (yyval.fl_tuple) = new ForLoopTuple(NULL, NULL, NULL); }
 #line 2327 "src/c_parser.tab.cpp" /* yacc.c:1646  */
     break;
 
-  case 126:
-#line 689 "src/c_parser.y" /* yacc.c:1646  */
-    { (yyval.statement_ptr) = new Conditional((yyvsp[0].vector_conditional_case_pointers_ptr)); }
+  case 124:
+#line 653 "src/c_parser.y" /* yacc.c:1646  */
+    { int last = (yyvsp[-2].vector_base_expression_ptrs_ptr)->size()-1; (yyval.statement_ptr) = new WhileLoop(((*((yyvsp[-2].vector_base_expression_ptrs_ptr)))[last]), (yyvsp[0].compound_statement_ptr), ST_while_loop); }
 #line 2333 "src/c_parser.tab.cpp" /* yacc.c:1646  */
     break;
 
-  case 127:
-#line 690 "src/c_parser.y" /* yacc.c:1646  */
-    { (yyval.statement_ptr) = new Conditional(vec_append((yyvsp[-1].vector_conditional_case_pointers_ptr),(yyvsp[0].vector_conditional_case_pointers_ptr))); }
+  case 125:
+#line 655 "src/c_parser.y" /* yacc.c:1646  */
+    { int last = (yyvsp[-2].vector_base_expression_ptrs_ptr)->size()-1; (yyval.statement_ptr) = new WhileLoop(((*((yyvsp[-2].vector_base_expression_ptrs_ptr)))[last]), (yyvsp[0].statement_ptr), ST_while_loop); }
 #line 2339 "src/c_parser.tab.cpp" /* yacc.c:1646  */
     break;
 
-  case 128:
-#line 693 "src/c_parser.y" /* yacc.c:1646  */
-    { (yyval.vector_conditional_case_pointers_ptr) = (yyvsp[0].vector_conditional_case_pointers_ptr); }
+  case 126:
+#line 674 "src/c_parser.y" /* yacc.c:1646  */
+    { (yyval.statement_ptr) = new Conditional((yyvsp[0].vector_conditional_case_pointers_ptr)); }
 #line 2345 "src/c_parser.tab.cpp" /* yacc.c:1646  */
     break;
 
-  case 129:
-#line 694 "src/c_parser.y" /* yacc.c:1646  */
-    { (yyval.vector_conditional_case_pointers_ptr) = vec_append((yyvsp[-1].vector_conditional_case_pointers_ptr), (yyvsp[0].vector_conditional_case_pointers_ptr)); }
+  case 127:
+#line 675 "src/c_parser.y" /* yacc.c:1646  */
+    { (yyval.statement_ptr) = new Conditional(vec_append((yyvsp[-1].vector_conditional_case_pointers_ptr),(yyvsp[0].vector_conditional_case_pointers_ptr))); }
 #line 2351 "src/c_parser.tab.cpp" /* yacc.c:1646  */
     break;
 
+  case 128:
+#line 678 "src/c_parser.y" /* yacc.c:1646  */
+    { (yyval.vector_conditional_case_pointers_ptr) = (yyvsp[0].vector_conditional_case_pointers_ptr); }
+#line 2357 "src/c_parser.tab.cpp" /* yacc.c:1646  */
+    break;
+
+  case 129:
+#line 679 "src/c_parser.y" /* yacc.c:1646  */
+    { (yyval.vector_conditional_case_pointers_ptr) = vec_append((yyvsp[-1].vector_conditional_case_pointers_ptr), (yyvsp[0].vector_conditional_case_pointers_ptr)); }
+#line 2363 "src/c_parser.tab.cpp" /* yacc.c:1646  */
+    break;
+
   case 130:
-#line 699 "src/c_parser.y" /* yacc.c:1646  */
+#line 684 "src/c_parser.y" /* yacc.c:1646  */
     { (yyval.vector_conditional_case_pointers_ptr) = new vector<ConditionalCase*>; int last = (yyvsp[-2].vector_base_expression_ptrs_ptr)->size()-1;
                   (yyval.vector_conditional_case_pointers_ptr)->push_back(new ConditionalCase((yyvsp[0].compound_statement_ptr),((*((yyvsp[-2].vector_base_expression_ptrs_ptr)))[last]), source_line, source_file)); }
-#line 2358 "src/c_parser.tab.cpp" /* yacc.c:1646  */
+#line 2370 "src/c_parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 131:
-#line 702 "src/c_parser.y" /* yacc.c:1646  */
+#line 687 "src/c_parser.y" /* yacc.c:1646  */
     { (yyval.vector_conditional_case_pointers_ptr) = new vector<ConditionalCase*>; int last = (yyvsp[-2].vector_base_expression_ptrs_ptr)->size()-1;
                   (yyval.vector_conditional_case_pointers_ptr)->push_back(new ConditionalCase((yyvsp[0].statement_ptr),((*((yyvsp[-2].vector_base_expression_ptrs_ptr)))[last]), source_line, source_file)); }
-#line 2365 "src/c_parser.tab.cpp" /* yacc.c:1646  */
-    break;
-
-  case 132:
-#line 707 "src/c_parser.y" /* yacc.c:1646  */
-    { (yyval.vector_conditional_case_pointers_ptr) = new vector<ConditionalCase*>; (yyval.vector_conditional_case_pointers_ptr)->push_back(new ConditionalCase((yyvsp[0].compound_statement_ptr), NULL, source_line, source_file)); }
-#line 2371 "src/c_parser.tab.cpp" /* yacc.c:1646  */
-    break;
-
-  case 133:
-#line 709 "src/c_parser.y" /* yacc.c:1646  */
-    { (yyval.vector_conditional_case_pointers_ptr) = new vector<ConditionalCase*>; (yyval.vector_conditional_case_pointers_ptr)->push_back(new ConditionalCase((yyvsp[0].statement_ptr), NULL, source_line, source_file)); }
 #line 2377 "src/c_parser.tab.cpp" /* yacc.c:1646  */
     break;
 
-  case 134:
-#line 722 "src/c_parser.y" /* yacc.c:1646  */
-    { (yyval.compound_statement_ptr)=new CompoundStatement((yyvsp[-2].vector_var_declarations_ptrs_ptr), (yyvsp[-1].vector_statement_pointers_ptr));}
+  case 132:
+#line 692 "src/c_parser.y" /* yacc.c:1646  */
+    { (yyval.vector_conditional_case_pointers_ptr) = new vector<ConditionalCase*>; (yyval.vector_conditional_case_pointers_ptr)->push_back(new ConditionalCase((yyvsp[0].compound_statement_ptr), NULL, source_line, source_file)); }
 #line 2383 "src/c_parser.tab.cpp" /* yacc.c:1646  */
     break;
 
-  case 135:
-#line 723 "src/c_parser.y" /* yacc.c:1646  */
-    { (yyval.compound_statement_ptr)=new CompoundStatement(NULL,(yyvsp[-1].vector_statement_pointers_ptr));}
+  case 133:
+#line 694 "src/c_parser.y" /* yacc.c:1646  */
+    { (yyval.vector_conditional_case_pointers_ptr) = new vector<ConditionalCase*>; (yyval.vector_conditional_case_pointers_ptr)->push_back(new ConditionalCase((yyvsp[0].statement_ptr), NULL, source_line, source_file)); }
 #line 2389 "src/c_parser.tab.cpp" /* yacc.c:1646  */
     break;
 
-  case 136:
-#line 724 "src/c_parser.y" /* yacc.c:1646  */
-    { (yyval.compound_statement_ptr)=new CompoundStatement((yyvsp[-1].vector_var_declarations_ptrs_ptr),NULL);}
+  case 134:
+#line 707 "src/c_parser.y" /* yacc.c:1646  */
+    { (yyval.compound_statement_ptr)=new CompoundStatement((yyvsp[-2].vector_var_declarations_ptrs_ptr), (yyvsp[-1].vector_statement_pointers_ptr));}
 #line 2395 "src/c_parser.tab.cpp" /* yacc.c:1646  */
     break;
 
-  case 137:
-#line 725 "src/c_parser.y" /* yacc.c:1646  */
-    { (yyval.compound_statement_ptr)=NULL; }
+  case 135:
+#line 708 "src/c_parser.y" /* yacc.c:1646  */
+    { (yyval.compound_statement_ptr)=new CompoundStatement(NULL,(yyvsp[-1].vector_statement_pointers_ptr));}
 #line 2401 "src/c_parser.tab.cpp" /* yacc.c:1646  */
     break;
 
-  case 138:
-#line 729 "src/c_parser.y" /* yacc.c:1646  */
-    { (yyval.vector_var_declarations_ptrs_ptr) = new vector<VarDeclaration*>; (yyval.vector_var_declarations_ptrs_ptr)->push_back((yyvsp[0].var_declaration_ptr));}
+  case 136:
+#line 709 "src/c_parser.y" /* yacc.c:1646  */
+    { (yyval.compound_statement_ptr)=new CompoundStatement((yyvsp[-1].vector_var_declarations_ptrs_ptr),NULL);}
 #line 2407 "src/c_parser.tab.cpp" /* yacc.c:1646  */
     break;
 
-  case 139:
-#line 730 "src/c_parser.y" /* yacc.c:1646  */
-    { (yyval.vector_var_declarations_ptrs_ptr)->push_back((yyvsp[0].var_declaration_ptr));}
+  case 137:
+#line 710 "src/c_parser.y" /* yacc.c:1646  */
+    { (yyval.compound_statement_ptr)=NULL; }
 #line 2413 "src/c_parser.tab.cpp" /* yacc.c:1646  */
     break;
 
-  case 140:
-#line 733 "src/c_parser.y" /* yacc.c:1646  */
-    { (yyval.vector_statement_pointers_ptr) = new vector<Statement*>; (yyval.vector_statement_pointers_ptr)->push_back((yyvsp[0].statement_ptr));}
+  case 138:
+#line 714 "src/c_parser.y" /* yacc.c:1646  */
+    { (yyval.vector_var_declarations_ptrs_ptr) = new vector<VarDeclaration*>; (yyval.vector_var_declarations_ptrs_ptr)->push_back((yyvsp[0].var_declaration_ptr));}
 #line 2419 "src/c_parser.tab.cpp" /* yacc.c:1646  */
     break;
 
-  case 141:
-#line 734 "src/c_parser.y" /* yacc.c:1646  */
-    { (yyval.vector_statement_pointers_ptr)->push_back((yyvsp[0].statement_ptr));}
+  case 139:
+#line 715 "src/c_parser.y" /* yacc.c:1646  */
+    { (yyval.vector_var_declarations_ptrs_ptr)->push_back((yyvsp[0].var_declaration_ptr));}
 #line 2425 "src/c_parser.tab.cpp" /* yacc.c:1646  */
     break;
 
-  case 142:
-#line 739 "src/c_parser.y" /* yacc.c:1646  */
-    { (yyval.statement_ptr)=(yyvsp[0].statement_ptr); }
+  case 140:
+#line 718 "src/c_parser.y" /* yacc.c:1646  */
+    { (yyval.vector_statement_pointers_ptr) = new vector<Statement*>; (yyval.vector_statement_pointers_ptr)->push_back((yyvsp[0].statement_ptr));}
 #line 2431 "src/c_parser.tab.cpp" /* yacc.c:1646  */
     break;
 
-  case 143:
-#line 740 "src/c_parser.y" /* yacc.c:1646  */
-    { (yyval.statement_ptr)=(yyvsp[0].statement_ptr); }
+  case 141:
+#line 719 "src/c_parser.y" /* yacc.c:1646  */
+    { (yyval.vector_statement_pointers_ptr)->push_back((yyvsp[0].statement_ptr));}
 #line 2437 "src/c_parser.tab.cpp" /* yacc.c:1646  */
     break;
 
-  case 144:
-#line 741 "src/c_parser.y" /* yacc.c:1646  */
+  case 142:
+#line 724 "src/c_parser.y" /* yacc.c:1646  */
     { (yyval.statement_ptr)=(yyvsp[0].statement_ptr); }
 #line 2443 "src/c_parser.tab.cpp" /* yacc.c:1646  */
     break;
 
-  case 145:
-#line 742 "src/c_parser.y" /* yacc.c:1646  */
+  case 143:
+#line 725 "src/c_parser.y" /* yacc.c:1646  */
     { (yyval.statement_ptr)=(yyvsp[0].statement_ptr); }
 #line 2449 "src/c_parser.tab.cpp" /* yacc.c:1646  */
     break;
 
-  case 146:
-#line 743 "src/c_parser.y" /* yacc.c:1646  */
-    { (yyval.statement_ptr)=(yyvsp[0].compound_statement_ptr); }
+  case 144:
+#line 726 "src/c_parser.y" /* yacc.c:1646  */
+    { (yyval.statement_ptr)=(yyvsp[0].statement_ptr); }
 #line 2455 "src/c_parser.tab.cpp" /* yacc.c:1646  */
     break;
 
-  case 147:
-#line 748 "src/c_parser.y" /* yacc.c:1646  */
-    { (yyval.statement_ptr) = new ExpressionStatement((yyvsp[-1].vector_base_expression_ptrs_ptr));}
+  case 145:
+#line 727 "src/c_parser.y" /* yacc.c:1646  */
+    { (yyval.statement_ptr)=(yyvsp[0].statement_ptr); }
 #line 2461 "src/c_parser.tab.cpp" /* yacc.c:1646  */
     break;
 
-  case 148:
-#line 752 "src/c_parser.y" /* yacc.c:1646  */
-    { (yyval.statement_ptr)=(yyvsp[0].statement_ptr);}
+  case 146:
+#line 728 "src/c_parser.y" /* yacc.c:1646  */
+    { (yyval.statement_ptr)=(yyvsp[0].compound_statement_ptr); }
 #line 2467 "src/c_parser.tab.cpp" /* yacc.c:1646  */
     break;
 
-  case 149:
-#line 753 "src/c_parser.y" /* yacc.c:1646  */
-    { (yyval.statement_ptr)=NULL;}
+  case 147:
+#line 733 "src/c_parser.y" /* yacc.c:1646  */
+    { (yyval.statement_ptr) = new ExpressionStatement((yyvsp[-1].vector_base_expression_ptrs_ptr));}
 #line 2473 "src/c_parser.tab.cpp" /* yacc.c:1646  */
     break;
 
-  case 150:
-#line 764 "src/c_parser.y" /* yacc.c:1646  */
-    { (yyval.statement_ptr) = new ReturnStatement((yyvsp[-1].base_expr_ptr), source_line, source_file);}
+  case 148:
+#line 737 "src/c_parser.y" /* yacc.c:1646  */
+    { (yyval.statement_ptr)=(yyvsp[0].statement_ptr);}
 #line 2479 "src/c_parser.tab.cpp" /* yacc.c:1646  */
     break;
 
-  case 151:
-#line 765 "src/c_parser.y" /* yacc.c:1646  */
-    { (yyval.statement_ptr) = new ReturnStatement(NULL, source_line, source_file);}
+  case 149:
+#line 738 "src/c_parser.y" /* yacc.c:1646  */
+    { (yyval.statement_ptr)=NULL;}
 #line 2485 "src/c_parser.tab.cpp" /* yacc.c:1646  */
     break;
 
+  case 150:
+#line 749 "src/c_parser.y" /* yacc.c:1646  */
+    { (yyval.statement_ptr) = new ReturnStatement((yyvsp[-1].base_expr_ptr), source_line, source_file);}
+#line 2491 "src/c_parser.tab.cpp" /* yacc.c:1646  */
+    break;
 
-#line 2489 "src/c_parser.tab.cpp" /* yacc.c:1646  */
+  case 151:
+#line 750 "src/c_parser.y" /* yacc.c:1646  */
+    { (yyval.statement_ptr) = new ReturnStatement(NULL, source_line, source_file);}
+#line 2497 "src/c_parser.tab.cpp" /* yacc.c:1646  */
+    break;
+
+
+#line 2501 "src/c_parser.tab.cpp" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -2713,7 +2725,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 771 "src/c_parser.y" /* yacc.c:1906  */
+#line 756 "src/c_parser.y" /* yacc.c:1906  */
   
 
 int yyerror(const char* s){ 

@@ -49,8 +49,8 @@ extern int yydebug;
   #include "DataStructures/Function.h"
   #include "DataStructures/Variable.h"
 
-  #include "DataStructures/Loop.h"
   #include "DataStructures/ForLoop.h"
+  #include "DataStructures/WhileLoop.h"
   #include "DataStructures/Conditional.h"
   #include "DataStructures/VarDeclaration.h"
   #include "DataStructures/ReturnStatement.h"

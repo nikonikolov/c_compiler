@@ -44,8 +44,8 @@ fn:
 	sw      $a3, -16($fp)
 	lw      $t0, -4($fp)
 	beq     $t0, $0, $LKDHGF3
-	lui     $t1, %hi(glob4)
-	lw      $t0, %lo(glob4)($t1)
+	lui     $t9, %hi(glob4)
+	lw      $t0, %lo(glob4)($t9)
 	beq     $t0, $0, $LKDHGF5
 	lw      $v0, -12($fp)
 	lw      $ra, 0($fp)		# Load return address in register 31

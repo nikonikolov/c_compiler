@@ -20,7 +20,7 @@ public:
 
 	BaseExpression* simplify();
 	void pretty_print(const int& indent);
-	void renderasm(ASMhandle& context, char** destination=NULL);
+	void renderasm(ASMhandle& context, ExprResult** dest=NULL);
 
 private:
 	vector<BaseExpression*>* lhs;			// Bottom nodes

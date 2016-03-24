@@ -26,7 +26,9 @@ void VarExpr::pretty_print(const int& indent){
 }
 
 
-void VarExpr::renderasm(ASMhandle& context, char** destination /*=NULL*/){
+void VarExpr::renderasm(ASMhandle& context, ExprResult** dest /*=NULL*/){
+	if(dest==NULL) return;
+
 	Variable* result;
 	try{
 		result = context.get_var_location(name);
@@ -34,9 +36,8 @@ void VarExpr::renderasm(ASMhandle& context, char** destination /*=NULL*/){
 	catch(const int& error){
 		generate_error("variable \""+string(name)+"\" not defined for the current scope");
 	}
-	bool global_var=false;
-	*destination=result->get_asm_location(context, global_var);
-	if(global_var) throw global_var;
+	
+	*dest=result;
 }
 
 

@@ -2,6 +2,7 @@
 #define STATEMENT_H
 
 #include "include.h"
+#include "ExprResult.h"
 
 /* =============================================== ASMHANDLE CLASS =============================================== */
 
@@ -30,13 +31,13 @@ public:
 	/* ----------------------------------------------- SUBROUTINES AND SCOPES ----------------------------------------------- */
 
 	void subroutine_enter(const int& mem_amount = default_mem_increase);
-	void subroutine_exit(char* return_val);
+	void subroutine_exit(ExprResult** return_val);
 	
 	char* allocate_subroutine_stack_param(pair<string, Variable*>& var_in, const int& mem_amount = 4);
 
 	void exit_scope(const ASMhandle& new_context);
 
-	void push_subroutine_stack_params(vector<pair<char**, bool>>& params);
+	void push_subroutine_stack_params(vector<ExprResult**>& params);
 
 	Function* find_function_definition(char* name_in);
 
@@ -44,8 +45,6 @@ public:
 	void allocate_mem(const int& mem_amount = default_mem_increase);
 	char* allocate_var(pair<string, Variable*>& var_in, const int& mem_amount = 4);
 	char* allocate_var(const int& mem_amount = 4);
-	string allocate_str_var(pair<string, Variable*>& var_in, const int& mem_amount = 4);
-	string allocate_str_var(const int& mem_amount = 4);
 	void deallocate_var(const int& mem_amount = 4);
 
 	Variable* get_var_location(char* name);
@@ -77,7 +76,8 @@ private:
 	static map<string, Function*>* functions;		
 	static map<string, Function*>* fn_prototypes;		
 
-	stack<string>* return_address;
+	//stack<string>* return_address;
+	char* return_address;
 
 	/* ----------------------------------------------- LABELS AND MEMORY AMOUNT ----------------------------------------------- */
 	

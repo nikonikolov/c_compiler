@@ -21,16 +21,14 @@ public:
 																	const int& line_in, const string& src_file_in);
 	~AssignmentExpression();
 
-	void renderasm(ASMhandle& context, char** destination=NULL);
+	void renderasm(ASMhandle& context, ExprResult** dest=NULL);
 
 private:
-	void assignment_ins(char** destination, char* lhs_dest, char* rhs_dest, const string& instruction="");
-	void arithmetic_ins(char* lhs_dest, char* rhs_dest, const string& instruction);
-	void inc_dec_ins(char** destination, char* arg, const int& val, const bool& post_inc);
-	void div_rem_ins(char** destination, char* lhs_dest, char* rhs_dest, const string& instruction);
+	void assignment_ins (ExprResult** dest, ExprResult* lhs_result, ExprResult* rhs_result, const string& instruction="");
+	void div_rem_ins 	(ExprResult** dest, ExprResult* lhs_result, ExprResult* rhs_result, const string& instruction);
 
-	void store_lhs(char* arg, const string& dest_reg, const bool& loaded, const string& lhs_reg ="$t8");
-	void store_rhs(char* arg, const string& dest_reg, const bool& loaded, const string& rhs_reg ="$t9");
+	void inc_dec_ins 	(ExprResult** dest, ExprResult* arg, const int& val, const bool& post_inc);
+	void arithmetic_ins (ExprResult* lhs_result, ExprResult* rhs_result, const string& instruction);
 
 };
 

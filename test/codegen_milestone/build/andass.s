@@ -44,20 +44,20 @@ fn:
 	sw      $a3, -16($fp)
 	lw      $t0, -12($fp)
 	lw      $t1, -8($fp)
-	and     $t0, $t0, $t1
-	sw      $t0, -12($fp)
+	and     $t2, $t0, $t1
+	sw      $t2, -12($fp)
 	lw      $t0, -12($fp)
 	lw      $t1, 24($fp)
-	and     $t0, $t0, $t1
-	sw      $t0, -12($fp)
+	and     $t2, $t0, $t1
+	sw      $t2, -12($fp)
 	lw      $t0, -12($fp)
 	lw      $t1, 28($fp)
-	and     $t0, $t0, $t1
-	sw      $t0, -12($fp)
+	and     $t2, $t0, $t1
+	sw      $t2, -12($fp)
 	lw      $t0, -12($fp)
 	lw      $t1, 32($fp)
-	and     $t0, $t0, $t1
-	sw      $t0, -12($fp)
+	and     $t2, $t0, $t1
+	sw      $t2, -12($fp)
 	lw      $v0, -12($fp)
 	lw      $ra, 0($fp)		# Load return address in register 31
 	lw      $fp, 4($fp)		# Restore the value of the frame pointer

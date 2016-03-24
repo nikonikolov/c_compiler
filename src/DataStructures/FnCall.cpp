@@ -59,7 +59,7 @@ BaseExpression* FnCall::simplify(){
 	throw 1;
 }
 
-void FnCall::renderasm(ASMhandle& context, char** destination /*=NULL*/){
+void FnCall::renderasm(ASMhandle& context, ExprResult** dest /*=NULL*/){
 	
 	try{
 		Function* fncalled = context.find_function_definition(name);
@@ -68,40 +68,40 @@ void FnCall::renderasm(ASMhandle& context, char** destination /*=NULL*/){
 		generate_error("No function with name \""+string(name)+"\" defined");
 	}
 
-	vector<pair<char**,bool>> params_results;
+	vector<ExprResult**> params_results;
 	if(arguments!=NULL){
-		
 		// Calculate the values of the parameters that you need to pass
 		vector<BaseExpression*>::iterator it;
 		for(it=arguments->begin(); it!=arguments->end(); ++it){
-			char** param_destination;
-			bool param_global=false;
-			if((*it)->get_expr_type()!=EXPR_tmp_var) 	param_destination = new char*(context.allocate_var());
-			else 										param_destination=new char*;
-			try 					{ (*it)->renderasm(context, param_destination); }
-			catch(const bool& glob)	{ param_global=glob; }
-			params_results.push_back(pair<char**,bool>(param_destination, param_global));
+			ExprResult** param_dest = new ExprResult*(NULL);
+			(*it)->renderasm(context, param_dest);
+			params_results.push_back(param_dest);
 		}
 	
 		// Load register parameters
 		for(int i=0; i<4; i++){
-			if(!params_results[i].second) assembler.push_back(ss<<pad<<"lw"<<"$a"<<i<<", "<<*(params_results[i].first)<<endl);
-			else{
-				assembler.push_back(ss<<pad<<"lui"<<"$t0"<<", %hi("<<*(params_results[i].first)<<")"<<endl);
-				assembler.push_back(ss<<pad<<"lw"<<"$a"<<i<<", %lo("<<*(params_results[i].first)<<")($t0)"<<endl);
-			}
+			(*params_results[i])->load(string("$a" + std::to_string(i)).c_str());
 		}
 		// Load stack parameters
 		if(params_results.size()>4) context.push_subroutine_stack_params(params_results);
 	} 
 
+	// Call the function
 	assembler.push_back(ss<<pad<<"la"<<"$t0, "<<name<<endl);
 	assembler.push_back(ss<<pad<<"jalr"<<"$t0"<<endl);
 	assembler.push_back(ss<<pad<<"nop"<<endl);
 
 	// Load the return value in the destination
-	if(destination!=NULL){
-		assembler.push_back(ss<<pad<<"sw"<<"$v0, "<<*destination<<endl);
+	if(dest!=NULL){
+		if(*dest==NULL) *dest = new Temporary(context.allocate_var()); 		// Not null when called by Variables
+		(*dest)->store("$v0");
 	}
 
+	// Deallocate memory
+	for(int i=0; i<params_results.size(); i++){
+		if( (*params_results[i])->get_result_type() == RESULT_tmp ){
+			delete (*params_results[i]);
+		} 
+		delete params_results[i];
+	}
 }

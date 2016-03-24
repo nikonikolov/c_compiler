@@ -114,33 +114,33 @@ BaseExpression* Expression::simplify(){
 
 	if(debug) cerr<<"Expression: simplify : casting pointers"<<endl;
 
-	Constant<int>* res_ptr=NULL;
-	Constant<int>* lhs_ptr = static_cast<Constant<int>*>(lhs);
-	Constant<int>* rhs_ptr = static_cast<Constant<int>*>(rhs);
+	Constant<uint64_t>* res_ptr=NULL;
+	Constant<uint64_t>* lhs_ptr = static_cast<Constant<uint64_t>*>(lhs);
+	Constant<uint64_t>* rhs_ptr = static_cast<Constant<uint64_t>*>(rhs);
 	int lhs_val=lhs_ptr->get_value(), rhs_val=rhs_ptr->get_value();
 	
 	if(debug) cerr<<"Expression: simplify : calculating new result"<<endl;
 
 	/* ----------------------------------- TWO OPERANDS ----------------------------------- */
 	if(lhs!=NULL && rhs!=NULL){
-		if(!strcmp(oper,"+")) 	res_ptr = new Constant<int>(lhs_val + rhs_val); 	
-		if(!strcmp(oper,"-")) 	res_ptr = new Constant<int>(lhs_val - rhs_val); 	
-		if(!strcmp(oper,"*")) 	res_ptr = new Constant<int>(lhs_val * rhs_val); 	
-		if(!strcmp(oper,"%")) 	res_ptr = new Constant<int>(lhs_val % rhs_val); 	
-		if(!strcmp(oper,"/")) 	res_ptr = new Constant<int>(lhs_val / rhs_val); 	
-		if(!strcmp(oper,"|")) 	res_ptr = new Constant<int>(lhs_val | rhs_val); 	
-		if(!strcmp(oper,"&")) 	res_ptr = new Constant<int>(lhs_val & rhs_val); 	
-		if(!strcmp(oper,"^")) 	res_ptr = new Constant<int>(lhs_val ^ rhs_val); 	
-		if(!strcmp(oper,"||")) 	res_ptr = new Constant<int>(lhs_val || rhs_val); 	
-		if(!strcmp(oper,"&&")) 	res_ptr = new Constant<int>(lhs_val && rhs_val); 	
-		if(!strcmp(oper,"<<")) 	res_ptr = new Constant<int>(lhs_val << rhs_val); 	
-		if(!strcmp(oper,">>")) 	res_ptr = new Constant<int>(lhs_val >> rhs_val); 	
-		if(!strcmp(oper,"<=")) 	res_ptr = new Constant<int>(lhs_val <= rhs_val); 	
-		if(!strcmp(oper,">=")) 	res_ptr = new Constant<int>(lhs_val >= rhs_val); 	
-		if(!strcmp(oper,">")) 	res_ptr = new Constant<int>(lhs_val > rhs_val); 	
-		if(!strcmp(oper,"<")) 	res_ptr = new Constant<int>(lhs_val < rhs_val); 	
-		if(!strcmp(oper,"==")) 	res_ptr = new Constant<int>(lhs_val == rhs_val); 	
-		if(!strcmp(oper,"!=")) 	res_ptr = new Constant<int>(lhs_val != rhs_val); 
+		if(!strcmp(oper,"+")) 	res_ptr = new Constant<uint64_t>(lhs_val + rhs_val); 	
+		if(!strcmp(oper,"-")) 	res_ptr = new Constant<uint64_t>(lhs_val - rhs_val); 	
+		if(!strcmp(oper,"*")) 	res_ptr = new Constant<uint64_t>(lhs_val * rhs_val); 	
+		if(!strcmp(oper,"%")) 	res_ptr = new Constant<uint64_t>(lhs_val % rhs_val); 	
+		if(!strcmp(oper,"/")) 	res_ptr = new Constant<uint64_t>(lhs_val / rhs_val); 	
+		if(!strcmp(oper,"|")) 	res_ptr = new Constant<uint64_t>(lhs_val | rhs_val); 	
+		if(!strcmp(oper,"&")) 	res_ptr = new Constant<uint64_t>(lhs_val & rhs_val); 	
+		if(!strcmp(oper,"^")) 	res_ptr = new Constant<uint64_t>(lhs_val ^ rhs_val); 	
+		if(!strcmp(oper,"||")) 	res_ptr = new Constant<uint64_t>(lhs_val || rhs_val); 	
+		if(!strcmp(oper,"&&")) 	res_ptr = new Constant<uint64_t>(lhs_val && rhs_val); 	
+		if(!strcmp(oper,"<<")) 	res_ptr = new Constant<uint64_t>(lhs_val << rhs_val); 	
+		if(!strcmp(oper,">>")) 	res_ptr = new Constant<uint64_t>(lhs_val >> rhs_val); 	
+		if(!strcmp(oper,"<=")) 	res_ptr = new Constant<uint64_t>(lhs_val <= rhs_val); 	
+		if(!strcmp(oper,">=")) 	res_ptr = new Constant<uint64_t>(lhs_val >= rhs_val); 	
+		if(!strcmp(oper,">")) 	res_ptr = new Constant<uint64_t>(lhs_val > rhs_val); 	
+		if(!strcmp(oper,"<")) 	res_ptr = new Constant<uint64_t>(lhs_val < rhs_val); 	
+		if(!strcmp(oper,"==")) 	res_ptr = new Constant<uint64_t>(lhs_val == rhs_val); 	
+		if(!strcmp(oper,"!=")) 	res_ptr = new Constant<uint64_t>(lhs_val != rhs_val); 
 	
 		if(!strcmp(oper,"=")) 	throw 1; 	
 		if(!strcmp(oper,"+=")) 	throw 1; 	
@@ -154,11 +154,11 @@ BaseExpression* Expression::simplify(){
 	}
 	/* ----------------------------------- SINGLE OPERAND ----------------------------------- */
 	if(lhs==NULL && rhs!=NULL){
-		if(!strcmp(oper,"+"))	res_ptr = new Constant<int>(+(rhs_val));
-		if(!strcmp(oper,"-"))	res_ptr = new Constant<int>(-(rhs_val));
-		if(!strcmp(oper,"!")) 	res_ptr = new Constant<int>(!(rhs_val));
-		if(!strcmp(oper,"~")) 	res_ptr = new Constant<int>(~(rhs_val));
-		if(!strcmp(oper,"sizeof")) 	res_ptr = new Constant<int>(sizeof(rhs_val));
+		if(!strcmp(oper,"+"))	res_ptr = new Constant<uint64_t>(+(rhs_val));
+		if(!strcmp(oper,"-"))	res_ptr = new Constant<uint64_t>(-(rhs_val));
+		if(!strcmp(oper,"!")) 	res_ptr = new Constant<uint64_t>(!(rhs_val));
+		if(!strcmp(oper,"~")) 	res_ptr = new Constant<uint64_t>(~(rhs_val));
+		if(!strcmp(oper,"sizeof")) 	res_ptr = new Constant<uint64_t>(sizeof(rhs_val));
 	}
 	/* ----------------------------------- RETURN DECISION ----------------------------------- */
 	
@@ -183,58 +183,61 @@ BaseExpression* Expression::simplify(){
 */
 
 
-void Expression::renderasm(ASMhandle& context, char** destination /*=NULL*/){
-	// Case when Expression appears just as arithmetical action with result saved nowhere
-	if(destination==NULL) return;
+void Expression::renderasm(ASMhandle& context, ExprResult** dest /*=NULL*/){
+	if(dest==NULL) return;
 
-	char **lhs_dest, **rhs_dest;
-	//lhs_global=false;
-	//rhs_global=false;
+	ExprResult** lhs_result = NULL;
+	ExprResult** rhs_result = NULL;
 	if(lhs!=NULL){
-		if(lhs->get_expr_type()!=EXPR_tmp_var) lhs_dest = new char*(context.allocate_var());
-		else lhs_dest=new char*;
-		try 					{ lhs->renderasm(context, lhs_dest); }
-		catch(const bool& glob)	{ lhs_global=glob; }
+		lhs_result = new ExprResult*(NULL);
+		lhs->renderasm(context, lhs_result);
 	} 
 	if(rhs!=NULL){
-		if(rhs->get_expr_type()!=EXPR_tmp_var) rhs_dest = new char*(context.allocate_var());
-		else rhs_dest=new char*;
-		try 					{ rhs->renderasm(context, rhs_dest); }
-		catch(const bool& glob)	{ rhs_global=glob; }
+		rhs_result = new ExprResult*(NULL);
+		rhs->renderasm(context, rhs_result);
 	} 
 
+	if(*dest==NULL) *dest = new Temporary(context.allocate_var()); 		// Not null when called by Variables
 
 	if(lhs!=NULL && rhs!=NULL){
-		if(!strcmp(oper,"+")) 	arithmetic_ins(*destination, *lhs_dest, *rhs_dest, "addu"); 	
-		if(!strcmp(oper,"-")) 	arithmetic_ins(*destination, *lhs_dest, *rhs_dest, "subu"); 	
-		if(!strcmp(oper,"|")) 	arithmetic_ins(*destination, *lhs_dest, *rhs_dest, "or"); 	
-		if(!strcmp(oper,"&")) 	arithmetic_ins(*destination, *lhs_dest, *rhs_dest, "and"); 	
-		if(!strcmp(oper,"^")) 	arithmetic_ins(*destination, *lhs_dest, *rhs_dest, "xor"); 	
-		if(!strcmp(oper,"<<")) 	arithmetic_ins(*destination, *lhs_dest, *rhs_dest, "sllv"); 	
-		if(!strcmp(oper,">>")) 	arithmetic_ins(*destination, *lhs_dest, *rhs_dest, "srav"); 	
+		if(!strcmp(oper,"+")) 	arithmetic_ins			(*dest, *lhs_result, *rhs_result, "addu"); 	
+		if(!strcmp(oper,"-")) 	arithmetic_ins			(*dest, *lhs_result, *rhs_result, "subu"); 	
+		if(!strcmp(oper,"|")) 	arithmetic_ins			(*dest, *lhs_result, *rhs_result, "or"); 	
+		if(!strcmp(oper,"&")) 	arithmetic_ins			(*dest, *lhs_result, *rhs_result, "and"); 	
+		if(!strcmp(oper,"^")) 	arithmetic_ins			(*dest, *lhs_result, *rhs_result, "xor"); 	
+		if(!strcmp(oper,"<<")) 	arithmetic_ins			(*dest, *lhs_result, *rhs_result, "sllv"); 	
+		if(!strcmp(oper,">>")) 	arithmetic_ins			(*dest, *lhs_result, *rhs_result, "srav"); 	
 
-		if(!strcmp(oper,"*")) 	arithmetic_ins(*destination, *lhs_dest, *rhs_dest, "mul"); 	
-		if(!strcmp(oper,"%")) 	div_rem_ins(*destination, *lhs_dest, *rhs_dest, "mfhi"); 	
-		if(!strcmp(oper,"/")) 	div_rem_ins(*destination, *lhs_dest, *rhs_dest, "mflo"); 	
+		if(!strcmp(oper,"*")) 	arithmetic_ins			(*dest, *lhs_result, *rhs_result, "mul"); 	
+		if(!strcmp(oper,"%")) 	div_rem_ins				(*dest, *lhs_result, *rhs_result, "mfhi"); 	
+		if(!strcmp(oper,"/")) 	div_rem_ins				(*dest, *lhs_result, *rhs_result, "mflo"); 	
 
-		if(!strcmp(oper,"||")) 	logical_or_ins(context, *destination, *lhs_dest, *rhs_dest); 	
-		if(!strcmp(oper,"&&")) 	logical_and_ins(context, *destination, *lhs_dest, *rhs_dest); 	
-		if(!strcmp(oper,"<=")) 	logical_comparison_ins(context, *destination, *lhs_dest, *rhs_dest, "blez"); 	
-		if(!strcmp(oper,">=")) 	logical_comparison_ins(context, *destination, *lhs_dest, *rhs_dest, "bgez"); 	
-		if(!strcmp(oper,"<")) 	logical_comparison_ins(context, *destination, *lhs_dest, *rhs_dest, "bltz"); 	
-		if(!strcmp(oper,">")) 	logical_comparison_ins(context, *destination, *lhs_dest, *rhs_dest, "bgtz"); 	
-		if(!strcmp(oper,"==")) 	logical_comparison_ins(context, *destination, *lhs_dest, *rhs_dest, "beq", false); 	
-		if(!strcmp(oper,"!=")) 	logical_comparison_ins(context, *destination, *lhs_dest, *rhs_dest, "bne", false); 
+		if(!strcmp(oper,"||")) 	logical_or_ins 			(*dest, *lhs_result, *rhs_result, context); 	
+		if(!strcmp(oper,"&&")) 	logical_and_ins 		(*dest, *lhs_result, *rhs_result, context); 	
+		if(!strcmp(oper,"<=")) 	logical_comparison_ins 	(*dest, *lhs_result, *rhs_result, context, "blez"); 	
+		if(!strcmp(oper,">=")) 	logical_comparison_ins 	(*dest, *lhs_result, *rhs_result, context, "bgez"); 	
+		if(!strcmp(oper,"<")) 	logical_comparison_ins 	(*dest, *lhs_result, *rhs_result, context, "bltz"); 	
+		if(!strcmp(oper,">")) 	logical_comparison_ins 	(*dest, *lhs_result, *rhs_result, context, "bgtz"); 	
+		if(!strcmp(oper,"==")) 	logical_comparison_ins 	(*dest, *lhs_result, *rhs_result, context, "beq", false); 	
+		if(!strcmp(oper,"!=")) 	logical_comparison_ins 	(*dest, *lhs_result, *rhs_result, context, "bne", false); 
 	}
 	/* ----------------------------------- SINGLE OPERAND ----------------------------------- */
 	if(lhs==NULL && rhs!=NULL){
-		if(!strcmp(oper,"+"))	sign_ins(*destination, *rhs_dest, false);
-		if(!strcmp(oper,"-"))	sign_ins(*destination, *rhs_dest, true);
-		if(!strcmp(oper,"!")) 	logical_not_ins(context, *destination, *rhs_dest);
-		if(!strcmp(oper,"~")) 	bitwise_not_ins(*destination, *rhs_dest);
-		if(!strcmp(oper,"sizeof"))	sizeof_ins(*destination, *rhs_dest);
+		if(!strcmp(oper,"+"))		sign_ins 			(*dest, *rhs_result, false);
+		if(!strcmp(oper,"-"))		sign_ins 			(*dest, *rhs_result, true);
+		if(!strcmp(oper,"!")) 		logical_not_ins 	(*dest, *rhs_result, context);
+		if(!strcmp(oper,"~")) 		bitwise_not_ins 	(*dest, *rhs_result);
+		if(!strcmp(oper,"sizeof"))	sizeof_ins 			(*dest, *rhs_result);
 	}
 
+	if(lhs_result!=NULL) {
+		if((*lhs_result)->get_result_type()==RESULT_tmp) delete *lhs_result;
+		delete lhs_result;
+	}
+	if(rhs_result!=NULL){
+		if((*rhs_result)->get_result_type()==RESULT_tmp) delete *rhs_result;
+		delete rhs_result;
+	} 
 }
 
 
@@ -243,97 +246,98 @@ void Expression::renderasm(ASMhandle& context, char** destination /*=NULL*/){
 
 /* ---------------------------------------------- ARITHMETIC INSTRUCTIONS ---------------------------------------------- */
 
-void Expression::arithmetic_ins(char* destination, char* arg1, char* arg2, const string& instruction){
-	load_lhs(arg1, "$t0");
-	load_rhs(arg2, "$t1");
+void Expression::arithmetic_ins(ExprResult* dest, ExprResult* lhs_result, ExprResult* rhs_result, const string& instruction){
+	lhs_result->load("$t0");
+	rhs_result->load("$t1");
 	assembler.push_back(ss<<pad<<instruction<<"$t2, $t0, $t1"<<endl);
-	assembler.push_back(ss<<pad<<"sw"<<"$t2, "<<destination<<endl);
+	dest->store("$t2");
 }
 
-void Expression::div_rem_ins(char* destination, char* arg1, char* arg2, const string& instruction){
-	load_lhs(arg1, "$t0");
-	load_rhs(arg2, "$t1");
+void Expression::div_rem_ins(ExprResult* dest, ExprResult* lhs_result, ExprResult* rhs_result, const string& instruction){
+	lhs_result->load("$t0");
+	rhs_result->load("$t1");
 	assembler.push_back(ss<<pad<<"teq"<<"$t1, $0, 7"<<endl);
 	assembler.push_back(ss<<pad<<"div"<<"$t0, $t1"<<endl);
 	assembler.push_back(ss<<pad<<instruction<<"$t2"<<endl);
-	assembler.push_back(ss<<pad<<"sw"<<"$t2, "<<destination<<endl);
+	dest->store("$t2");
 }
 
 
 /* ---------------------------------------------- LOGICAL INSTRUCTIONS ---------------------------------------------- */
 
-void Expression::logical_or_ins(ASMhandle& context, char* destination, char* arg1, char* arg2){
+void Expression::logical_or_ins(ExprResult* dest, ExprResult* lhs_result, ExprResult* rhs_result, ASMhandle& context){
 	string non_default_action = context.get_assembly_label();		
 	string continued_exec = context.get_assembly_label();		
 	
-	load_lhs(arg1, "$t0");
-	assembler.push_back(ss<<pad<<"bne"<<"$0, $t0, "<<non_default_action<<endl);	// If arg1 is not 0, go to non_default action
+	lhs_result->load("$t0");
+	assembler.push_back(ss<<pad<<"bne"<<"$0, $t0, "<<non_default_action<<endl);		// If arg1 is not 0, go to non_default action
 	assembler.push_back(ss<<pad<<"nop"<<endl);
-	load_rhs(arg2, "$t1");
+	rhs_result->load("$t1");
 	assembler.push_back(ss<<pad<<"bne"<<"$0, $t1, "<<non_default_action<<endl); 	// If arg2 is not 0, go to non_default action
 	assembler.push_back(ss<<pad<<"nop"<<endl);
-	assembler.push_back(ss<<pad<<"move"<<"$t2"<<", $0"<<endl); 					// Default action reached, result is 0
-	assembler.push_back(ss<<pad<<"sw"<<"$t2, "<<destination<<endl);
+	assembler.push_back(ss<<pad<<"move"<<"$t2"<<", $0"<<endl); 						// Default action reached, result is 0
+	dest->store("$t2");
 	assembler.push_back(ss<<pad<<"b"<<continued_exec<<endl);
 	assembler.push_back(ss<<pad<<"nop"<<endl);
 	assembler.push_back(ss<<non_default_action<<":"<<endl);
 	assembler.push_back(ss<<pad<<"li"<<"$t2, 1"<<endl); 							// non-default action reached, result is 1
-	assembler.push_back(ss<<pad<<"sw"<<"$t2, "<<destination<<endl);
+	dest->store("$t2");
 	assembler.push_back(ss<<pad<<"b"<<continued_exec<<endl);
 	assembler.push_back(ss<<pad<<"nop"<<endl);
 	assembler.push_back(ss<<continued_exec<<":"<<endl); 							// continue execution of the program
 }
 
 
-void Expression::logical_and_ins(ASMhandle& context, char* destination, char* arg1, char* arg2){
+void Expression::logical_and_ins(ExprResult* dest, ExprResult* lhs_result, ExprResult* rhs_result, ASMhandle& context){
 	string non_default_action = context.get_assembly_label();		
 	string continued_exec = context.get_assembly_label();		
 	
-	load_lhs(arg1, "$t0");
-	assembler.push_back(ss<<pad<<"beq"<<"$0, $t0, "<<non_default_action<<endl);	// If arg1 is 0, go to non_default action
-	assembler.push_back(ss<<pad<<"nop"<<endl);
-	load_rhs(arg2, "$t1");
+	lhs_result->load("$t0");
+	assembler.push_back(ss<<pad<<"beq"<<"$0, $t0, "<<non_default_action<<endl);		// If arg1 is 0, go to non_default action
+	//assembler.push_back(ss<<pad<<"nop"<<endl);
+	rhs_result->load("$t1");
 	assembler.push_back(ss<<pad<<"beq"<<"$0, $t1, "<<non_default_action<<endl); 	// If arg2 is 0, go to non_default action
-	assembler.push_back(ss<<pad<<"nop"<<endl);
+	//assembler.push_back(ss<<pad<<"nop"<<endl);
 	assembler.push_back(ss<<pad<<"li"<<"$t2, 1"<<endl); 							// Default action reached, result is 1
-	assembler.push_back(ss<<pad<<"sw"<<"$t2, "<<destination<<endl);
+	dest->store("$t2");
 	assembler.push_back(ss<<pad<<"b"<<continued_exec<<endl);
-	assembler.push_back(ss<<pad<<"nop"<<endl);
+	//assembler.push_back(ss<<pad<<"nop"<<endl);
 	assembler.push_back(ss<<non_default_action<<":"<<endl);
-	assembler.push_back(ss<<pad<<"move"<<"$t2"<<", $0"<<endl); 					// non-default action reached, result is 0
-	assembler.push_back(ss<<pad<<"sw"<<"$t2, "<<destination<<endl);
-	assembler.push_back(ss<<pad<<"b"<<continued_exec<<endl);
-	assembler.push_back(ss<<pad<<"nop"<<endl);
+	assembler.push_back(ss<<pad<<"move"<<"$t2"<<", $0"<<endl); 						// non-default action reached, result is 0
+	dest->store("$t2");
+//	assembler.push_back(ss<<pad<<"b"<<continued_exec<<endl);
+//	assembler.push_back(ss<<pad<<"nop"<<endl);
 	assembler.push_back(ss<<continued_exec<<":"<<endl); 							// continue execution of the program
+
 }
 
 
-void Expression::logical_not_ins(ASMhandle& context, char* destination, char* arg){
+void Expression::logical_not_ins(ExprResult* dest, ExprResult* arg, ASMhandle& context){
 	string non_default_action = context.get_assembly_label();		
 	string continued_exec = context.get_assembly_label();		
 	
-	load_rhs(arg, "$t0");
-	assembler.push_back(ss<<pad<<"bne"<<"$0, $t0, "<<non_default_action<<endl);	// If arg1 is not 0, go to non_default action
+	arg->load("$t0");
+	assembler.push_back(ss<<pad<<"bne"<<"$0, $t0, "<<non_default_action<<endl);		// If arg1 is not 0, go to non_default action
 	assembler.push_back(ss<<pad<<"nop"<<endl);
 	assembler.push_back(ss<<pad<<"li"<<"$t2, 1"<<endl); 							// non-default action reached, result is 1
-	assembler.push_back(ss<<pad<<"sw"<<"$t2, "<<destination<<endl);
+	dest->store("$t2");
 	assembler.push_back(ss<<pad<<"b"<<continued_exec<<endl);
 	assembler.push_back(ss<<pad<<"nop"<<endl);
 	assembler.push_back(ss<<non_default_action<<":"<<endl);
-	assembler.push_back(ss<<pad<<"sw"<<"$0, "<<destination<<endl);					// non-default action reached, result is 0
+	dest->store("$0");
 	assembler.push_back(ss<<pad<<"b"<<continued_exec<<endl);
 	assembler.push_back(ss<<pad<<"nop"<<endl);
 	assembler.push_back(ss<<continued_exec<<":"<<endl); 							// continue execution of the program
 }
 
 // if comparison of arg1-arg2 is true, then 1, otherwise 0
-void Expression::logical_comparison_ins(ASMhandle& context, char* destination, char* arg1, char* arg2, 
-														const string& instruction, const bool& subtract/*=true*/){
+void Expression::logical_comparison_ins(ExprResult* dest, ExprResult* lhs_result, ExprResult* rhs_result, ASMhandle& context,
+																	const string& instruction, const bool& subtract/*=true*/){
 	string non_default_action = context.get_assembly_label();		
 	string continued_exec = context.get_assembly_label();		
 	
-	load_lhs(arg1, "$t0");
-	load_rhs(arg2, "$t1");
+	lhs_result->load("$t0");
+	rhs_result->load("$t1");
 	
 	if(subtract){
 	 	assembler.push_back(ss<<pad<<"subu"<<"$t2, $t0, $t1"<<endl);
@@ -343,13 +347,13 @@ void Expression::logical_comparison_ins(ASMhandle& context, char* destination, c
 	else assembler.push_back(ss<<pad<<instruction<<"$t0, $t1, "<<non_default_action<<endl); 	// Branch if comparison is true
 	assembler.push_back(ss<<pad<<"nop"<<endl);
 
-	assembler.push_back(ss<<pad<<"move"<<"$t2"<<", $0"<<endl); 						// Default action reached, result is 0
-	assembler.push_back(ss<<pad<<"sw"<<"$t2, "<<destination<<endl);
+	assembler.push_back(ss<<pad<<"move"<<"$t2"<<", $0"<<endl); 							// Default action reached, result is 0
+	dest->store("$t2");
 	assembler.push_back(ss<<pad<<"b"<<continued_exec<<endl);
 	assembler.push_back(ss<<pad<<"nop"<<endl);
 	assembler.push_back(ss<<non_default_action<<":"<<endl);
 	assembler.push_back(ss<<pad<<"li"<<"$t2, 1"<<endl); 								// non-default action reached, result is 1
-	assembler.push_back(ss<<pad<<"sw"<<"$t2, "<<destination<<endl);
+	dest->store("$t2");
 	assembler.push_back(ss<<pad<<"b"<<continued_exec<<endl);
 	assembler.push_back(ss<<pad<<"nop"<<endl);
 	assembler.push_back(ss<<continued_exec<<":"<<endl); 								// continue execution of the program
@@ -358,44 +362,27 @@ void Expression::logical_comparison_ins(ASMhandle& context, char* destination, c
 
 /* ---------------------------------------------- SINGLE OPERAND ---------------------------------------------- */
 
-void Expression::sign_ins(char* destination, char* arg, const bool& get_negative){
-	load_rhs(arg, "$t0");
+void Expression::sign_ins(ExprResult* dest, ExprResult* arg, const bool& get_negative){
+	arg->load("$t0");
 	if(get_negative){
 		assembler.push_back(ss<<pad<<"li"<<"$t1, 0xFFFFFFFF"<<endl);
-		assembler.push_back(ss<<pad<<"xor"<<"$t0, $t0, $t1"<<endl);					// Invert
+		assembler.push_back(ss<<pad<<"xor"<<"$t0, $t0, $t1"<<endl);						// Invert
 		assembler.push_back(ss<<pad<<"addi"<<"$t0, $t0, 1"<<endl);						// Add 1
 	}
-	assembler.push_back(ss<<pad<<"sw"<<"$t0, "<<destination<<endl);
+	dest->store("$t0");
 }
 
-void Expression::bitwise_not_ins(char* destination, char* arg){
-	load_rhs(arg, "$t0");
+void Expression::bitwise_not_ins(ExprResult* dest, ExprResult* arg){
+	arg->load("$t0");
 	assembler.push_back(ss<<pad<<"li"<<"$t1, 0xFFFFFFFF"<<endl);
 	assembler.push_back(ss<<pad<<"xor"<<"$t2, $t0, $t1"<<endl);
-	assembler.push_back(ss<<pad<<"sw"<<"$t2, "<<destination<<endl);
+	dest->store("$t2");
 }
 
-void Expression::sizeof_ins(char* destination, char* arg){
-	assembler.push_back(ss<<pad<<"li"<<"$t1, 4"<<endl);
-	assembler.push_back(ss<<pad<<"sw"<<"$t1, "<<destination<<endl);
+void Expression::sizeof_ins(ExprResult* dest, ExprResult* arg){
+	assembler.push_back(ss<<pad<<"li"<<"$t2, 4"<<endl);
+	dest->store("$t2");
 }
 
 
-/* ---------------------------------------------- LOADING OPERANDS ---------------------------------------------- */
 
-
-void Expression::load_lhs(char* arg, const string& dest_reg, const string& lhs_reg /*="$t8"*/){
-	if(!lhs_global) assembler.push_back(ss<<pad<<"lw"<<dest_reg<<", "<<arg<<endl);
-	else{
-		assembler.push_back(ss<<pad<<"lui"<<lhs_reg<<", %hi("<<arg<<")"<<endl);
-		assembler.push_back(ss<<pad<<"lw"<<dest_reg<<", %lo("<<arg<<")("<<lhs_reg<<")"<<endl);
-	}
-}
-
-void Expression::load_rhs(char* arg, const string& dest_reg, const string& rhs_reg /*="$t9"*/){
-	if(!rhs_global) assembler.push_back(ss<<pad<<"lw"<<dest_reg<<", "<<arg<<endl);
-	else{
-		assembler.push_back(ss<<pad<<"lui"<<rhs_reg<<", %hi("<<arg<<")"<<endl);
-		assembler.push_back(ss<<pad<<"lw"<<dest_reg<<", %lo("<<arg<<")("<<rhs_reg<<")"<<endl);
-	}
-}

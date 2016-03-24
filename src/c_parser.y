@@ -284,7 +284,7 @@ direct_declarator : IDENTIFIER                                      { $$ = new V
                   | LBRACKET declarator RBRACKET                    { $$ = $2; }
                   // Array cell
                   //| direct_declarator LSQUARE constant_expression RSQUARE     { $$= $1; $$->dereference_back($3); }
-                  //| direct_declarator LSQUARE RSQUARE               { $$= $1; $$->dereference_back(new Constant<int>(0));}
+                  //| direct_declarator LSQUARE RSQUARE               { $$= $1; $$->dereference_back(new Constant<uint64_t>(0));}
                   
                   // Function declaration: name and arguments
                   //| direct_declarator LBRACKET parameter_type_list RBRACKET
@@ -385,7 +385,7 @@ unary_expression  // Reduction to Level 1
                   | SIZEOF unary_expression              { $$ = new Expression(NULL, $1, $2, source_line, source_file);}
                   // Sizeof type
                   //| SIZEOF LBRACKET type_name RBRACKET                   { $$ = new Expression(NULL, $1, $3);}
-                  | SIZEOF LBRACKET INT RBRACKET         { $$ = new Constant<int>(sizeof(int), source_line, source_file);}
+                  | SIZEOF LBRACKET INT RBRACKET         { $$ = new Constant<uint64_t>(sizeof(int), source_line, source_file);}
                   ;
 
 UNARY_OPERATOR  // Address-of

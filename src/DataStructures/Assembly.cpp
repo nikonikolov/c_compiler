@@ -11,6 +11,9 @@ Assembly::~Assembly(){
 void Assembly::push_back(std::ostream& out){
 	stringstream ss;
 	ss << out.rdbuf();
+	//string line = ss.str();
+	//std::cerr<<line; 
+    //instructions->push_back(line);
     instructions->push_back(ss.str());
 
 /*	string line;

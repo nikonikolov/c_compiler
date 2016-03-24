@@ -42,9 +42,7 @@ fn:
 	sw      $a2, -12($fp)
 	addiu   $sp, $sp, -28		# Allocate more memory
 	sw      $a3, -16($fp)
-	li      $t0, 10
-	sw      $t0, -20($fp)
-	lw      $v0, -20($fp)
+	li      $v0, 10
 	lw      $ra, 0($fp)		# Load return address in register 31
 	lw      $fp, 4($fp)		# Restore the value of the frame pointer
 	addiu   $sp, $sp, 52		# Restore the value of the stack pointer

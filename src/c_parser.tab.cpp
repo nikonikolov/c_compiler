@@ -1869,7 +1869,7 @@ yyreduce:
 
   case 47:
 #line 388 "src/c_parser.y" /* yacc.c:1646  */
-    { (yyval.base_expr_ptr) = new Constant<int>(sizeof(int), source_line, source_file);}
+    { (yyval.base_expr_ptr) = new Constant<uint64_t>(sizeof(int), source_line, source_file);}
 #line 1874 "src/c_parser.tab.cpp" /* yacc.c:1646  */
     break;
 

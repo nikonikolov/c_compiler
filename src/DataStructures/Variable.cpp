@@ -3,24 +3,24 @@
 bool Variable::first_global = true;
 
 Variable::Variable(char* name_in) :
-	type_name(NULL), init_val(NULL), dereferencer(NULL), initialized(false), location(NULL) {
+	ExprResult(RESULT_var), type_name(NULL), init_val(NULL), dereferencer(NULL), initialized(false) {
 		name = strdup(name_in);
 }
 
 Variable::Variable(char* type_name_in, char* name_in, list<PtrDeref>* dereferencer_in/*=NULL*/) :
-	init_val(NULL), dereferencer(dereferencer_in), initialized(false), location(NULL) {
+	ExprResult(RESULT_var), init_val(NULL), dereferencer(dereferencer_in), initialized(false) {
 	type_name = strdup(type_name_in);
 	if(name_in!=NULL) name = strdup(name_in);
 }
 
-Variable::Variable(char* name_in, const int& line_in, const string& src_file_in) :
-	type_name(NULL), init_val(NULL), dereferencer(NULL), initialized(false), location(NULL), line(line_in), src_file(src_file_in) {
+Variable::Variable(char* name_in, const int& line_in, const string& src_file_in) : ExprResult(RESULT_var), 
+	type_name(NULL), init_val(NULL), dereferencer(NULL), initialized(false), line(line_in), src_file(src_file_in) {
 		name = strdup(name_in);
 }
 
 Variable::Variable(char* type_name_in, char* name_in, const int& line_in, const string& src_file_in, 
-	list<PtrDeref>* dereferencer_in /*=NULL*/) : line(line_in), src_file(src_file_in),
-	init_val(NULL), dereferencer(dereferencer_in), initialized(false), location(NULL) {
+	list<PtrDeref>* dereferencer_in /*=NULL*/) : ExprResult(RESULT_var), line(line_in), src_file(src_file_in),
+	init_val(NULL), dereferencer(dereferencer_in), initialized(false) {
 	type_name = strdup(type_name_in);
 	if(name_in!=NULL) name = strdup(name_in);
 }
@@ -28,7 +28,6 @@ Variable::Variable(char* type_name_in, char* name_in, const int& line_in, const 
 
 Variable::~Variable(){
 	if(init_val!=NULL) delete init_val;
-	if(location!=NULL) free(location);
 	if(type_name!=NULL) free(type_name);
 	if(name!=NULL) 	free(name);
 
@@ -61,32 +60,15 @@ string Variable::get_name_str() const{
 }
 
 void Variable::set_asm_location(const string& str_in){
-	location=strdup(str_in.c_str());
-	initialized = true;			// Called by function parameters
-	global=false;
+	set_asm_location(str_in.c_str());
 }
 
 void Variable::set_asm_location(char* str_in){
-	location=strdup(str_in);
-	initialized = true;			// Called by function parameters
+	mem_location=strdup(str_in);
+	initialized = true;							// When called by function parameters
 	global=false;
 }
 
-char* Variable::get_asm_location(ASMhandle& context, bool& global_var /*=false*/){
-	if(!global){
-		global_var=false;
-		return location;
-	} 
-	else {
-		global_var=true;
-		return name;
-	}
-}
-
-/*bool Variable::initialized() const{
-	return initialized;
-}
-*/
 /* ================================================== GLOBALLY USED METHODS ================================================== */
 
 
@@ -112,7 +94,7 @@ void Variable::renderasm(ASMhandle& context, const bool& local /*=true*/){
 		global=false;
 		try{	// Allocate variable on the stack
 			pair<string, Variable*> tmp(string(name), this);
-			location = context.allocate_var(tmp);
+			mem_location = context.allocate_var(tmp);
 		}
 		catch(const ErrorgenT& error_in){
 			generate_error("Redefinition of variable \""+string(name)+"\"");
@@ -120,8 +102,12 @@ void Variable::renderasm(ASMhandle& context, const bool& local /*=true*/){
 		if(init_val==NULL) return;
 		if(init_val->get_expr_type()==EXPR_assignment_expr) generate_error("Invalid syntax for variable initialization value");
 		simplify_init_val();
-		init_val->renderasm(context, &location);
+
+		// Automatically assigns the value to the Variable location by invoking store
+		ExprResult** dest = new ExprResult*(this);
+		init_val->renderasm(context, dest);
 	
+		delete dest;
 		if(debug) cerr<<"Variable: renderasm successful"<<endl;
 	}
 
@@ -148,25 +134,11 @@ void Variable::renderasm_global(ASMhandle& context){
 	if(debug) cerr<<"Variable: renderasm_global(): variable inserted in ASMhandle"<<endl;
 
 	if(init_val!=NULL){
-		if(debug) cerr<<"Variable: renderasm_global(): starting initializer optimization"<<endl;
 		// Try to optimize the expression if not already a Constant
-		if(init_val->get_expr_type()!=EXPR_constant){
-			BaseExpression* tmp_expr=NULL;
-			try{
-				tmp_expr = init_val->simplify();
-				if(tmp_expr!=NULL){			
-					if(tmp_expr->get_expr_type()!=EXPR_constant) generate_error("Initializer for global variable not constant");
-					delete init_val;
-					init_val = tmp_expr;
-				}
-			}	
-			catch(const int& exception_in){
-				generate_error("Initializer for global variable not constant");
-			}
-		}
+		simplify_init_val();
+		if(init_val->get_expr_type()!=EXPR_constant) generate_error("Initializer for global variable not constant");
+		if(debug) cerr<<"Variable: renderasm_global() : initializer expression optimized"<<endl;
 	}
-
-	if(debug) cerr<<"Variable: renderasm_global : initializer expression optimized"<<endl;
 
 	assembler.push_back(ss<<pad<<".globl"<<name<<endl);
 	if(first_global){
@@ -179,13 +151,44 @@ void Variable::renderasm_global(ASMhandle& context){
 	assembler.push_back(ss<<pad<<".size"<<name<<", 4"<<endl);
 	assembler.push_back(ss<<name<<":"<<endl);
 	if(init_val!=NULL && init_val->get_expr_type()==EXPR_constant){
-		Constant<int>* value = static_cast<Constant<int>*>(init_val);		
+		Constant<uint64_t> *value = static_cast<Constant<uint64_t>*>(init_val);		
 		assembler.push_back(ss<<pad<<".word"<<value->get_value()<<endl);
 	} 
 	assembler.push_back(ss<<endl);
 
 	if(debug) cerr<<"Variable: renderasm_global successful"<<endl;
 }
+
+/* ================================================== ExprResult METHODS ================================================== */
+
+void Variable::load(const string& dest_reg){
+	if(!global) assembler.push_back(ss<<pad<<"lw"<<dest_reg<<", "<<mem_location<<endl);
+	else{
+		assembler.push_back(ss<<pad<<"lui"<<"$t9"<<", %hi("<<name<<")"<<endl);
+		assembler.push_back(ss<<pad<<"lw"<<dest_reg<<", %lo("<<name<<")($t9)"<<endl);
+	}
+}
+
+void Variable::store_from_mem(const string& dest_mem_location){
+	if(!global){
+		assembler.push_back(ss<<pad<<"lw"<<"$t0, "<<mem_location<<endl);
+		assembler.push_back(ss<<pad<<"sw"<<"$t0, "<<dest_mem_location<<endl);
+	} 
+	else{
+		assembler.push_back(ss<<pad<<"lui"<<"$t9"<<", %hi("<<name<<")"<<endl);
+		assembler.push_back(ss<<pad<<"lw"<<"$t8"<<", %lo("<<name<<")($t9)"<<endl);
+		assembler.push_back(ss<<pad<<"sw"<<"$t8, "<<dest_mem_location<<endl);
+	}
+}
+
+void Variable::store(const string& reg_location_in){
+	if(!global) assembler.push_back(ss<<pad<<"sw"<<reg_location_in<<", "<<mem_location<<endl);
+	else{
+		assembler.push_back(ss<<pad<<"lui"<<"$t9"<<", %hi("<<name<<")"<<endl);
+		assembler.push_back(ss<<pad<<"sw"<<reg_location_in<<", %lo("<<name<<")($t9)"<<endl);
+	}
+}
+
 
 /* ================================================== POINTER RELATED ================================================== */
 
@@ -217,13 +220,14 @@ void Variable::generate_error(const string& msg_out){
 /* ================================================== PRIVATE ================================================== */
 
 void Variable::simplify_init_val(){
+	if(debug) cerr<<"Variable: simplify_init_val(): starting initializer optimization"<<endl;
 	BaseExpression* tmp_expr=NULL;
 	try{
 		if(init_val!=NULL){
 			tmp_expr = init_val->simplify();
 			if(tmp_expr!=NULL){
 				delete init_val;
-				init_val = tmp_expr; 		// In case LHS was not simplified
+				init_val = tmp_expr; 		
 			}
 		} 
 	}

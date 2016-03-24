@@ -88,6 +88,8 @@ void CompoundStatement::renderasm(ASMhandle& context){
 // NOTE: Correction of $sp is performed by the caller for IF/FOR statements
 void CompoundStatement::renderasm(ASMhandle& context, const bool& function){
 
+	if(debug) cerr<<"CompoundStatement: renderasm enter"<<endl;
+
 	// Not needed by any of the callers - they copy it on their own
 	// ASMhandle new_context(context);
 
@@ -98,6 +100,8 @@ void CompoundStatement::renderasm(ASMhandle& context, const bool& function){
 		}
 	}
 
+	if(debug) cerr<<"CompoundStatement: renderasm declarations successful"<<endl;
+
 	bool return_stat=false;
 	// Execute the statements
 	if(statements!=NULL){
@@ -107,6 +111,8 @@ void CompoundStatement::renderasm(ASMhandle& context, const bool& function){
 			(*it)->renderasm(context);
 		}
 	}
+
+	if(debug) cerr<<"CompoundStatement: renderasm statements successful"<<endl;
 
 	if(!return_stat && function) context.subroutine_exit(NULL);
 }

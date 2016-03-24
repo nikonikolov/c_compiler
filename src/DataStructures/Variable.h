@@ -8,12 +8,19 @@
 
 typedef std::pair<BaseExpression*,int> PtrDeref;
 
+/* 	Template version instead of using var_type would not be a good idea since you would not know the types of Variables
+	appearing in BaseExpressions. Enum type instead of string would not be useful as well because you won't be able to
+	describe structs and unions. Note that the string contains only type-names such as int, double, etc and no * or [].
+	Pointers and levels of dereferencing are dealt with by the dereferecer structure below 
+*/
+
+
 /*	FIX:
 		1. Currently only integers assumed. Don't forger to account for template type at 
 		casting to Constant in renderasm_global_var as well
 */
 
-class Variable{
+class Variable : public ExprResult{
 
 public:
 	// NOTE: you need to overload constructor to build dereferencepretty_print(const int& indent)r
@@ -32,21 +39,22 @@ public:
 
 	const char* get_name() const;
 	string get_name_str() const;
-	//bool initialized() const;
 
 	void set_type_name(char* type_name_in);
 	void set_init_val(BaseExpression* init_val_in);
 	void set_asm_location(const string& str_in);
 	void set_asm_location(char* str_in);
-	char* get_asm_location(ASMhandle& context, bool& global_var);
+
+	/* ------------------------------------------------- ExprResult METHODS  ------------------------------------------------- */
+
+	void load(const string& dest_reg);
+	void store(const string& reg_location_in);
+	void store_from_mem(const string& dest_mem_location);
 
 	/* ------------------------------------------------- GLOBALLY USED METHODS ------------------------------------------------- */
 
 	void pretty_print(const int& indent);
 	void renderasm(ASMhandle& context, const bool& local = true);
-
-	/* ------------------------------------------------- GLOBAL SCOPE RELATED ------------------------------------------------- */
-	void renderasm_global(ASMhandle& context);
 
 	/* ------------------------------------------------- POINTER RELATED ------------------------------------------------- */
 
@@ -60,21 +68,32 @@ public:
 	void generate_error(const string& msg_out);
 
 private:
+	/* ------------------------------------------------- PRIVATE METHODS ------------------------------------------------- */
 	void simplify_init_val();
 	
+	/* ------------------------------------------------- GLOBAL SCOPE RELATED ------------------------------------------------- */
+	void renderasm_global(ASMhandle& context);
 
-	/* 	Template version instead of using var_type would not be a good idea since you would not know the types of Variables
-		appearing in BaseExpressions. Enum type instead of string would not be useful as well because you won't be able to
-		describe structs and unions. Note that the string contains only type-names such as int, double, etc and no * or [].
-		Pointers and levels of dereferencing are dealt with by the dereferecer structure below 
-	*/
+
+	/* ------------------------------------------------- SPECIFICATION MEMBER DATA --------------------------------------------- */
 	
 	char* type_name;				// Contains the typename of the variable, i.e. int, double, etc. No * or []
-	snum_t num_val;					// Contains the numerical value of token_val cast to the specified type
 	char* name;						// Name given to the variable in the program
 	BaseExpression* init_val;		// Contains the value to be assigned to the variable at initialization
 	
-	
+	/* ------------------------------------------------- MEMBER DATA FOR ASSEMBLY ---------------------------------------------- */
+	bool initialized;
+	bool global;
+	static bool first_global;			// Needed to identify when to print .data
+
+	/* ------------------------------------------------- GENERAL MEMBER DATA ------------------------------------------------- */
+
+	int line;
+	string src_file;
+	stringstream ss;
+
+	/* ------------------------------------------------- MEMBER DATA FOR POINTERS ---------------------------------------------- */
+
 	/* 	The following structure allows for describing Variables appearing both in declarations or in BaseExpressions.
 	 	Arrays and pointers are treated exactly the same way - using dereferencing
 	*/
@@ -87,18 +106,6 @@ private:
 		to Nan
 	*/
 
-
-	/* Fields for assembly */
-	char* location;						// Holds the location of the variable, e.g. 4($sp) or $t0
-	bool initialized;
-	
-	bool global;
-	static bool first_global;			// Needed to identify when to print .data
-
-	int line;
-	string src_file;
-
-	stringstream ss;
 };
 
 

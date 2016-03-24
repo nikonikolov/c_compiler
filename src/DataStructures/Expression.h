@@ -3,6 +3,7 @@
 
 #include "BaseExpression.h"
 #include "Constant.h"
+#include "Temporary.h"
 #include <string.h>
 
 
@@ -30,31 +31,30 @@ public:
 
 	BaseExpression* simplify();
 	void pretty_print(const int& indent);
-	virtual void renderasm(ASMhandle& context, char** destination=NULL);
+	virtual void renderasm(ASMhandle& context, ExprResult** dest=NULL);
 
 protected:
-	void load_lhs(char* arg, const string& dest_reg, const string& lhs_reg ="$t8");
-	void load_rhs(char* arg, const string& dest_reg, const string& rhs_reg ="$t9");
-
-
-	void arithmetic_ins(char* destination, char* arg1, char* arg2, const string& instruction);
-	void logical_or_ins(ASMhandle& context, char* destination, char* arg1, char* arg2);
-	void logical_and_ins(ASMhandle& context, char* destination, char* arg1, char* arg2);
-	void logical_not_ins(ASMhandle& context, char* destination, char* arg);
-	void logical_comparison_ins(ASMhandle& context, char* destination, char* arg1, char* arg2, const string& instruction, 
-																									const bool& subtract=true);
-	void div_rem_ins(char* destination, char* arg1, char* arg2, const string& instruction);
-	void sign_ins(char* destination, char* arg, const bool& get_negative);
-	void bitwise_not_ins(char* destination, char* arg);
-	void sizeof_ins(char* destination, char* arg);
+	
+	/* ---------------------------------------------- ARITHMETIC INSTRUCTIONS ---------------------------------------------- */
+	void arithmetic_ins			(ExprResult* dest, ExprResult* lhs_result, ExprResult* rhs_result, const string& instruction);
+	void div_rem_ins 			(ExprResult* dest, ExprResult* lhs_result, ExprResult* rhs_result, const string& instruction);
+	
+	/* ---------------------------------------------- LOGICAL INSTRUCTIONS ---------------------------------------------- */
+	void logical_or_ins 		(ExprResult* dest, ExprResult* lhs_result, ExprResult* rhs_result, ASMhandle& context);
+	void logical_and_ins 		(ExprResult* dest, ExprResult* lhs_result, ExprResult* rhs_result, ASMhandle& context);
+	void logical_not_ins 		(ExprResult* dest, ExprResult* arg, ASMhandle& context);
+	void logical_comparison_ins (ExprResult* dest, ExprResult* lhs_result, ExprResult* rhs_result, ASMhandle& context,
+																		const string& instruction, const bool& subtract=true);
+	
+	/* ---------------------------------------------- SINGLE OPERAND ---------------------------------------------- */
+	void sign_ins 				(ExprResult* dest, ExprResult* arg, const bool& get_negative);
+	void bitwise_not_ins 		(ExprResult* dest, ExprResult* arg);
+	void sizeof_ins 			(ExprResult* dest, ExprResult* arg);
 
 
 	char* oper;
 	BaseExpression* lhs;
 	BaseExpression* rhs;
-
-	bool lhs_global = false;
-	bool rhs_global = false;
 };
 
 

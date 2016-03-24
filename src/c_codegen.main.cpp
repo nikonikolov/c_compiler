@@ -13,6 +13,7 @@ int main(int argc, char* argv[]){
 		}
 	}
 
+  //cerr<<debug<<endl;
 	//yydebug=1;
 
   	cerr<<"========================================= Parsing starts ========================================="<<endl;

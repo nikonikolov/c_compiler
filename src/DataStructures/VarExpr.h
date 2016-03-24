@@ -20,7 +20,7 @@ public:
 	const char* get_name() const;
 	
 	void pretty_print(const int& indent);
-	void renderasm(ASMhandle& context, char** destination=NULL);
+	void renderasm(ASMhandle& context, ExprResult** dest=NULL);
 	BaseExpression* simplify();
 
 private:

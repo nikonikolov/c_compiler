@@ -4,6 +4,7 @@
 #include "Variable.h"
 #include "include.h"
 #include "BaseExpression.h"
+#include "Temporary.h"
 
 
 /*	FIX:
@@ -23,7 +24,7 @@ public:
 
 	string get_name() const;
 
-	void renderasm(ASMhandle& context, char** destination =NULL);
+	void renderasm(ASMhandle& context, ExprResult** dest =NULL);
 	void pretty_print(const int& indent);
 	BaseExpression* simplify();
 

@@ -4,6 +4,7 @@
 #include "Statement.h"
 #include "CompoundStatement.h"
 #include "BaseExpression.h"
+#include "ExprResult.h"
 
 /*
 	ConditionalCase: Represents a single if, else if, else, case or default statement as part of a bigger block of if or switch 

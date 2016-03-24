@@ -70,8 +70,7 @@ enum StatementT{
 
 
 enum ExprT{
-	//EXPR_fn_call = 3,
-	
+
 	EXPR_expression = 20,
 	EXPR_expr_statement = 21,
 	EXPR_constant = 22,
@@ -80,6 +79,16 @@ enum ExprT{
 	EXPR_ternery_expr = 28,
 	EXPR_fn_call = 29
 };
+
+/* =============================================== EXPRRESULT TYPES =============================================== */
+
+enum ResultT{
+	
+	RESULT_const = 20,
+	RESULT_var = 21,
+	RESULT_tmp = 22
+};
+
 
 /* =============================================== FUNCTION TYPES =============================================== */
 /*

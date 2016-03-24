@@ -36,20 +36,16 @@ void ConditionalCase::renderasm(ASMhandle& context){}
 // ReturnStatement, VarDeclaration. Last three don't do it. ConditionalCase and Loop will restore their own stack pointers,
 // so you should not be worried
 void ConditionalCase::renderasm(ASMhandle& context, const string& continued_execution, const string& next_jump){
+	if(debug) cerr<<"ConditionalCase: renderasm enter"<<endl;
 
 	ASMhandle new_context(context);
 	
 	// IF or ELSE IF; NOTE that bison will not parse sth invalid such as if() else if() do sth;
 	if(condition!=NULL){
-		char* result_condtion = context.allocate_var();
-		bool global_var=false;
-		try{ condition->renderasm(context, &result_condtion); }
-		catch(const bool& global_var_in){ global_var=global_var_in; }
-		if(!global_var)	assembler.push_back(ss<<pad<<"lw"<<"$t0, "<<result_condtion<<endl);
-		else{
-			assembler.push_back(ss<<pad<<"lui"<<"$t1"<<", %hi("<<result_condtion<<")"<<endl);
-			assembler.push_back(ss<<pad<<"lw"<<"$t0"<<", %lo("<<result_condtion<<")($t1)"<<endl);
-		}
+		ExprResult** result_condtion = new ExprResult*(NULL);
+		condition->renderasm(context, result_condtion);
+
+		(*result_condtion)->load("$t0");
 
 		// If condition is false jump to the next CondtionalCase or to the end of the Conditional
 		if(!next_jump.empty()) 	assembler.push_back(ss<<pad<<"beq"<<"$t0, $0, "<<next_jump<<endl);		 
@@ -89,6 +85,8 @@ void ConditionalCase::renderasm(ASMhandle& context, const string& continued_exec
 			}
 		}
 	}
+
+	if(debug) cerr<<"ConditionalCase: renderasm successful"<<endl;
 }
 
 
@@ -119,6 +117,8 @@ void Conditional::pretty_print(const int& indent){
 
 
 void Conditional::renderasm(ASMhandle& context){
+	if(debug) cerr<<"Conditional: renderasm enter"<<endl;
+	
 	string continued_execution = context.get_assembly_label();
 	string jump_next;
 	if(conditions->size()==1){
@@ -140,5 +140,8 @@ void Conditional::renderasm(ASMhandle& context){
 			else (*it)->renderasm(context, continued_execution, "");
 		}
 	}
+
+	if(debug) cerr<<"Conditional: renderasm successful"<<ss.str()<<endl;
+
 	assembler.push_back(ss<<continued_execution<<":"<<endl);
 }

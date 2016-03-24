@@ -15,115 +15,102 @@ AssignmentExpression::~AssignmentExpression(){
 
 /* =============================================== VIRTUAL METHODS IMPLEMENTATION =============================================== */
 
-void AssignmentExpression::renderasm(ASMhandle& context, char** destination /*=NULL*/){
+void AssignmentExpression::renderasm(ASMhandle& context, ExprResult** dest /*=NULL*/){
 
-	char **lhs_dest, **rhs_dest;
-	//Variable* var=NULL;
-	//lhs_global=false;
-	//rhs_global=false;
-
+	ExprResult** lhs_result = NULL;
+	ExprResult** rhs_result = NULL;
 	if(lhs!=NULL){
-		if(lhs->get_expr_type()!=EXPR_tmp_var) lhs_dest = new char*(context.allocate_var());
-		else lhs_dest=new char*;
-		try 					{ lhs->renderasm(context, lhs_dest); }
-		catch(const bool& glob) { lhs_global=glob; }
+		lhs_result = new ExprResult*(NULL);
+		lhs->renderasm(context, lhs_result);
 	} 
 	if(rhs!=NULL){
-		if(rhs->get_expr_type()!=EXPR_tmp_var) rhs_dest = new char*(context.allocate_var());
-		else rhs_dest=new char*;
-		try 					{ rhs->renderasm(context, rhs_dest); }
-		catch(const bool& glob) { rhs_global=glob; }
+		rhs_result = new ExprResult*(NULL);
+		rhs->renderasm(context, rhs_result);
+	} 
+
+	if(dest!=NULL){
+		if(*dest!=NULL) generate_error("Assignment Expression cannot be RHS of another expression");
+		*dest = new Temporary(context.allocate_var());
 	} 
 
 	if(lhs!=NULL && rhs!=NULL){
+		if(!strcmp(oper,"=")) 	assignment_ins 	(dest, *lhs_result, *rhs_result); 	
+		if(!strcmp(oper,"+=")) 	assignment_ins 	(dest, *lhs_result, *rhs_result, "addu"); 	
+		if(!strcmp(oper,"-=")) 	assignment_ins 	(dest, *lhs_result, *rhs_result, "subu"); 	
+		if(!strcmp(oper,"|=")) 	assignment_ins 	(dest, *lhs_result, *rhs_result, "or"); 	
+		if(!strcmp(oper,"&=")) 	assignment_ins 	(dest, *lhs_result, *rhs_result, "and"); 	
+		if(!strcmp(oper,"^=")) 	assignment_ins 	(dest, *lhs_result, *rhs_result, "xor"); 	
+		if(!strcmp(oper,"<<=")) assignment_ins 	(dest, *lhs_result, *rhs_result, "sllv"); 	
+		if(!strcmp(oper,">>=")) assignment_ins 	(dest, *lhs_result, *rhs_result, "srav"); 	
 
-		if(!strcmp(oper,"=")) 	assignment_ins(destination, *lhs_dest, *rhs_dest); 	
-		if(!strcmp(oper,"+=")) 	assignment_ins(destination, *lhs_dest, *rhs_dest, "addu"); 	
-		if(!strcmp(oper,"-=")) 	assignment_ins(destination, *lhs_dest, *rhs_dest, "subu"); 	
-		if(!strcmp(oper,"|=")) 	assignment_ins(destination, *lhs_dest, *rhs_dest, "or"); 	
-		if(!strcmp(oper,"&=")) 	assignment_ins(destination, *lhs_dest, *rhs_dest, "and"); 	
-		if(!strcmp(oper,"^=")) 	assignment_ins(destination, *lhs_dest, *rhs_dest, "xor"); 	
-		if(!strcmp(oper,"<<=")) assignment_ins(destination, *lhs_dest, *rhs_dest, "sllv"); 	
-		if(!strcmp(oper,">>=")) assignment_ins(destination, *lhs_dest, *rhs_dest, "srav"); 	
-
-		if(!strcmp(oper,"*=")) 	assignment_ins(destination, *lhs_dest, *rhs_dest, "mul"); 	
-		if(!strcmp(oper,"%=")) 	div_rem_ins(destination, *lhs_dest, *rhs_dest, "mfhi"); 	
-		if(!strcmp(oper,"/=")) 	div_rem_ins(destination, *lhs_dest, *rhs_dest, "mflo"); 	
+		if(!strcmp(oper,"*=")) 	assignment_ins 	(dest, *lhs_result, *rhs_result, "mul"); 	
+		if(!strcmp(oper,"%=")) 	div_rem_ins 	(dest, *lhs_result, *rhs_result, "mfhi"); 	
+		if(!strcmp(oper,"/=")) 	div_rem_ins 	(dest, *lhs_result, *rhs_result, "mflo"); 	
 
 	}
 	/* ----------------------------------- SINGLE OPERAND ----------------------------------- */
 	if(lhs==NULL && rhs!=NULL){
-		if(!strcmp(oper,"++")) 	inc_dec_ins(destination, *rhs_dest, 1, false);
-		if(!strcmp(oper,"--")) 	inc_dec_ins(destination, *rhs_dest, -1, false);
+		if(!strcmp(oper,"++")) 	inc_dec_ins 	(dest, *rhs_result, 1, false);
+		if(!strcmp(oper,"--")) 	inc_dec_ins 	(dest, *rhs_result, -1, false);
 	}
 	if(lhs!=NULL && rhs==NULL){
-		if(!strcmp(oper,"++")) 	inc_dec_ins(destination, *lhs_dest, 1, true);
-		if(!strcmp(oper,"--")) 	inc_dec_ins(destination, *lhs_dest, -1, true);
+		if(!strcmp(oper,"++")) 	inc_dec_ins 	(dest, *lhs_result, 1, true);
+		if(!strcmp(oper,"--")) 	inc_dec_ins 	(dest, *lhs_result, -1, true);
 	}
 
+	if(lhs_result!=NULL) {
+		if((*lhs_result)->get_result_type()==RESULT_tmp) delete *lhs_result;
+		delete lhs_result;
+	}
+	if(rhs_result!=NULL){
+		if((*rhs_result)->get_result_type()==RESULT_tmp) delete *rhs_result;
+		delete rhs_result;
+	} 
 }
 
 /* =============================================== CODEGEN METHODS =============================================== */
 
-void AssignmentExpression::assignment_ins(char** destination, char* lhs_dest, char* rhs_dest, const string& instruction /*=""*/){
+void AssignmentExpression::assignment_ins(ExprResult** dest, ExprResult* lhs_result, ExprResult* rhs_result, 
+																								const string& instruction /*=""*/){
 	bool lhs_loaded=true;
 
 	// Arithmetic operation required
-	if(!instruction.empty()) arithmetic_ins(lhs_dest, rhs_dest, instruction);
+	if(!instruction.empty()) arithmetic_ins(lhs_result, rhs_result, instruction);
 	// Simple assignment
 	else{
-		load_rhs(rhs_dest, "$t0");
+		rhs_result->load("$t2");
 		lhs_loaded=false;
 	} 
 
-	store_lhs(lhs_dest, "$t0", lhs_loaded);
-	if(destination!=NULL)	assembler.push_back(ss<<pad<<"sw"<<"$t0, "<<*destination<<endl);
+	lhs_result->store("$t2");
+	if(dest!=NULL)	(*dest)->store("$t2");
 }
 
-void AssignmentExpression::arithmetic_ins(char* lhs_dest, char* rhs_dest, const string& instruction){
-	load_lhs(lhs_dest, "$t0");
-	load_rhs(rhs_dest, "$t1");
-	assembler.push_back(ss<<pad<<instruction<<"$t0, $t0, $t1"<<endl);
+void AssignmentExpression::arithmetic_ins(ExprResult* lhs_result, ExprResult* rhs_result, const string& instruction){
+	lhs_result->load("$t0");
+	rhs_result->load("$t1");
+	assembler.push_back(ss<<pad<<instruction<<"$t2, $t0, $t1"<<endl);
 }
 
-void AssignmentExpression::inc_dec_ins(char** destination, char* arg, const int& val, const bool& post_inc){
-	if(post_inc) 	load_lhs(arg, "$t0");
-	else			load_rhs(arg, "$t0");
+void AssignmentExpression::inc_dec_ins(ExprResult** dest, ExprResult* arg, const int& val, const bool& post_inc){
+	arg->load("$t0");
 	
-	if(destination!=NULL && post_inc) assembler.push_back(ss<<pad<<"sw"<<"$t0, "<<*destination<<endl);	// Assign the old value to the destination
+	if(dest!=NULL && post_inc) 	(*dest)->store("$t0");					// Assign the old value to the destination
 	assembler.push_back(ss<<pad<<"addiu"<<"$t0, $t0, "<<val<<endl);
 	
-	// Assign the new value to the variable
-	if(post_inc) 	store_lhs(arg, "$t0", true);
-	else			store_rhs(arg, "$t0", true);
-	if(destination!=NULL && !post_inc) assembler.push_back(ss<<pad<<"sw"<<"$t0, "<<*destination<<endl);	// Assign the new value to the destination
+	arg->store("$t0");													// Assign the new value to the variable
+	if(dest!=NULL && !post_inc) (*dest)->store("$t0");					// Assign the new value to the destination
 }
 
-void AssignmentExpression::div_rem_ins(char** destination, char* lhs_dest, char* rhs_dest, const string& instruction){
-	load_lhs(lhs_dest, "$t0");
-	load_rhs(rhs_dest, "$t1");
+void AssignmentExpression::div_rem_ins(ExprResult** dest, ExprResult* lhs_result, ExprResult* rhs_result, const string& instruction){
+	lhs_result->load("$t0");
+	rhs_result->load("$t1");
 	assembler.push_back(ss<<pad<<"teq"<<"$t1, $0, 7"<<endl);
 	assembler.push_back(ss<<pad<<"div"<<"$t0, $t1"<<endl);
 	assembler.push_back(ss<<pad<<instruction<<"$t2"<<endl);
-	store_lhs(lhs_dest, "$t2", true);
-	if(destination!=NULL)	assembler.push_back(ss<<pad<<"sw"<<"$t2, "<<*destination<<endl);
+	lhs_result->store("$t2");
+	if(dest!=NULL)	(*dest)->store("$t2");
 }
 
 
-/* ---------------------------------------------- STORING OPERANDS ---------------------------------------------- */
 
-void AssignmentExpression::store_lhs(char* arg, const string& dest_reg, const bool& loaded, const string& lhs_reg /*="$t8"*/){
-	if(!lhs_global) assembler.push_back(ss<<pad<<"sw"<<dest_reg<<", "<<arg<<endl);	
-	else{
-		if(!loaded) assembler.push_back(ss<<pad<<"lui"<<lhs_reg<<", %hi("<<arg<<")"<<endl);
-		assembler.push_back(ss<<pad<<"sw"<<dest_reg<<", %lo("<<arg<<")("<<lhs_reg<<")"<<endl);
-	} 
-}
-
-void AssignmentExpression::store_rhs(char* arg, const string& dest_reg, const bool& loaded, const string& rhs_reg /*="$t9"*/){
-	if(!rhs_global) assembler.push_back(ss<<pad<<"sw"<<dest_reg<<", "<<arg<<endl);	
-	else{
-		if(!loaded) assembler.push_back(ss<<pad<<"lui"<<rhs_reg<<", %hi("<<arg<<")"<<endl);
-		assembler.push_back(ss<<pad<<"sw"<<dest_reg<<", %lo("<<arg<<")("<<rhs_reg<<")"<<endl);
-	} 
-}

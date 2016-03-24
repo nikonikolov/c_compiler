@@ -46,45 +46,45 @@ fn:
 	addiu   $t0, $t0, 1
 	sw      $t0, -8($fp)
 	sw      $t0, -20($fp)
-	lw      $t0, -20($fp)
-	sw      $t0, -12($fp)
+	lw      $t2, -20($fp)
+	sw      $t2, -12($fp)
 	lw      $t0, 24($fp)
 	addiu   $t0, $t0, 1
 	sw      $t0, 24($fp)
 	sw      $t0, -24($fp)
-	lw      $t0, -24($fp)
-	sw      $t0, -12($fp)
+	lw      $t2, -24($fp)
+	sw      $t2, -12($fp)
 	lw      $t0, 28($fp)
 	addiu   $t0, $t0, 1
 	sw      $t0, 28($fp)
 	sw      $t0, -28($fp)
-	lw      $t0, -28($fp)
-	sw      $t0, -12($fp)
+	lw      $t2, -28($fp)
+	sw      $t2, -12($fp)
 	lw      $t0, 32($fp)
 	addiu   $t0, $t0, 1
 	sw      $t0, 32($fp)
 	sw      $t0, -32($fp)
-	lw      $t0, -32($fp)
-	sw      $t0, -12($fp)
+	lw      $t2, -32($fp)
+	sw      $t2, -12($fp)
 	lw      $t0, -12($fp)
 	addiu   $t0, $t0, 1
 	sw      $t0, -12($fp)
 	sw      $t0, -36($fp)
-	lw      $t0, -36($fp)
-	lui     $t8, %hi(glob3)
-	sw      $t0, %lo(glob3)($t8)
+	lw      $t2, -36($fp)
+	lui     $t9, %hi(glob3)
+	sw      $t2, %lo(glob3)($t9)
 	lui     $t9, %hi(glob3)
 	lw      $t0, %lo(glob3)($t9)
 	addiu   $t0, $t0, 1
+	lui     $t9, %hi(glob3)
 	sw      $t0, %lo(glob3)($t9)
 	sw      $t0, -40($fp)
-	lw      $t0, -40($fp)
-	sw      $t0, -12($fp)
-	addiu   $sp, $sp, -28		# Allocate more memory
+	lw      $t2, -40($fp)
+	sw      $t2, -12($fp)
 	lw      $v0, -12($fp)
 	lw      $ra, 0($fp)		# Load return address in register 31
 	lw      $fp, 4($fp)		# Restore the value of the frame pointer
-	addiu   $sp, $sp, 80		# Restore the value of the stack pointer
+	addiu   $sp, $sp, 52		# Restore the value of the stack pointer
 	j       $ra
 	nop     
 

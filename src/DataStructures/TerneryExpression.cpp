@@ -80,7 +80,7 @@ void TerneryExpression::pretty_print(const int& indent){
 }
 
 
-void TerneryExpression::renderasm(ASMhandle& context, char** destination /*=NULL*/){
+void TerneryExpression::renderasm(ASMhandle& context, ExprResult** dest /*=NULL*/){
 }
 
 BaseExpression* TerneryExpression::simplify(){

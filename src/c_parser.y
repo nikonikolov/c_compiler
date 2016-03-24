@@ -17,7 +17,7 @@
   #include "DataStructures/VarExpr.h"
   #include "DataStructures/FnCall.h"
   #include "DataStructures/BaseExpression.h"
-  #include "DataStructures/TerneryExpression.h"
+  #include "DataStructures/ArrayExpression.h"
   #include "DataStructures/Expression.h"
   #include "DataStructures/ConditionalExpression.h"
   #include "DataStructures/AssignmentExpression.h"
@@ -35,8 +35,8 @@
 
 %union{
   char* strval;
-  uint64_t intval;
-  //int intval;
+  uint64_t uint64val;
+  int intval;
   double64_t floatval;
 
   Variable* var_ptr;
@@ -55,6 +55,7 @@
   BaseExpression* base_expr_ptr;
   ExpressionStatement* expr_statement_ptr;
   VarDeclaration* var_declaration_ptr;
+  ArrayExpression* arr_expr_ptr;
 
   ForLoopTuple* fl_tuple;
 }
@@ -75,7 +76,7 @@
 
 /* --------------------------------------------------- TOKENS CONSTANTS --------------------------------------------------- */
 
-%token <intval>   INTEGER_CONST 
+%token <uint64val>   INTEGER_CONST 
 %token <floatval> FLOATING_CONST
 %token <strval>   CHAR_CONST      // Probably needs changing
 
@@ -95,13 +96,15 @@
 %type <vector_vars_ptrs_ptr> fn_params_list init_declarator_list
 
 %type <var_ptr> init_declarator direct_declarator declarator
-%type <base_expr_ptr> initializer initializer_list
+%type <base_expr_ptr> initializer
+%type <arr_expr_ptr> initializer_list
 
 %type <vector_var_declarations_ptrs_ptr> declaration_list
 %type <var_declaration_ptr> declaration
 
 %type <fn_ptr> fn_declaration fn_prototype
 
+%type <intval>   pointer 
 
 /* ---------------------------------------------- STATEMENT TYPES -------------------------------------------- */
 
@@ -128,7 +131,7 @@
 %type <base_expr_ptr> CONSTANT primary_expression postfix_expression unary_expression cast_expression expression
 %type <base_expr_ptr> multiplicative_expression additive_expression shift_expression relational_expression equality_expression
 %type <base_expr_ptr> and_expression inclusive_or_expression exclusive_or_expression logical_and_expression logical_or_expression
-%type <base_expr_ptr> conditional_expression assignment_expression 
+%type <base_expr_ptr> conditional_expression assignment_expression constant_expression
 %type <vector_base_expression_ptrs_ptr> argument_expression_list expression_list
 
 %type <statement_ptr> expression_statement 
@@ -244,14 +247,7 @@ type_name : INT                                       { $$ = $1; }
 
 /* -------------------------------------------- VARIABLE DECLARATIONS ------------------------------------------ */
 
-// Declaration of a variable
-/* Original Version
-declaration : declaration_type init_declarator_list SEMI_COLON              { $$ = new VarDeclaration('int', $2); }
-            // Allowed but not sensible. Simply ignore
-            | declaration_type SEMI_COLON   { cerr<<"Useless definition in file "<<source_file<<", Line: "<<input_file_line<<endl;}
-            ;
-*/
-
+// Declaration of a variable; C-grammar uses declaration_type instead of INT
 declaration : INT init_declarator_list SEMI_COLON              { $$ = new VarDeclaration($1, $2); }
             // Allowed but not sensible. Simply ignore
             | INT SEMI_COLON   { cerr<<"Warning: Useless definition in file "<<source_file<<", Line: "<<input_file_line<<endl;}
@@ -274,49 +270,45 @@ init_declarator_list  : init_declarator                                   { $$ =
                       ;
                       
 // Variable name and initialization/value (if provided) at declaration
-init_declarator   : declarator                                      { $$ = $1;}
-                  | declarator EQUALS initializer                   { $$ = $1; $$->set_init_val($3);}
+init_declarator   : declarator                                            { $$ = $1;}
+                  | declarator EQUALS initializer                         { $$ = $1; $$->set_init_val($3);}
                   ;
 
 /* ---------------------------------------------- LHS OF INITIALIZATION -------------------------------------------- */
 
 // LHS of variable initialization
-declarator  : direct_declarator                                     { $$ = $1; }
-            //| pointer direct_declarator
+declarator  : direct_declarator                                           { $$ = $1; }
+            | pointer direct_declarator                                   { $$ = $2; $$->inc_deref_lvl($1); }
             ;
 
-// NB make a separate grammmar for function declarations and prototypes - they are definitely not the same as variables
 // Variable name, Array cell or function
-direct_declarator : IDENTIFIER                                      { $$ = new Variable($1, source_line, source_file); }
-                  | LBRACKET declarator RBRACKET                    { $$ = $2; }
+direct_declarator : IDENTIFIER                                            { $$ = new Variable(NULL, $1, source_line, source_file); }
+                  | LBRACKET declarator RBRACKET                              { $$ = $2; }
                   // Array cell
-                  //| direct_declarator LSQUARE constant_expression RSQUARE     { $$= $1; $$->dereference_back($3); }
-                  //| direct_declarator LSQUARE RSQUARE               { $$= $1; $$->dereference_back(new Constant<uint64_t>(0));}
-                  
-                  // Function declaration: name and arguments
-                  //| direct_declarator LBRACKET parameter_type_list RBRACKET
-                  //| direct_declarator LBRACKET identifier_list RBRACKET
-                  //| direct_declarator LBRACKET RBRACKET
+                  | direct_declarator LSQUARE constant_expression RSQUARE { $$ = $1; $$->inc_array_size($3); }
+                  | direct_declarator LSQUARE RSQUARE                     { $$ = $1; $$->inc_array_size(NULL); }
                   ;
+
+// Pointer
+pointer : MULT                    { $$=1; }
+        | pointer MULT            { $$++; }
+        ;
 
 /* ---------------------------------------------- RHS OF INITIALIZATION -------------------------------------------- */
 
 // RHS of variable initialization
 initializer // Expression value for a variable              
-            : assignment_expression                                 { $$ = $1;}
-
-            /* Options are to make a function that appends the lists properly, or to use the lhs pointers only of the first column
-              Note this means you can probably use TerneryExpressions only for the first column, but not obligatory. Some
-              additional functions will be needed in Ternery Expression. You will also need to repair it's pretty print */
-            // 1D array initialization
-            | LCURLY initializer_list RCURLY    
-            // 2D array initialization
-            | LCURLY initializer_list COMMA RCURLY
+            : expression                                            { $$ = $1;}
+            // 1D or final reduction for multidimensional array
+            | LCURLY initializer_list RCURLY                        { $$ = $2; }
+            // Indicates single dimension of a multidimensional array
+            | LCURLY initializer_list COMMA RCURLY                  { $$ = new ArrayExpression($2, source_line, source_file); }
             ;
 
 // List for array elements initialization
-initializer_list  : initializer                                     { /*$$ = new TerneryExpression(NULL,$1,NULL);*/}
-                  | initializer_list COMMA initializer              { /*$$ = $1; $$->push_back_rhs($3);*/}
+initializer_list  : initializer                                     { $$ = new ArrayExpression($1, source_line, source_file);}
+                  // Indicates either more than 1 dimension or a list for 1 dimension
+                  | initializer_list COMMA initializer              { $$ = $1; $$->push_back_mem($3);}
                   ;
 
 
@@ -357,7 +349,7 @@ postfix_expression  // Reduction to Level 0
                     | postfix_expression LSQUARE expression RSQUARE     
                     // Function call
                     | bracketed_identifier LBRACKET argument_expression_list RBRACKET 
-                                                                                  { $$ = new FnCall($1,$3,source_line,source_file); } 
+                                                                                { $$ = new FnCall($1,$3,source_line,source_file); } 
                     // Function call with no arguments
                     | bracketed_identifier LBRACKET RBRACKET                    { $$ = new FnCall($1,NULL,source_line,source_file); }
                     // Structs and Unions member access
@@ -584,9 +576,8 @@ expression_list // Reduction to Level 14
 
 /* ============================================== 3.4 CONSTANT EXPRESSIONS ============================================== */
 
-// NB: Although not yet needed, this might be very very useful for structs and enums. Check the C grammar
-//CONSTANT_EXPRESSION : CONDITIONAL_EXPRESSION ;            
-
+// Used when a value needs to be initialized to a constant. Excludes only assignment expressions
+constant_expression : conditional_expression ;            
 
 
 /* ===================================================================================================================== */
@@ -602,11 +593,18 @@ expression_list // Reduction to Level 14
   Try to make function pointers work. Try const, long, etc.. Actually in the end you should have one rule that defines 
   a variable and change only that one */
 
+ /* 
+fn_return_type  : INT                                 { $$ = new Variable($1, NULL); }
+                | INT pointer
+                | VOID
+                ;
+*/
+
 fn_prototype  : INT IDENTIFIER LBRACKET fn_params_list RBRACKET SEMI_COLON          
                                                       { $$ = new Function(new Variable($1, NULL), $2, $4, NULL); }
                 ;
 
-
+// NOTE: You cannot have an array as return type
 // You need to modify the grammar for return type and Variable* to be returned from the reduction of the rule
 fn_declaration  : INT IDENTIFIER LBRACKET fn_params_list RBRACKET compound_statement          
                                                       { $$ = new Function(new Variable($1, NULL), $2, $4, $6); }
@@ -622,6 +620,12 @@ fn_params_list  : INT bracketed_identifier                      { $$ = new vecto
 bracketed_identifier  : IDENTIFIER                                  { $$ = $1; }
                       | LBRACKET bracketed_identifier RBRACKET      { $$ = $2; }
                       ;
+
+                  // Function declaration: name and arguments
+                  //| direct_declarator LBRACKET parameter_type_list RBRACKET
+                  //| direct_declarator LBRACKET identifier_list RBRACKET
+                  //| direct_declarator LBRACKET RBRACKET
+
 
 /* -------------------------------------------- LOOP STATEMENTS ------------------------------------------ */
 
@@ -659,6 +663,7 @@ while_loop  : WHILE LBRACKET expression_list RBRACKET compound_statement
             ;
 
 /* -------------------------------------------- CONDITIONAL STATEMENTS ------------------------------------------ */
+
 /* --------------------------------------------- 3.6.4 SELECTION STATEMENTS ------------------------------------------- */
 
 /*SELECTION_STATEMENT : IF LBRACKET EXPRESSION RBRACKET STATEMENT

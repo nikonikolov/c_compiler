@@ -1320,17 +1320,17 @@ YY_RULE_SETUP
 case 37:
 YY_RULE_SETUP
 #line 151 "src/c_lexer.lex"
-{ yylval.intval = dec_to_uint64(yytext); return INTEGER_CONST; }
+{ yylval.uint64val = dec_to_uint64(yytext); return INTEGER_CONST; }
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
 #line 152 "src/c_lexer.lex"
-{ yylval.intval = dec_to_uint64(yytext); return INTEGER_CONST; }
+{ yylval.uint64val = dec_to_uint64(yytext); return INTEGER_CONST; }
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
 #line 153 "src/c_lexer.lex"
-{ yylval.intval = dec_to_uint64(yytext); return INTEGER_CONST; }
+{ yylval.uint64val = dec_to_uint64(yytext); return INTEGER_CONST; }
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
@@ -2609,7 +2609,7 @@ void yyfree (void * ptr )
 
 /* ==================== User function section - optional. Define the functions called on regex matches here ==================== */
 
-//{Integer_const}		{ yylval.intval = atoi(yytext); return INTEGER_CONST; }
+//{Integer_const}		{ yylval.uint64val = atoi(yytext); return INTEGER_CONST; }
 
 
 /*

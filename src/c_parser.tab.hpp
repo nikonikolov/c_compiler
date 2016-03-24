@@ -60,7 +60,7 @@ extern int yydebug;
   #include "DataStructures/VarExpr.h"
   #include "DataStructures/FnCall.h"
   #include "DataStructures/BaseExpression.h"
-  #include "DataStructures/TerneryExpression.h"
+  #include "DataStructures/ArrayExpression.h"
   #include "DataStructures/Expression.h"
   #include "DataStructures/ConditionalExpression.h"
   #include "DataStructures/AssignmentExpression.h"
@@ -178,8 +178,8 @@ union YYSTYPE
 #line 36 "src/c_parser.y" /* yacc.c:1909  */
 
   char* strval;
-  uint64_t intval;
-  //int intval;
+  uint64_t uint64val;
+  int intval;
   double64_t floatval;
 
   Variable* var_ptr;
@@ -198,10 +198,11 @@ union YYSTYPE
   BaseExpression* base_expr_ptr;
   ExpressionStatement* expr_statement_ptr;
   VarDeclaration* var_declaration_ptr;
+  ArrayExpression* arr_expr_ptr;
 
   ForLoopTuple* fl_tuple;
 
-#line 205 "src/c_parser.tab.hpp" /* yacc.c:1909  */
+#line 206 "src/c_parser.tab.hpp" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;

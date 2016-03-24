@@ -148,9 +148,9 @@ while				{ yylval.strval = strdup(yytext); return WHILE; }
 sizeof				{ yylval.strval = strdup(yytext); return SIZEOF; }
 {Identifier}		{ yylval.strval = strdup(yytext); return IDENTIFIER; }
 {Floating_const}	{ yylval.floatval = to_double64(yytext); return FLOATING_CONST; }
-{Decimal_constant}	{ yylval.intval = dec_to_uint64(yytext); return INTEGER_CONST; }
-{Octal_constant}	{ yylval.intval = dec_to_uint64(yytext); return INTEGER_CONST; }
-{Hex_constant}		{ yylval.intval = dec_to_uint64(yytext); return INTEGER_CONST; }
+{Decimal_constant}	{ yylval.uint64val = dec_to_uint64(yytext); return INTEGER_CONST; }
+{Octal_constant}	{ yylval.uint64val = dec_to_uint64(yytext); return INTEGER_CONST; }
+{Hex_constant}		{ yylval.uint64val = dec_to_uint64(yytext); return INTEGER_CONST; }
 {Char_const}		{ return CHAR_CONST; }
 \[					{ return LSQUARE; }
 \]					{ return RSQUARE; }
@@ -206,7 +206,7 @@ sizeof				{ yylval.strval = strdup(yytext); return SIZEOF; }
 %%
 /* ==================== User function section - optional. Define the functions called on regex matches here ==================== */
 
-//{Integer_const}		{ yylval.intval = atoi(yytext); return INTEGER_CONST; }
+//{Integer_const}		{ yylval.uint64val = atoi(yytext); return INTEGER_CONST; }
 
 
 /*

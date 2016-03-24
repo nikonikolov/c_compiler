@@ -36,8 +36,6 @@ using std::tuple;
 using std::get;
 
 
-#define INTNAN std::numeric_limits<int>::quiet_NaN()
-
 std::ostream& pad(std::ostream& os);
 
 /* =============================================== DECLARE ASSEMBLY OBJECT =============================================== */
@@ -73,7 +71,7 @@ enum ExprT{
 	EXPR_constant = 22,
 	EXPR_assignment_expr = 23,
 	EXPR_tmp_var = 24,
-	EXPR_ternery_expr = 28,
+	EXPR_array_expr = 28,
 	EXPR_fn_call = 29,
 	EXPR_conditional_expr = 30,
 };

@@ -6,9 +6,10 @@
 #include "BaseExpression.h"
 #include "Constant.h"
 
-typedef std::pair<BaseExpression*,int> PtrDeref;
+/* 	Variable Class: Describes a Variable that participates only in declarations. Variables appearing in Expressions are 
+	described by VarExpr class. This class is also capable of describing pointers
 
-/* 	Template version instead of using var_type would not be a good idea since you would not know the types of Variables
+	Template version instead of using var_type would not be a good idea since you would not know the types of Variables
 	appearing in BaseExpressions. Enum type instead of string would not be useful as well because you won't be able to
 	describe structs and unions. Note that the string contains only type-names such as int, double, etc and no * or [].
 	Pointers and levels of dereferencing are dealt with by the dereferecer structure below 
@@ -27,11 +28,11 @@ public:
 	
 	/* ------------------------------------------------- CONSTRUCTORS ------------------------------------------------- */
 
-	Variable(char* name_in);
-	Variable(char* type_name_in, char* name_in, list<PtrDeref>* dereferencer_in=NULL);
-
-	Variable(char* name_in, const int& line_in, const string& src_file_in);
-	Variable(char* type_name_in, char* name_in, const int& line_in, const string& src_file_in, list<PtrDeref>* dereferencer_in=NULL);
+	//Variable(char* name_in);
+	//Variable(char* name_in, const int& line_in, const string& src_file_in);
+	
+	Variable(char* type_name_in, char* name_in);
+	Variable(char* type_name_in, char* name_in, const int& line_in, const string& src_file_in);
 
 	~Variable();
 
@@ -58,10 +59,8 @@ public:
 
 	/* ------------------------------------------------- POINTER RELATED ------------------------------------------------- */
 
-	// You should probably use a tuple of 3 rather than a pair. 
-	//The third code should tell you how to deduce the size. Do it when pointers come up
-	void dereference_back(BaseExpression* expr_in, const int& size=INTNAN);
-	void dereference_front(BaseExpression* expr_in, const int& size=INTNAN);
+	void inc_deref_lvl(const int& increment);
+	void inc_array_size(BaseExpression* mult_by);
 
 	/* ------------------------------------------------- ERROR GENERATION ------------------------------------------------- */
 
@@ -77,14 +76,14 @@ private:
 
 	/* ------------------------------------------------- SPECIFICATION MEMBER DATA --------------------------------------------- */
 	
-	char* type_name;				// Contains the typename of the variable, i.e. int, double, etc. No * or []
-	char* name;						// Name given to the variable in the program
-	BaseExpression* init_val;		// Contains the value to be assigned to the variable at initialization
+	char* type_name = NULL;			// Contains the typename of the variable, i.e. int, double, etc. No * or []
+	char* name = NULL;				// Name given to the variable in the program
+	BaseExpression* init_val = NULL;// Contains the value to be assigned to the variable at initialization
 	
 	/* ------------------------------------------------- MEMBER DATA FOR ASSEMBLY ---------------------------------------------- */
-	bool initialized;
-	bool global;
-	static bool first_global;			// Needed to identify when to print .data
+	bool initialized = false;
+	bool global = false;
+	static bool first_global;		// Needed to identify when to print .data
 
 	/* ------------------------------------------------- GENERAL MEMBER DATA ------------------------------------------------- */
 
@@ -94,17 +93,9 @@ private:
 
 	/* ------------------------------------------------- MEMBER DATA FOR POINTERS ---------------------------------------------- */
 
-	/* 	The following structure allows for describing Variables appearing both in declarations or in BaseExpressions.
-	 	Arrays and pointers are treated exactly the same way - using dereferencing
-	*/
-	
-	list<PtrDeref>* dereferencer;			
-	/* 	The value of the BaseExpression in the list specifies the offset of the memory location pointed to. 
-		If you encounter a simple * in the parser, then push back a Constant equal to 0. 
-		The size of the list specifies how many times you need to dereference the variable. The integer value corresponding to
-		each BaseExpression in the list specifies the max offset of the memory that you can access. If you don't know it, set it
-		to Nan
-	*/
+	// NOTE: at most one dimension is allowed to be missing
+	vector<int>* size = NULL;  // Specifies the size of arrays at declaration. 0-valued member means size deduced by initializer expr	
+	int dereference_level = 0; // Specifies how many times the variable can be dereferenced. 0 for non-pointer types
 
 };
 

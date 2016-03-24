@@ -1,43 +1,39 @@
 #include "Variable.h"
 
 bool Variable::first_global = true;
-
+/*
 Variable::Variable(char* name_in) :
 	ExprResult(RESULT_var), type_name(NULL), init_val(NULL), dereferencer(NULL), initialized(false) {
 		name = strdup(name_in);
 }
 
-Variable::Variable(char* type_name_in, char* name_in, list<PtrDeref>* dereferencer_in/*=NULL*/) :
-	ExprResult(RESULT_var), init_val(NULL), dereferencer(dereferencer_in), initialized(false) {
-	type_name = strdup(type_name_in);
-	if(name_in!=NULL) name = strdup(name_in);
+Variable::Variable(char* name_in, const int& line_in, const string& src_file_in) : 
+	ExprResult(RESULT_var), type_name(NULL), init_val(NULL), line(line_in), src_file(src_file_in) {
+	name = strdup(name_in);
 }
 
-Variable::Variable(char* name_in, const int& line_in, const string& src_file_in) : ExprResult(RESULT_var), 
-	type_name(NULL), init_val(NULL), dereferencer(NULL), initialized(false), line(line_in), src_file(src_file_in) {
-		name = strdup(name_in);
+*/
+
+Variable::Variable(char* type_name_in, char* name_in) :
+	ExprResult(RESULT_var), init_val(NULL) {
+	if(name_in!=NULL) name = strdup(name_in);
+	if(type_name_in!=NULL) type_name = strdup(type_name_in);
 }
 
-Variable::Variable(char* type_name_in, char* name_in, const int& line_in, const string& src_file_in, 
-	list<PtrDeref>* dereferencer_in /*=NULL*/) : ExprResult(RESULT_var), line(line_in), src_file(src_file_in),
-	init_val(NULL), dereferencer(dereferencer_in), initialized(false) {
-	type_name = strdup(type_name_in);
+
+Variable::Variable(char* type_name_in, char* name_in, const int& line_in, const string& src_file_in) : 
+	ExprResult(RESULT_var), line(line_in), src_file(src_file_in),
+	init_val(NULL) {
 	if(name_in!=NULL) name = strdup(name_in);
+	if(type_name_in!=NULL) type_name = strdup(type_name_in);
 }
 
 
 Variable::~Variable(){
-	if(init_val!=NULL) delete init_val;
+	if(init_val!=NULL) 	delete init_val;
+	if(size!=NULL) 		delete size;
 	if(type_name!=NULL) free(type_name);
-	if(name!=NULL) 	free(name);
-
-	if(dereferencer!=NULL){
-		list<PtrDeref>::iterator it;
-		for(it=dereferencer->begin(); it!=dereferencer->end(); ++it){
-			delete (*it).first;
-		}
-		delete dereferencer;
-	}
+	if(name!=NULL) 		free(name);
 }
 
 /* ================================================== GETTERS AND SETTERS ================================================== */
@@ -66,7 +62,6 @@ void Variable::set_asm_location(const string& str_in){
 void Variable::set_asm_location(char* str_in){
 	mem_location=strdup(str_in);
 	initialized = true;							// When called by function parameters
-	global=false;
 }
 
 /* ================================================== GLOBALLY USED METHODS ================================================== */
@@ -91,7 +86,6 @@ void Variable::renderasm(ASMhandle& context, const bool& local /*=true*/){
 	initialized = true;
 	// Variable local
 	if(local){
-		global=false;
 		try{	// Allocate variable on the stack
 			pair<string, Variable*> tmp(string(name), this);
 			mem_location = context.allocate_var(tmp);
@@ -192,16 +186,34 @@ void Variable::store(const string& reg_location_in){
 
 /* ================================================== POINTER RELATED ================================================== */
 
-// You should probably use a tuple of 3 rather than a pair. 
-//The third code should tell you how to deduce the size. Do it when pointers come up
-void Variable::dereference_back(BaseExpression* expr_in, const int& size/*=INTNAN*/){
-	if(dereferencer==NULL) dereferencer = new list<PtrDeref>;
-	dereferencer->push_back(PtrDeref(expr_in,size));
+void Variable::inc_deref_lvl(const int& increment){
+	dereference_level+=increment;
 }
 
-void Variable::dereference_front(BaseExpression* expr_in, const int& size/*=INTNAN*/){
-	if(dereferencer==NULL) dereferencer = new list<PtrDeref>;
-	dereferencer->push_front(PtrDeref(expr_in,size));
+void Variable::inc_array_size(BaseExpression* dim_size){
+	if(size==NULL) size = new vector<int>;
+	
+	dereference_level++;
+
+	if(dim_size==NULL){
+		size->push_back(0);
+		return;
+	} 
+
+	BaseExpression* tmp_expr=NULL;
+	try{
+		tmp_expr = dim_size->simplify();
+		if(tmp_expr!=NULL){
+			delete dim_size;
+			dim_size = tmp_expr; 		
+			if(tmp_expr->get_expr_type()!=EXPR_constant) generate_error("Variable size array not allowed");
+			Constant<uint64_t>* value = static_cast<Constant<uint64_t>*>(tmp_expr);		
+			size->push_back((int)value->get_value());
+		}
+	}
+	catch(const int& exception_in){
+		generate_error("Invalid array dimensions size");
+	}
 }
 
 

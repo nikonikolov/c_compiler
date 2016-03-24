@@ -1,0 +1,14 @@
+VARIABLE : glob1
+VARIABLE : glob2
+VARIABLE : glob3
+VARIABLE : a
+FUNCTION : fn
+    PARAM : a
+    PARAM : b
+    PARAM : c
+    PARAM : d
+    PARAM : e
+    PARAM : f
+    PARAM : g
+SCOPE
+    RETURN ((a)<(b)) ? (a) : (b)

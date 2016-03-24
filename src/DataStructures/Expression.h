@@ -29,8 +29,8 @@ public:
 	void set_lhs(Expression* lhs_in);	
 	void set_rhs(Expression* rhs_in);
 
-	BaseExpression* simplify();
-	void pretty_print(const int& indent);
+	virtual BaseExpression* simplify();
+	virtual void pretty_print(const int& indent);
 	virtual void renderasm(ASMhandle& context, ExprResult** dest=NULL);
 
 protected:

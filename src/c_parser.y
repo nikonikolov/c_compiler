@@ -19,6 +19,7 @@
   #include "DataStructures/BaseExpression.h"
   #include "DataStructures/TerneryExpression.h"
   #include "DataStructures/Expression.h"
+  #include "DataStructures/ConditionalExpression.h"
   #include "DataStructures/AssignmentExpression.h"
   #include "DataStructures/ExpressionStatement.h"
   
@@ -541,7 +542,7 @@ conditional_expression  // Reduction to Level 12
                         : logical_or_expression                   { $$ = $1; }
                         // Ternary conditional
                         | logical_or_expression Q_MARK expression COLON conditional_expression   
-                                                        //{ $$ = new ConditionalExpression($1, $3, $5, source_line, source_file)}
+                                                        { $$ = new ConditionalExpression($1, $3, $5, source_line, source_file);}
                         ;
 
 /* -------------------------------------------- 3.3.16 ASSIGNMENT OPERATOR ------------------------------------------ */

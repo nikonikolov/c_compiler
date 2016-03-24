@@ -5,27 +5,32 @@
 Expression::Expression(BaseExpression* lhs_in, char* oper_in, BaseExpression* rhs_in, const ExprT& expr_type_in) : 
 	BaseExpression(expr_type_in), lhs(lhs_in), rhs(rhs_in) {
 	if(oper_in!=NULL) oper = strdup(oper_in);
+	else oper=NULL;
 }
 
 Expression::Expression(BaseExpression* lhs_in, char* oper_in, BaseExpression* rhs_in, 
 		const ExprT& expr_type_in, const int& line_in, const string& src_file_in) :
 	BaseExpression(expr_type_in, line_in, src_file_in), lhs(lhs_in), rhs(rhs_in){
-	oper = strdup(oper_in);
+	if(oper_in!=NULL) oper = strdup(oper_in);
+	else oper=NULL;
 }
 
 Expression::Expression(BaseExpression* lhs_in, char* oper_in, BaseExpression* rhs_in) : 
 	BaseExpression(EXPR_expression), lhs(lhs_in), rhs(rhs_in) {
-	oper = strdup(oper_in);
+	if(oper_in!=NULL) oper = strdup(oper_in);
+	else oper=NULL;
 }
 
 Expression::Expression(BaseExpression* lhs_in, char* oper_in, BaseExpression* rhs_in, const int& line_in, const string& src_file_in) :
 	BaseExpression(EXPR_expression, line_in, src_file_in), lhs(lhs_in), rhs(rhs_in){
-	oper = strdup(oper_in);
+	if(oper_in!=NULL) oper = strdup(oper_in);
+	else oper=NULL;
 }
 
 Expression::~Expression(){
 	if(lhs!=NULL) delete lhs;		// Note that destructors for the objects down the tree get recursively called
 	if(rhs!=NULL) delete rhs;
+	if(oper!=NULL) free(oper);
 }
 
 /* =============================================== GETTERS AND SETTERS =============================================== */

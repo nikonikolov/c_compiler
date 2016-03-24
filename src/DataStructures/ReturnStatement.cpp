@@ -22,6 +22,7 @@ void ReturnStatement::pretty_print(const int& indent){
 void ReturnStatement::renderasm(ASMhandle& context){
 	ExprResult** dest = NULL;
 	if(return_expr!=NULL){
+		if(return_expr->get_expr_type()==EXPR_assignment_expr) generate_error("Assignment expression is invalid return expression");
 		dest = new ExprResult*(NULL); 
 		return_expr->renderasm(context, dest);
 	} 

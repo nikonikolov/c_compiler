@@ -20,6 +20,13 @@ glob2:
 glob3:
 	.word   80
 
+	.globl  a
+	.align  2
+	.type   a, @object
+	.size   a, 4
+a:
+	.word   57
+
 	.text   
 	.align	2
 	.globl fn
@@ -34,26 +41,22 @@ fn:
 	sw      $a1, -8($fp)
 	sw      $a2, -12($fp)
 	sw      $a3, -16($fp)
-	lw      $t0, -4($fp)
-	beq     $t0, $0, $LKDHGF4
-	lw      $v0, -12($fp)
+	li      $t0, 10
+	sw      $t0, -24($fp)
+	addiu   $t0, $fp, -24
+	sw      $t0, -28($fp)
+	addiu   $sp, $sp, -28		# Allocate more memory
+	lw      $t0, -28($fp)
+	sw      $t0, -32($fp)
+	lw      $t2, -32($fp)
+	sw      $t2, -20($fp)
+	li      $t2, 50
+	lw      $t6, -20($fp)
+	sw      $t2, 0($t6)
+	lw      $v0, -24($fp)
 	lw      $ra, 0($fp)		# Load return address in register 31
 	lw      $fp, 4($fp)		# Restore the value of the frame pointer
-	addiu   $sp, $sp, 40		# Restore the value of the stack pointer
-	j       $ra
-	nop     
-	b       $LKDHGF3
-$LKDHGF4:
-	lw      $v0, -8($fp)
-	lw      $ra, 0($fp)		# Load return address in register 31
-	lw      $fp, 4($fp)		# Restore the value of the frame pointer
-	addiu   $sp, $sp, 40		# Restore the value of the stack pointer
-	j       $ra
-	nop     
-$LKDHGF3:
-	lw      $ra, 0($fp)		# Load return address in register 31
-	lw      $fp, 4($fp)		# Restore the value of the frame pointer
-	addiu   $sp, $sp, 40		# Restore the value of the stack pointer
+	addiu   $sp, $sp, 68		# Restore the value of the stack pointer
 	j       $ra
 	nop     
 

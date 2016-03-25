@@ -26,21 +26,20 @@ glob3:
 	.ent fn
 	.type fn, @function
 fn:
-	addiu   $sp, $sp, -24		# Allocate memory on the stack
-	sw      $fp, 20($sp)		# Store value of $fp on the bottom of the stack
-	addiu   $fp, $sp, 16		# Point $fp to the bottom of the available memory
+	addiu   $sp, $sp, -40		# Allocate memory on the stack
+	sw      $fp, 36($sp)		# Store value of $fp on the bottom of the stack
+	addiu   $fp, $sp, 32		# Point $fp to the bottom of the available memory
 	sw      $ra, 0($fp)		# Store the return address for the current subroutine
 	sw      $a0, -4($fp)
 	sw      $a1, -8($fp)
 	sw      $a2, -12($fp)
-	addiu   $sp, $sp, -28		# Allocate more memory
 	sw      $a3, -16($fp)
 	lw      $t0, -8($fp)
 	beq     $t0, $0, $LKDHGF4
 	lw      $v0, -8($fp)
 	lw      $ra, 0($fp)		# Load return address in register 31
 	lw      $fp, 4($fp)		# Restore the value of the frame pointer
-	addiu   $sp, $sp, 52		# Restore the value of the stack pointer
+	addiu   $sp, $sp, 40		# Restore the value of the stack pointer
 	j       $ra
 	nop     
 	b       $LKDHGF3
@@ -50,7 +49,7 @@ $LKDHGF4:
 	lw      $v0, 32($fp)
 	lw      $ra, 0($fp)		# Load return address in register 31
 	lw      $fp, 4($fp)		# Restore the value of the frame pointer
-	addiu   $sp, $sp, 52		# Restore the value of the stack pointer
+	addiu   $sp, $sp, 40		# Restore the value of the stack pointer
 	j       $ra
 	nop     
 	b       $LKDHGF5
@@ -58,14 +57,14 @@ $LKDHGF6:
 	lw      $v0, -12($fp)
 	lw      $ra, 0($fp)		# Load return address in register 31
 	lw      $fp, 4($fp)		# Restore the value of the frame pointer
-	addiu   $sp, $sp, 52		# Restore the value of the stack pointer
+	addiu   $sp, $sp, 40		# Restore the value of the stack pointer
 	j       $ra
 	nop     
 $LKDHGF5:
 $LKDHGF3:
 	lw      $ra, 0($fp)		# Load return address in register 31
 	lw      $fp, 4($fp)		# Restore the value of the frame pointer
-	addiu   $sp, $sp, 52		# Restore the value of the stack pointer
+	addiu   $sp, $sp, 40		# Restore the value of the stack pointer
 	j       $ra
 	nop     
 
@@ -76,20 +75,19 @@ $LKDHGF3:
 	.ent fncall
 	.type fncall, @function
 fncall:
-	addiu   $sp, $sp, -24		# Allocate memory on the stack
-	sw      $fp, 20($sp)		# Store value of $fp on the bottom of the stack
-	addiu   $fp, $sp, 16		# Point $fp to the bottom of the available memory
+	addiu   $sp, $sp, -40		# Allocate memory on the stack
+	sw      $fp, 36($sp)		# Store value of $fp on the bottom of the stack
+	addiu   $fp, $sp, 32		# Point $fp to the bottom of the available memory
 	sw      $ra, 0($fp)		# Store the return address for the current subroutine
 	sw      $a0, -4($fp)
 	sw      $a1, -8($fp)
 	sw      $a2, -12($fp)
-	addiu   $sp, $sp, -28		# Allocate more memory
 	sw      $a3, -16($fp)
 	lw      $a0, -4($fp)
 	lw      $a1, -8($fp)
 	lw      $a2, -12($fp)
 	lw      $a3, -16($fp)
-	addiu   $sp, $sp, -20		# Allocate more memory
+	addiu   $sp, $sp, -32		# Allocate more memory
 	lw      $t0, 24($fp)
 	sw      $t0, 16($sp)
 	lw      $t0, 28($fp)

@@ -7,7 +7,7 @@
 /* ----------------------------------------------- CONSTRUCTION ----------------------------------------------- */
 
 uint64_t ASMhandle::label_idx = 3;
-int ASMhandle::default_mem_increase = 24;
+int ASMhandle::default_mem_increase = 40;
 string ASMhandle::label = "$LKDHGF";
 
 map<string, Function*>* ASMhandle::functions=NULL;		

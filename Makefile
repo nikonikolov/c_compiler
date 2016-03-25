@@ -59,6 +59,5 @@ clean:
 	rm src/c_parser.tab.cpp
 	rm src/c_parser.tab.hpp
 	rm src/DataStructures/*.o
-	rm bin/c_parser
-	rm bin/c_lexer
+	rm bin/*
 

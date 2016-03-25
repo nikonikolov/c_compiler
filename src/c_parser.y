@@ -602,19 +602,28 @@ constant_expression : conditional_expression ;
 
  /* 
 fn_return_type  : INT                                 { $$ = new Variable($1, NULL); }
-                | INT pointer
-                | VOID
+                | INT pointer                         { $$ = new Variable($1, NULL); $$->inc_deref_lvl($2); }
+                | VOID                                { $$ = new Variable($1, NULL); }
                 ;
 */
 
 fn_prototype  : INT IDENTIFIER LBRACKET fn_params_list RBRACKET SEMI_COLON          
                                                       { $$ = new Function(new Variable($1, NULL), $2, $4, NULL); }
-                ;
+              | VOID IDENTIFIER LBRACKET fn_params_list RBRACKET SEMI_COLON          
+                                                      { $$ = new Function(new Variable($1, NULL), $2, $4, NULL); }
+              | INT pointer IDENTIFIER LBRACKET fn_params_list RBRACKET SEMI_COLON          
+                                                      { $$ = new Function(new Variable($1, NULL), $3, $5, NULL); }
+              ;
 
 // NOTE: You cannot have an array as return type
 // You need to modify the grammar for return type and Variable* to be returned from the reduction of the rule
 fn_declaration  : INT IDENTIFIER LBRACKET fn_params_list RBRACKET compound_statement          
                                                       { $$ = new Function(new Variable($1, NULL), $2, $4, $6); }
+                | VOID IDENTIFIER LBRACKET fn_params_list RBRACKET compound_statement          
+                                                      { $$ = new Function(new Variable($1, NULL), $2, $4, $6); }
+                | INT pointer IDENTIFIER LBRACKET fn_params_list RBRACKET compound_statement          
+                                                      { $$ = new Function(new Variable($1, NULL), $3, $5, $7); }
+
                 ;
 
 fn_params_list  : INT declarator                         { $$ = new vector<Variable*>; $2->set_type_name($1); $$->push_back($2);}

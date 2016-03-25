@@ -51,6 +51,7 @@ public:
 	void load(const string& dest_reg);
 	void store(const string& reg_location_in);
 	void store_from_mem(const string& dest_mem_location);
+//	bool dereferencable();
 
 	/* ------------------------------------------------- GLOBALLY USED METHODS ------------------------------------------------- */
 

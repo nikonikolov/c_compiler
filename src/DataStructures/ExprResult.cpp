@@ -14,13 +14,16 @@ ResultT ExprResult::get_result_type() const{
 
 
 void ExprResult::set_reg_location(char* reg_location_in){
-	reg_location = reg_location_in;
+	if(reg_location_in!=NULL) reg_location = strdup(reg_location_in);
 }
 
 void ExprResult::set_mem_location(char* mem_location_in){
-	mem_location = strdup(mem_location_in);
+	if(mem_location_in!=NULL) mem_location = strdup(mem_location_in);
 }
 
+char* ExprResult::get_mem_location(){
+	return mem_location;
+}
 
 ExprResult::~ExprResult(){
 	if(mem_location!=NULL) free(mem_location);

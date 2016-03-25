@@ -28,9 +28,10 @@ void ArrayExpression::pretty_print(const int& indent){
 	cout<<white_space<<"{";
 	if(dimension!=NULL){
 		vector<BaseExpression*>::iterator it;
+		vector<BaseExpression*>::iterator it_end = --(dimension->end());
 		for(it=dimension->begin(); it!=dimension->end(); ++it){
 			(*it)->pretty_print(0);
-			cout<<", ";		
+			if(it!=it_end) cout<<", ";		
 		}
 	}
 	cout<<"}";

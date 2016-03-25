@@ -1,0 +1,13 @@
+VARIABLE : g
+VARIABLE : b
+VARIABLE : d
+VARIABLE : f = a
+FUNCTION : x
+FUNCTION : zz
+    PARAM : a
+    PARAM : b
+    PARAM : c
+SCOPE
+    VARIABLE : arr = {{1, 2}, {3, 4}, {5, 6}}
+    VARIABLE : arr = {1, 2}
+    VARIABLE : arr = {{1, 2}}

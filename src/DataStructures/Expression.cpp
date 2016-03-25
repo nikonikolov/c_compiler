@@ -67,6 +67,12 @@ void Expression::pretty_print(const int& indent){
 	}
 }
 
+// Memory leak strdup
+void Expression::fix_dereference(){
+	BaseExpression* insert = new Expression(new Constant<uint64_t>(4), strdup("*"), rhs, line, src_file);
+	rhs = insert;
+}
+
 
 /* 	Note the caller to simplify has to handle the exception. Usually that would be renderasm(ASMhandle& context) member method
 	of a BaseExpression implementation. Note you cannot have Constant as return type as this is a pure virtual function 
@@ -159,6 +165,9 @@ BaseExpression* Expression::simplify(){
 	}
 	/* ----------------------------------- SINGLE OPERAND ----------------------------------- */
 	if(lhs==NULL && rhs!=NULL){
+		if(!strcmp(oper,"&"))	throw 1;
+		if(!strcmp(oper,"*"))	throw 1;
+		
 		if(!strcmp(oper,"+"))	res_ptr = new Constant<uint64_t>(+(rhs_val));
 		if(!strcmp(oper,"-"))	res_ptr = new Constant<uint64_t>(-(rhs_val));
 		if(!strcmp(oper,"!")) 	res_ptr = new Constant<uint64_t>(!(rhs_val));
@@ -171,9 +180,7 @@ BaseExpression* Expression::simplify(){
 		tmp_expr = res_ptr;
 		return tmp_expr;
 	} 
-	//generate_error("unrecognized operator \""+string(oper)+"\" in expression");			// Invalid semantics of the expression
-	// Temporary for testing only. Uncomment above for final version
-	throw 1;						// Invalid semantics of the expression
+	generate_error("unrecognized operator \""+string(oper)+"\" in expression");			// Invalid semantics of the expression
 }
 
 /*	First, if either operand has type long double, the other operand is converted to long double . Otherwise, if either operand 

@@ -62,6 +62,8 @@ extern int yydebug;
   #include "DataStructures/BaseExpression.h"
   #include "DataStructures/ArrayExpression.h"
   #include "DataStructures/Expression.h"
+  #include "DataStructures/AddressExpression.h"
+  #include "DataStructures/DereferenceExpression.h"
   #include "DataStructures/ConditionalExpression.h"
   #include "DataStructures/AssignmentExpression.h"
   #include "DataStructures/ExpressionStatement.h"
@@ -75,7 +77,7 @@ extern int yydebug;
   extern Program* root;
 
 
-#line 79 "src/c_parser.tab.hpp" /* yacc.c:1909  */
+#line 81 "src/c_parser.tab.hpp" /* yacc.c:1909  */
 
 /* Token type.  */
 #ifndef YYTOKENTYPE
@@ -175,7 +177,7 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 36 "src/c_parser.y" /* yacc.c:1909  */
+#line 38 "src/c_parser.y" /* yacc.c:1909  */
 
   char* strval;
   uint64_t uint64val;
@@ -202,7 +204,7 @@ union YYSTYPE
 
   ForLoopTuple* fl_tuple;
 
-#line 206 "src/c_parser.tab.hpp" /* yacc.c:1909  */
+#line 208 "src/c_parser.tab.hpp" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;

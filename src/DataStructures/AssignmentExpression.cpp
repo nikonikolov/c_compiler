@@ -42,7 +42,7 @@ void AssignmentExpression::renderasm(ASMhandle& context, ExprResult** dest /*=NU
 	if(debug) cerr<<"AssignmentExpression: renderasm : dest check successful"<<endl;
 
 	if(lhs!=NULL && rhs!=NULL){
-		if((*lhs_result)->get_result_type()!=RESULT_var) generate_error("Assignment Expression must have a variable on LHS");
+		//if((*lhs_result)->get_result_type()!=RESULT_var) generate_error("Assignment Expression must have a variable on LHS");
 
 		if(!strcmp(oper,"=")) 	assignment_ins 	(dest, *lhs_result, *rhs_result); 	
 		if(!strcmp(oper,"+=")) 	assignment_ins 	(dest, *lhs_result, *rhs_result, "addu"); 	

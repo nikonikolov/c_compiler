@@ -1,0 +1,14 @@
+FUNCTION : fn
+    PARAM : a
+    PARAM : b
+    PARAM : c
+    PARAM : d
+    PARAM : e
+    PARAM : f
+    PARAM : g
+SCOPE
+    VARIABLE : ptr
+    VARIABLE : var = 10
+    (ptr)=(&(var))
+    (*(ptr))=(50)
+    RETURN var

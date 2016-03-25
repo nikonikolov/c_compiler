@@ -1,0 +1,15 @@
+# 2 "arithmetic.run.in" 3 4
+int x()
+{}
+
+
+int g, b, d, f=a;
+
+
+int zz(int a, int b, int c)
+{
+
+    int arr[6][7] = { {1,2}, {3,4}, {5,6}};
+    int arr[7] = { 1,2 };
+    int arr[7] = { {1,2} };
+}

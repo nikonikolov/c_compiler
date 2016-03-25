@@ -155,6 +155,11 @@ void Variable::renderasm_global(ASMhandle& context){
 
 /* ================================================== ExprResult METHODS ================================================== */
 
+/*	NOTE: If the variable is a pointer, whenever it participates in expressions or assignments it will be part of 
+	DereferenceExpression which will automatically create a pointer with the value of the memory address and will take
+	care of loading and storing automatically
+*/
+	
 void Variable::load(const string& dest_reg){
 	if(!global) assembler.push_back(ss<<pad<<"lw"<<dest_reg<<", "<<mem_location<<endl);
 	else{
@@ -182,7 +187,12 @@ void Variable::store(const string& reg_location_in){
 		assembler.push_back(ss<<pad<<"sw"<<reg_location_in<<", %lo("<<name<<")($t9)"<<endl);
 	}
 }
-
+/*
+bool Variable::dereferencable(){
+	if(size!=NULL || dereference_level!=0) return true;
+	return false;
+}
+*/
 
 /* ================================================== POINTER RELATED ================================================== */
 

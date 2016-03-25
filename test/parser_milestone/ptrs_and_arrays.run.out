@@ -1,5 +1,7 @@
 FUNCTION : f
 SCOPE
+    WHILE LOOP
+    CONDITION: 0
     SCOPE
         (a)=(&(b))
         (a)=(*(b))

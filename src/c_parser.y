@@ -19,6 +19,8 @@
   #include "DataStructures/BaseExpression.h"
   #include "DataStructures/ArrayExpression.h"
   #include "DataStructures/Expression.h"
+  #include "DataStructures/AddressExpression.h"
+  #include "DataStructures/DereferenceExpression.h"
   #include "DataStructures/ConditionalExpression.h"
   #include "DataStructures/AssignmentExpression.h"
   #include "DataStructures/ExpressionStatement.h"
@@ -283,7 +285,7 @@ declarator  : direct_declarator                                           { $$ =
 
 // Variable name, Array cell or function
 direct_declarator : IDENTIFIER                                            { $$ = new Variable(NULL, $1, source_line, source_file); }
-                  | LBRACKET declarator RBRACKET                              { $$ = $2; }
+                  | LBRACKET declarator RBRACKET                          { $$ = $2; }
                   // Array cell
                   | direct_declarator LSQUARE constant_expression RSQUARE { $$ = $1; $$->inc_array_size($3); }
                   | direct_declarator LSQUARE RSQUARE                     { $$ = $1; $$->inc_array_size(NULL); }
@@ -291,7 +293,7 @@ direct_declarator : IDENTIFIER                                            { $$ =
 
 // Pointer
 pointer : MULT                    { $$=1; }
-        | pointer MULT            { $$++; }
+        | pointer MULT            { $$=$1; $$++; }
         ;
 
 /* ---------------------------------------------- RHS OF INITIALIZATION -------------------------------------------- */
@@ -344,9 +346,11 @@ primary_expression  // Identifier
 
 // Level 1 Precedence
 postfix_expression  // Reduction to Level 0 
-                    : primary_expression                                                { $$ = $1; }
+                    : primary_expression                                        { $$ = $1; }
                     // Array access
-                    | postfix_expression LSQUARE expression RSQUARE     
+                    | postfix_expression LSQUARE expression RSQUARE             
+                              { BaseExpression* deref = new Expression($1, strdup("+"), $3, source_line, source_file);
+                                                                $$ = new DereferenceExpression(deref, source_line, source_file); }
                     // Function call
                     | bracketed_identifier LBRACKET argument_expression_list RBRACKET 
                                                                                 { $$ = new FnCall($1,$3,source_line,source_file); } 
@@ -380,6 +384,10 @@ unary_expression  // Reduction to Level 1
                   | MINUS_MINUS unary_expression         { $$ = new AssignmentExpression(NULL, $1, $2, source_line, source_file);}
                   // Type cast, see UNARY_OPERATOR
                   | UNARY_OPERATOR cast_expression       { $$ = new Expression(NULL, $1, $2, source_line, source_file);}
+                  // Pointer dereference
+                  | MULT cast_expression                 { $$ = new DereferenceExpression($2, source_line, source_file);}
+                  // Address-of
+                  | BITWISE_AND cast_expression          { $$ = new AddressExpression($2, source_line, source_file);}
                   // Sizeof 
                   | SIZEOF unary_expression              { $$ = new Expression(NULL, $1, $2, source_line, source_file);}
                   // Sizeof type
@@ -387,12 +395,8 @@ unary_expression  // Reduction to Level 1
                   | SIZEOF LBRACKET INT RBRACKET         { $$ = new Constant<uint64_t>(sizeof(int), source_line, source_file);}
                   ;
 
-UNARY_OPERATOR  // Address-of
-                : BITWISE_AND                         { $$ = $1; }
-                // Dereference(Contents of address) 
-                | MULT                                { $$ = $1; }
-                // Positive 
-                | PLUS                                { $$ = $1; }
+UNARY_OPERATOR  // Positive 
+                : PLUS                                { $$ = $1; }
                 // Negative
                 | MINUS                               { $$ = $1; }
                 // Bitwise negation 
@@ -401,8 +405,11 @@ UNARY_OPERATOR  // Address-of
                 | EXL_MARK                            { $$ = $1; }
                 ;
 
+// Fix for non-INT data types
+// Level 2 Precedence
 cast_expression : unary_expression                               { $$ = $1; }
-                | LBRACKET type_name RBRACKET cast_expression    { $$ = new Expression(NULL, $2, $4, source_line, source_file);}
+                | LBRACKET type_name RBRACKET cast_expression    { $$ = $4; }
+                //| LBRACKET type_name RBRACKET cast_expression    { $$ = new Expression(NULL, $2, $4, source_line, source_file);}
                 ;
 
 /* ---------------------------------------------- 3.3.5 MULTIPLICATIVE OPERATORS -------------------------------------------- */

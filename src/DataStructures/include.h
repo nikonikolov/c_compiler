@@ -74,6 +74,8 @@ enum ExprT{
 	EXPR_array_expr = 28,
 	EXPR_fn_call = 29,
 	EXPR_conditional_expr = 30,
+	EXPR_dereference_expr = 31,
+	EXPR_address_expr = 32
 };
 
 /* =============================================== EXPRRESULT TYPES =============================================== */
@@ -82,7 +84,8 @@ enum ResultT{
 	
 	RESULT_const = 20,
 	RESULT_var = 21,
-	RESULT_tmp = 22
+	RESULT_tmp = 22,
+	RESULT_ptr = 23
 };
 
 

@@ -13,11 +13,9 @@ FUNCTION : fn
 SCOPE
     VARIABLE : sum
     FOR LOOP
-    INIT BLOCK:
-(a)=(0)
+    INIT BLOCK: (a)=(0)
     CONDITION BLOCK: (a)<(glob2)
-    UPDATE BLOCK:
-(a)++
+    UPDATE BLOCK: (a)++
     SCOPE
         (sum)+=(a)
     RETURN sum

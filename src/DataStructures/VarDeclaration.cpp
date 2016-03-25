@@ -54,7 +54,9 @@ void VarDeclaration::pretty_print(const int& indent){
 	// Print the name of variables defined in this Statement
 	vector<Variable*>::iterator it;
 	for(it=variables->begin(); it!=variables->end(); ++it){
-		cout<<white_space<<"VARIABLE : "<<(*it)->get_name()<<endl;
+		cout<<white_space<<"VARIABLE : ";
+		(*it)->pretty_print(0);
+		cout<<endl;
 	}
 }
 

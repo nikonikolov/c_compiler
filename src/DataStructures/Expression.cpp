@@ -71,6 +71,12 @@ void Expression::pretty_print(const int& indent){
 void Expression::fix_dereference(){
 	BaseExpression* insert = new Expression(new Constant<uint64_t>(4), strdup("*"), rhs, line, src_file);
 	rhs = insert;
+	if(lhs!=NULL){
+		if(lhs->get_expr_type()==EXPR_expression){
+			Expression* tmp = static_cast<Expression*>(lhs);
+			tmp->fix_dereference();
+		}
+	}
 }
 
 

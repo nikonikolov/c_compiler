@@ -1,0 +1,19 @@
+VARIABLE : glob1 = 10
+VARIABLE : glob2 = 67
+VARIABLE : glob3 = 80
+VARIABLE : a = 57
+FUNCTION : fn
+    PARAM : a
+    PARAM : b
+    PARAM : c
+    PARAM : d
+    PARAM : e
+    PARAM : f
+    PARAM : g
+SCOPE
+    VARIABLE : ptr
+    VARIABLE : var = 10
+    (ptr)=(&(var))
+    (*((ptr)+(0)))=(50)
+    (*(((ptr)+(10))-(10)))=(60)
+    RETURN *(ptr)

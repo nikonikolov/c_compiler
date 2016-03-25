@@ -1,10 +1,4 @@
 
-
-
-/* ============================================== 3.4 CONSTANT EXPRESSIONS ============================================== */
-
-CONSTANT_EXPRESSION : CONDITIONAL_EXPRESSION ;
-
 /* ============================================== 3.5 DECLARATIONS ============================================== */
 
 
@@ -36,7 +30,7 @@ init_declarator   : declarator
 
 // LHS of variable initialization
 declarator  : direct_declarator
-            //| pointer direct_declarator
+            | pointer direct_declarator
             ;
 
 // Variable name, Array cell or function
@@ -64,7 +58,15 @@ initializer_list  : initializer
                   | initializer_list COMMA initializer
                   ;
 
+POINTER : MULT TYPE_QUALIFIER_LIST
+        | MULT 
+        | MULT TYPE_QUALIFIER_LIST POINTER
+        | MULT POINTER
+        ;
 
+TYPE_QUALIFIER_LIST : TYPE_QUALIFIER
+                    | TYPE_QUALIFIER_LIST TYPE_QUALIFIER
+                    ;
 
 /* -------------------------------------------- TYPE AND STORAGE SPECIFIERS -------------------------------------------- */
 
@@ -124,15 +126,7 @@ DIRECT_ABSTRACT_DECLARATOR  : LBRACKET ABSTRACT_DECLARATOR RBRACKET
                             | LBRACKET RBRACKET
                             ; 
 
-POINTER : MULT TYPE_QUALIFIER_LIST
-        | MULT 
-        | MULT TYPE_QUALIFIER_LIST POINTER
-        | MULT POINTER
-        ;
 
-TYPE_QUALIFIER_LIST : TYPE_QUALIFIER
-                    | TYPE_QUALIFIER_LIST TYPE_QUALIFIER
-                    ;
 
 /* ---------------------------------------------- 3.5.6 TYPE DEFINITIONS -------------------------------------------- */
 

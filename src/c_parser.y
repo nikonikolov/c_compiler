@@ -617,10 +617,9 @@ fn_declaration  : INT IDENTIFIER LBRACKET fn_params_list RBRACKET compound_state
                                                       { $$ = new Function(new Variable($1, NULL), $2, $4, $6); }
                 ;
 
-fn_params_list  : INT bracketed_identifier                      { $$ = new vector<Variable*>; 
-                                                                  $$->push_back(new Variable($1, $2, source_line, source_file));}
-                | fn_params_list COMMA INT bracketed_identifier { $$->push_back(new Variable($3, $4, source_line, source_file));}
-                |                                               { $$ = NULL; }
+fn_params_list  : INT declarator                         { $$ = new vector<Variable*>; $2->set_type_name($1); $$->push_back($2);}
+                | fn_params_list COMMA INT declarator             { $4->set_type_name($3); $$->push_back($4);}
+                |                                                 { $$ = NULL; }
                 ;   
 
 // Get rid of this at the end. You most probably need declarator, still you might have arrays passed on to functions

@@ -93,18 +93,18 @@ void Variable::renderasm(ASMhandle& context, const bool& local /*=true*/){
 		catch(const ErrorgenT& error_in){
 			generate_error("Redefinition of variable \""+string(name)+"\"");
 		}
-		if(init_val==NULL){
-			// Normal Variable
-			if(size==NULL) return;
+
+		if(size!=NULL){
 			
 			// Variable is Array
-			int mem_amount=0;
+			int mem_amount=1;
 			vector<int>::iterator it;
 			for(it=size->begin(); it!=size->end(); ++it){
-				if(it==size->begin()) mem_amount+=(*it);
-				else mem_amount*=(*it);
+				//if(it==size->begin()) mem_amount+=(*it);
+				//else mem_amount*=(*it);
+				mem_amount*=(*it);
 			}
-			if(debug) cerr<<"Variable: array size calculated"<<endl;
+			if(debug) cerr<<"Variable: array size calculated : "<<mem_amount<<endl;
 			
 			// Allocate the proper amount of memory
 			string location = string(context.allocate_var(mem_amount*4));
@@ -118,8 +118,10 @@ void Variable::renderasm(ASMhandle& context, const bool& local /*=true*/){
 			// Save the address of the array in the memory location of the Variable
 			assembler.push_back(ss<<pad<<"addiu"<<"$t0, "<<address<<", "<<offset<<endl);
 			store("$t0");
-			return;
 		} 
+
+		if(init_val==NULL) return;
+
 		if(init_val->get_expr_type()==EXPR_assignment_expr) generate_error("Invalid syntax for variable initialization value");
 		simplify_init_val();
 
@@ -243,9 +245,9 @@ void Variable::inc_array_size(BaseExpression* dim_size){
 			delete dim_size;
 			dim_size = tmp_expr; 		
 			if(tmp_expr->get_expr_type()!=EXPR_constant) generate_error("Variable size array not allowed");
-			Constant<uint64_t>* value = static_cast<Constant<uint64_t>*>(tmp_expr);		
-			size->push_back((int)value->get_value());
 		}
+		Constant<uint64_t>* value = static_cast<Constant<uint64_t>*>(dim_size);		
+		size->push_back((int)value->get_value());
 	}
 	catch(const int& exception_in){
 		generate_error("Invalid array dimensions size");

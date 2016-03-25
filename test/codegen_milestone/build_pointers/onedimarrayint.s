@@ -41,33 +41,37 @@ fn:
 	sw      $a1, -8($fp)
 	sw      $a2, -12($fp)
 	sw      $a3, -16($fp)
-	addiu   $sp, $sp, -56		# Allocate more memory
+	addiu   $sp, $sp, -416		# Allocate more memory
 	addiu   $t0, $fp, -24
 	sw      $t0, -20($fp)
-	li      $t0, 4
-	li      $t1, 8
-	mul     $t2, $t0, $t1
-	sw      $t2, -64($fp)
 	lw      $t0, -20($fp)
-	lw      $t1, -64($fp)
-	subu    $t2, $t0, $t1
-	sw      $t2, -68($fp)
-	li      $t2, 68
-	lw      $t6, -68($fp)
-	sw      $t2, 0($t6)
-	li      $t0, 4
-	li      $t1, 8
-	mul     $t2, $t0, $t1
-	sw      $t2, -72($fp)
+	li      $t1, 1
+	sw      $t1, 0($t0)
 	lw      $t0, -20($fp)
-	lw      $t1, -72($fp)
+	li      $t1, 2
+	sw      $t1, -4($t0)
+	lw      $t0, -20($fp)
+	li      $t1, 3
+	sw      $t1, -8($t0)
+	lw      $t0, -20($fp)
+	li      $t1, 4
+	sw      $t1, -12($t0)
+	lw      $t0, -20($fp)
+	li      $t1, 5
+	sw      $t1, -16($t0)
+	li      $t0, 4
+	li      $t1, 2
+	mul     $t2, $t0, $t1
+	sw      $t2, -424($fp)
+	lw      $t0, -20($fp)
+	lw      $t1, -424($fp)
 	subu    $t2, $t0, $t1
-	sw      $t2, -76($fp)
-	lw      $t6, -76($fp)
+	sw      $t2, -428($fp)
+	lw      $t6, -428($fp)
 	lw      $v0, 0($t6)
 	lw      $ra, 0($fp)		# Load return address in register 31
 	lw      $fp, 4($fp)		# Restore the value of the frame pointer
-	addiu   $sp, $sp, 96		# Restore the value of the stack pointer
+	addiu   $sp, $sp, 456		# Restore the value of the stack pointer
 	j       $ra
 	nop     
 

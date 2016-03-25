@@ -2,6 +2,7 @@
 #define ARRAYEXPRESSION_H
 
 #include "BaseExpression.h"
+#include "DereferenceExpression.h"
 #include "Constant.h"
 
 class ArrayExpression : public BaseExpression{

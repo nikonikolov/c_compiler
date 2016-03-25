@@ -39,6 +39,13 @@ void ArrayExpression::pretty_print(const int& indent){
 
 
 void ArrayExpression::renderasm(ASMhandle& context, ExprResult** dest /*=NULL*/){
+	for(int i=0; i<dimension->size(); i++){
+		ExprResult** result = new ExprResult*(NULL);
+		((*dimension)[i])->renderasm(context, result);
+		(*dest)->load("$t0");
+		(*result)->load("$t1");
+		assembler.push_back(ss<<pad<<"sw"<<"$t1, "<<-(i*4)<<"($t0)"<<endl);
+	}
 }
 
 BaseExpression* ArrayExpression::simplify(){

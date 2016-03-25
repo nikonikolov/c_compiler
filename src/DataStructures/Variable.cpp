@@ -93,7 +93,33 @@ void Variable::renderasm(ASMhandle& context, const bool& local /*=true*/){
 		catch(const ErrorgenT& error_in){
 			generate_error("Redefinition of variable \""+string(name)+"\"");
 		}
-		if(init_val==NULL) return;
+		if(init_val==NULL){
+			// Normal Variable
+			if(size==NULL) return;
+			
+			// Variable is Array
+			int mem_amount=0;
+			vector<int>::iterator it;
+			for(it=size->begin(); it!=size->end(); ++it){
+				if(it==size->begin()) mem_amount+=(*it);
+				else mem_amount*=(*it);
+			}
+			if(debug) cerr<<"Variable: array size calculated"<<endl;
+			
+			// Allocate the proper amount of memory
+			string location = string(context.allocate_var(mem_amount*4));
+			size_t lbracket = location.find("(");
+			size_t rbracket = location.find(")");
+			string offset = location.substr(0,lbracket);
+			string address = location.substr(lbracket+1, rbracket-lbracket-1);
+			
+			if(debug) cerr<<"Variable: array mem location extracted"<<endl;
+
+			// Save the address of the array in the memory location of the Variable
+			assembler.push_back(ss<<pad<<"addiu"<<"$t0, "<<address<<", "<<offset<<endl);
+			store("$t0");
+			return;
+		} 
 		if(init_val->get_expr_type()==EXPR_assignment_expr) generate_error("Invalid syntax for variable initialization value");
 		simplify_init_val();
 

@@ -169,9 +169,9 @@ char* ASMhandle::allocate_var(pair<string, Variable*>& var_in, const int& mem_am
 // Used for temporaries mainly
 char* ASMhandle::allocate_var(const int& mem_amount /*= 4*/){
 	if( (fp_offset+mem_amount)>allocated_mem ) 
-		allocate_mem(fp_offset + mem_amount - allocated_mem + 24);			// Allocate memory if necessary
-	char* address=strdup(string(std::to_string(-fp_offset)+"($fp)").c_str());				// Get the location of the temporary
-	fp_offset+=mem_amount;													// Increment fp_offset
+		allocate_mem(fp_offset + mem_amount - allocated_mem + 24);				// Allocate memory if necessary
+	char* address=strdup(string(std::to_string(-fp_offset)+"($fp)").c_str());	// Get the location of the temporary
+	fp_offset+=mem_amount;														// Increment fp_offset
 	return address;
 }
 

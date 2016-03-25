@@ -15,13 +15,14 @@ map<string, Function*>* ASMhandle::fn_prototypes=NULL;
 
 
 ASMhandle::ASMhandle(ASMhandle& orig){
-	local_vars = new map<string, Variable*>;
+	local_vars = new vector<map<string, Variable*>*>;
 	if(orig.local_vars!=NULL){
-		map<string, Variable*>::iterator it;
-		for(it=(orig.local_vars)->begin(); it!=(orig.local_vars)->end(); ++it){
-			(local_vars)->insert(*it);
+		vector<map<string, Variable*>*>::iterator it;
+		for(it=orig.local_vars->begin(); it!=orig.local_vars->end(); ++it){
+			local_vars->push_back(*it);
 		}
 	}
+
 
 	global_vars = new map<string, Variable*>;
 	if(orig.global_vars!=NULL){
@@ -45,7 +46,8 @@ ASMhandle::ASMhandle(map<string, Function*>* functions_in, map<string, Function*
 	functions=functions_in;
 	fn_prototypes=fn_prototypes_in;
 	global_vars = new map<string, Variable*>;
-	local_vars = new map<string, Variable*>;
+	//local_vars = new map<string, Variable*>;
+	local_vars = new vector<map<string, Variable*>*>;
 	return_address = NULL;
 	
 	sp_offset = 0;
@@ -183,20 +185,32 @@ void ASMhandle::deallocate_var(const int& mem_amount/* = 4*/){
 
 
 Variable* ASMhandle::get_var_location(char* name){
-	map<string, Variable*>::iterator it;
-	it=local_vars->find(string(name));
-	if(it==local_vars->end()){
-		it=global_vars->find(string(name));
-		if(it==global_vars->end()) throw 1;
+	vector<map<string, Variable*>*>::reverse_iterator rit;
+	for(rit=local_vars->rbegin(); rit!=local_vars->rend(); ++rit){
+		map<string, Variable*>::iterator it;
+		it=(*rit)->find(string(name));
+		if(it==(*rit)->end()) continue;
+		return (*it).second;
 	}
+	
+	map<string, Variable*>::iterator it;
+	it=global_vars->find(string(name));
+	if(it==global_vars->end()) throw 1;
 	return (*it).second;
 }
 
 
 void ASMhandle::insert_local_var(pair<string, Variable*>& var_in){
+	if(debug) cerr<<"ASMhandle: insert_local_var(): start"<<endl;
+	
+	int size = local_vars->size();
+	if(size==0) (*local_vars).push_back(new map<string, Variable*>);
+
 	pair<map<string, Variable*>::iterator,bool> ret;
-	ret = local_vars->insert(var_in);									// Put Variable* in local_vars
+	int last=local_vars->size()-1;
+	ret = ((*local_vars)[last])->insert(var_in);									// Put Variable* in local_vars
   	if (ret.second==false) throw ERROR_redefinition;
+	if(debug) cerr<<"ASMhandle: insert_global_var(): end"<<endl;
 }
 
 /* ----------------------------------------------- GLOBAL VARIABLES ----------------------------------------------- */

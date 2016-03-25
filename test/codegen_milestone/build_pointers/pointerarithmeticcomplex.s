@@ -54,7 +54,7 @@ fn:
 	sw      $t2, -32($fp)
 	lw      $t0, -20($fp)
 	lw      $t1, -32($fp)
-	addu    $t2, $t0, $t1
+	subu    $t2, $t0, $t1
 	sw      $t2, -36($fp)
 	li      $t2, 50
 	lw      $t6, -36($fp)
@@ -65,7 +65,7 @@ fn:
 	sw      $t2, -40($fp)
 	lw      $t0, -20($fp)
 	lw      $t1, -40($fp)
-	addu    $t2, $t0, $t1
+	subu    $t2, $t0, $t1
 	sw      $t2, -44($fp)
 	li      $t2, 60
 	lw      $t6, -44($fp)

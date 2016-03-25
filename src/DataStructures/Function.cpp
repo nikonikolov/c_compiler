@@ -70,6 +70,7 @@ void Function::renderasm(ASMhandle& context){
 	assembler.push_back(ss<<"\t.type "<<name<<", @function"<<endl);
 	assembler.push_back(ss<<name<<":"<<endl);
 
+
 	ASMhandle new_context(context);
 
 	new_context.subroutine_enter();
@@ -92,6 +93,8 @@ void Function::renderasm(ASMhandle& context){
 void Function::init_args(ASMhandle& context){
 	if(params==NULL) return;
 
+	if(debug) cerr<<"Function: parameter loading start"<<endl;
+
 	// Repair - put arguments on the stack and account for arguments bigger than 32bits
 	for(int i=0; i<params->size() && i<4; i++){
 		try{
@@ -104,6 +107,8 @@ void Function::init_args(ASMhandle& context){
 			(*params)[i]->generate_error("Function parameters cannot have the same name");
 		}
 	}
+
+	if(debug) cerr<<"Function: register parameters successful"<<endl;
 
 	for(int i=4; i<params->size(); i++){
 		pair<string, Variable*> tmp((*params)[i]->get_name_str(), (*params)[i]);

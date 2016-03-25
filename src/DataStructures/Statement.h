@@ -70,9 +70,11 @@ private:
 	int stack_args_offset;	// Used to allocate locations for parameters to functions with index bigger than 4
 	
 	/* ----------------------------------------------- DATA STRUCTURES ----------------------------------------------- */
+
+	vector<map<string, Variable*>*>* local_vars;
 	
 	map<string, Variable*>* global_vars;
-	map<string, Variable*>* local_vars;
+	//map<string, Variable*>* local_vars;
 	static map<string, Function*>* functions;		
 	static map<string, Function*>* fn_prototypes;		
 

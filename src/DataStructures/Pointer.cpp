@@ -31,6 +31,7 @@ void Pointer::store(const string& reg_location_in){
 }
 
 void Pointer::store_from_mem(const string& dest_mem_location){
-	assembler.push_back(ss<<pad<<"lw"<<"$t7, "<<mem_location<<endl);
+	assembler.push_back(ss<<pad<<"lw"<<"$t6, "<<mem_location<<endl);
+	assembler.push_back(ss<<pad<<"lw"<<"$t7, 0($t6)"<<endl);
 	assembler.push_back(ss<<pad<<"sw"<<"$t7, "<<dest_mem_location<<endl);
 }

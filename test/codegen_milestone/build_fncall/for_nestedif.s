@@ -72,6 +72,7 @@ $LKDHGF8:
 	j       $ra
 	nop     
 	b       $LKDHGF5
+	nop     
 $LKDHGF6:
 	lw      $t0, -20($fp)
 	lw      $t1, -4($fp)

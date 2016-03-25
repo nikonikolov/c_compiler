@@ -64,8 +64,10 @@ $LKDHGF7:
 	j       $ra
 	nop     
 	b       $LKDHGF5
+	nop     
 $LKDHGF5:
 	b       $LKDHGF3
+	nop     
 $LKDHGF4:
 	lw      $t0, -8($fp)
 	beq     $t0, $0, $LKDHGF9
@@ -91,8 +93,10 @@ $LKDHGF12:
 	j       $ra
 	nop     
 	b       $LKDHGF10
+	nop     
 $LKDHGF10:
 	b       $LKDHGF8
+	nop     
 $LKDHGF9:
 	lw      $t0, -12($fp)
 	beq     $t0, $0, $LKDHGF14
@@ -104,6 +108,7 @@ $LKDHGF9:
 	j       $ra
 	nop     
 	b       $LKDHGF13
+	nop     
 $LKDHGF14:
 	lw      $t0, -16($fp)
 	beq     $t0, $0, $LKDHGF16
@@ -122,8 +127,10 @@ $LKDHGF14:
 	j       $ra
 	nop     
 	b       $LKDHGF17
+	nop     
 $LKDHGF17:
 	b       $LKDHGF15
+	nop     
 $LKDHGF16:
 	lw      $t0, 24($fp)
 	beq     $t0, $0, $LKDHGF19
@@ -137,8 +144,10 @@ $LKDHGF16:
 	j       $ra
 	nop     
 	b       $LKDHGF20
+	nop     
 $LKDHGF20:
 	b       $LKDHGF18
+	nop     
 $LKDHGF19:
 	lw      $t0, 28($fp)
 	beq     $t0, $0, $LKDHGF22
@@ -152,6 +161,7 @@ $LKDHGF19:
 	j       $ra
 	nop     
 	b       $LKDHGF23
+	nop     
 $LKDHGF24:
 	lw      $t0, 32($fp)
 	lui     $t9, %hi(glob1)
@@ -168,9 +178,11 @@ $LKDHGF24:
 	j       $ra
 	nop     
 	b       $LKDHGF25
+	nop     
 $LKDHGF25:
 $LKDHGF23:
 	b       $LKDHGF21
+	nop     
 $LKDHGF22:
 	lw      $t0, 32($fp)
 	beq     $t0, $0, $LKDHGF27
@@ -188,6 +200,7 @@ $LKDHGF22:
 	j       $ra
 	nop     
 	b       $LKDHGF28
+	nop     
 $LKDHGF29:
 	lui     $t9, %hi(glob4)
 	lw      $t0, %lo(glob4)($t9)
@@ -211,6 +224,7 @@ $LKDHGF29:
 	j       $ra
 	nop     
 	b       $LKDHGF30
+	nop     
 $LKDHGF31:
 	lui     $t9, %hi(glob3)
 	lw      $v0, %lo(glob3)($t9)
@@ -222,6 +236,7 @@ $LKDHGF31:
 $LKDHGF30:
 $LKDHGF28:
 	b       $LKDHGF26
+	nop     
 $LKDHGF27:
 	lui     $t9, %hi(glob4)
 	lw      $v0, %lo(glob4)($t9)

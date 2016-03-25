@@ -43,6 +43,7 @@ fn:
 	j       $ra
 	nop     
 	b       $LKDHGF3
+	nop     
 $LKDHGF3:
 	lw      $ra, 0($fp)		# Load return address in register 31
 	lw      $fp, 4($fp)		# Restore the value of the frame pointer

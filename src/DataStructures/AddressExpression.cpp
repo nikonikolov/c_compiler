@@ -24,8 +24,11 @@ void AddressExpression::renderasm(ASMhandle& context, ExprResult** dest /*=NULL*
 
 	// when you have nested Address and Dereference expressions of the type &(*(&a)). This one is &a in the example
 	if(rhs->get_expr_type()==EXPR_dereference_expr){
-		char* address_value=(*mem_location)->get_mem_location();
-		assembler.push_back(ss<<pad<<"lw"<<"$t0, "<<address_value<<endl);
+		//char* address_value=(*mem_location)->get_mem_location();
+		//assembler.push_back(ss<<pad<<"lw"<<"$t0, "<<address_value<<endl);
+		ExprResult* to_cast = *mem_location;
+		Pointer* tmp = static_cast<Pointer*>(to_cast);
+		tmp->load_memory_location("$t0");
 		(*dest)->store("$t0");
 	}
 	else{

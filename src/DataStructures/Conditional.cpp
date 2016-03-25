@@ -116,30 +116,24 @@ void Conditional::pretty_print(const int& indent){
 
 }
 
-
 void Conditional::renderasm(ASMhandle& context){
 	if(debug) cerr<<"Conditional: renderasm enter"<<endl;
 	
 	string continued_execution = context.get_assembly_label();
 	string jump_next;
-	if(conditions->size()==1){
-		(*conditions)[0]->renderasm(context, continued_execution, "");
-	} 	
-	else{
-		vector<ConditionalCase*>::iterator it, it_end;
-		it_end=conditions->end();
-		--it_end;
-		for(it=conditions->begin(); it!=conditions->end(); ++it){
-			if(it!=it_end){
-				jump_next=context.get_assembly_label();
-				// jump_next is the label to jump if condition is not true, i.e. the next else if
-				// continued_execution it the label to jump after executing the block in the case that the condition evaluates to true
-				(*it)->renderasm(context, continued_execution, jump_next);
-				assembler.push_back(ss<<jump_next<<":"<<endl);
-			}
-			// Last ELSE/ELSE IF statement
-			else (*it)->renderasm(context, continued_execution, "");
+	vector<ConditionalCase*>::iterator it, it_end;
+	it_end=conditions->end();
+	--it_end;
+	for(it=conditions->begin(); it!=conditions->end(); ++it){
+		if(it!=it_end){
+			jump_next=context.get_assembly_label();
+			// jump_next is the label to jump if condition is not true, i.e. the next else if
+			// continued_execution it the label to jump after executing the block in the case that the condition evaluates to true
+			(*it)->renderasm(context, continued_execution, jump_next);
+			assembler.push_back(ss<<jump_next<<":"<<endl);
 		}
+		// Last ELSE/ELSE IF statement
+		else (*it)->renderasm(context, continued_execution, "");
 	}
 
 	if(debug) cerr<<"Conditional: renderasm successful"<<ss.str()<<endl;

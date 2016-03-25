@@ -12,6 +12,7 @@ public:
 	Pointer(ExprResult* expr_res_in, ASMhandle& context); 
 	~Pointer();
 
+	void load_memory_location(const string& dest_reg);
 	void load(const string& dest_reg);
 	void store_from_mem(const string& dest_mem_location);
 	void store(const string& reg_location_in);

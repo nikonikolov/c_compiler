@@ -58,6 +58,7 @@ fn:
 	j       $ra
 	nop     
 	b       $LKDHGF3
+	nop     
 	addiu   $sp, $sp, 28
 $LKDHGF4:
 	lw      $v0, -8($fp)

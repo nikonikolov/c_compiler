@@ -119,4 +119,3 @@ void CompoundStatement::renderasm(ASMhandle& context, const bool& function){
 
 	if(!return_stat && function) context.subroutine_exit(NULL);
 }
-

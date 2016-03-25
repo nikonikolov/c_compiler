@@ -5,6 +5,7 @@
 #include "include.h"
 #include "BaseExpression.h"
 #include "Temporary.h"
+#include "Pointer.h"
 
 
 /*	FIX:

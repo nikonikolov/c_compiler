@@ -80,7 +80,12 @@ void FnCall::renderasm(ASMhandle& context, ExprResult** dest /*=NULL*/){
 	
 		// Load register parameters
 		for(int i=0; i<4; i++){
-			(*params_results[i])->load(string("$a" + std::to_string(i)).c_str());
+			if((*params_results[i])->get_result_type()==RESULT_ptr){
+				ExprResult* to_cast = *params_results[i];
+				Pointer* tmp = static_cast<Pointer*>(to_cast);
+				tmp->load_memory_location(string("$a" + std::to_string(i)).c_str());
+			}
+			else (*params_results[i])->load(string("$a" + std::to_string(i)).c_str());
 		}
 		// Load stack parameters
 		if(params_results.size()>4) context.push_subroutine_stack_params(params_results);

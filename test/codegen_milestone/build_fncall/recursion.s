@@ -80,6 +80,7 @@ $LKDHGF6:
 	j       $ra
 	nop     
 	b       $LKDHGF3
+	nop     
 	addiu   $sp, $sp, 40
 $LKDHGF4:
 	lui     $t9, %hi(glob3)

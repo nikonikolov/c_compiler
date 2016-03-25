@@ -15,6 +15,11 @@ Pointer::Pointer(ExprResult* expr_res_in, ASMhandle& context) :
 Pointer::~Pointer(){
 }
 
+void Pointer::load_memory_location(const string& dest_reg){
+	assembler.push_back(ss<<pad<<"lw"<<dest_reg<<", "<<mem_location<<endl);
+}
+
+
 void Pointer::load(const string& dest_reg){
 	assembler.push_back(ss<<pad<<"lw"<<"$t6, "<<mem_location<<endl);
 	assembler.push_back(ss<<pad<<"lw"<<dest_reg<<", 0($t6)"<<endl);

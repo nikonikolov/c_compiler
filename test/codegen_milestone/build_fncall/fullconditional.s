@@ -43,6 +43,7 @@ fn:
 	j       $ra
 	nop     
 	b       $LKDHGF3
+	nop     
 $LKDHGF4:
 	lw      $t0, 32($fp)
 	beq     $t0, $0, $LKDHGF6
@@ -53,6 +54,7 @@ $LKDHGF4:
 	j       $ra
 	nop     
 	b       $LKDHGF5
+	nop     
 $LKDHGF6:
 	lw      $v0, -12($fp)
 	lw      $ra, 0($fp)		# Load return address in register 31

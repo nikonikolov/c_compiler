@@ -75,7 +75,6 @@
 %token <strval> COMMA HASH HASH_HASH SEMI_COLON EQUALS BITWISE_OR BITWISE_AND BITWISE_XOR MULT PLUS MINUS WAVE EXL_MARK DIV PERCENT 
 %token <strval> LOGICAL_MORE LOGICAL_LESS
 
-
 /* --------------------------------------------------- TOKENS CONSTANTS --------------------------------------------------- */
 
 %token <uint64val>   INTEGER_CONST 
@@ -147,15 +146,7 @@
 /* Enable run-time traces (yydebug).  */
 %define parse.trace
 
-/* Formatting semantic values.  */
-//%printer { fprintf (yyoutput, "%s", $$.strval); } <char*>;
-//%printer { cerr<<$$.strval; } <char*>;
-//%printer { fprintf (yyoutput, "%s()", $$->strval); } FNCT;
-//%printer { fprintf (yyoutput, "%g", $$); } <double>;
-
 /* ---------------------------------------------- END FOR DEBUGGING PURPOSES -------------------------------------------- */
-
-
 
 %start program
 
@@ -166,18 +157,14 @@
 
 %%
 
-/*  NOTES ON ARCHITECTURE:
+/*  NOTES:
     1. GRAMMAR: Terminals are upper case while non-terminals are lower-case
-      NB: To have a correct grammar, whenever you use recursion you should have a terminating rule, i.e. an alternative rule
-      from the recursion path
     2. RECURSION: You should always use left recursion, otherwise you can blow the stack. Left recursion looks like:
-        expseq1 : exp
-                | expseq1 ',' exp
+        expseq  : exp
+                | expseq ',' exp
                 ;
-    3. Managing constants:
-      The lexer converts the constant to a uint64_t representation and passes that value to the parser. The parser saves the value 
-      in a Variable or Constant object and casts it to the required type. NOTE: you are compiling for MIPS 32 bit so every 32 bit 
-      constant can be cast to unsigned 64 bit constant without losing any information, even long and negative 
+    3. Types:
+      Lexer converts all types to their proper representation for use by the parser
 */
 
 
@@ -255,17 +242,6 @@ declaration : INT init_declarator_list SEMI_COLON              { $$ = new VarDec
             | INT SEMI_COLON   { cerr<<"Warning: Useless definition in file "<<source_file<<", Line: "<<input_file_line<<endl;}
             ;
 
-// Any combination of type specifier(int, struct, etc), storage specifier(register, auto, etc) and type qualifier (const, volatile)
-/*declaration_type  : TYPE_SPECIFIER
-                  | TYPE_SPECIFIER declaration_type
-                  // Can try making constants work at some point
-                  //| TYPE_QUALIFIER
-                  //| TYPE_QUALIFIER declaration_type
-                  // Can try making typedefs, externs and statics work at some point
-                  //| STORAGE_SPECIFIER 
-                  //| STORAGE_SPECIFIER declaration_type
-                  ;
-*/
 // Initialization list (List of variable declarations)
 init_declarator_list  : init_declarator                                   { $$ = new vector<Variable*>; $$->push_back($1); }
                       | init_declarator_list COMMA init_declarator        { $$->push_back($3); }
@@ -336,12 +312,9 @@ primary_expression  // Identifier
 
 /* ---------------------------------------------- 3.3.2 POSTFIX OPERATORS -------------------------------------------- */
 
-/*
-  ORIGINAL
-                    | postfix_expression LBRACKET argument_expression_list RBRACKET {$$ = new FnCall($1,$3,source_file,source_file);} 
-                    // Function call with no arguments
-                    | postfix_expression LBRACKET RBRACKET                       { $$ = new FnCall($1,NULL,source_file,source_file);}
-
+/* C-grammar uses: 
+                    | postfix_expression LBRACKET argument_expression_list RBRACKET 
+                    | postfix_expression LBRACKET RBRACKET                       
 */
 
 // Level 1 Precedence
@@ -372,6 +345,10 @@ postfix_expression  // Reduction to Level 0
 argument_expression_list  : expression                                  { $$ = new vector<BaseExpression*>; $$->push_back($1); }
                           | argument_expression_list COMMA expression   { $$->push_back($3); }
                           ;
+
+bracketed_identifier  : IDENTIFIER                                  { $$ = $1; }
+                      | LBRACKET bracketed_identifier RBRACKET      { $$ = $2; }
+                      ;
 
 /* ---------------------------------------------- 3.3.3 UNARY OPERATORS -------------------------------------------- */
 
@@ -596,10 +573,6 @@ constant_expression : conditional_expression ;
 
 /* -------------------------------------------- FUNCTION DECLARATIONS ------------------------------------------ */
 
-/* For both fn_params_list and fn_declaration: include other types than int: void, double, char, structs, pointers, etc.
-  Try to make function pointers work. Try const, long, etc.. Actually in the end you should have one rule that defines 
-  a variable and change only that one */
-
  /* 
 fn_return_type  : INT                                 { $$ = new Variable($1, NULL); }
                 | INT pointer                         { $$ = new Variable($1, NULL); $$->inc_deref_lvl($2); }
@@ -631,17 +604,6 @@ fn_params_list  : INT declarator                         { $$ = new vector<Varia
                 |                                                 { $$ = NULL; }
                 ;   
 
-// Get rid of this at the end. You most probably need declarator, still you might have arrays passed on to functions
-bracketed_identifier  : IDENTIFIER                                  { $$ = $1; }
-                      | LBRACKET bracketed_identifier RBRACKET      { $$ = $2; }
-                      ;
-
-                  // Function declaration: name and arguments
-                  //| direct_declarator LBRACKET parameter_type_list RBRACKET
-                  //| direct_declarator LBRACKET identifier_list RBRACKET
-                  //| direct_declarator LBRACKET RBRACKET
-
-
 /* -------------------------------------------- LOOP STATEMENTS ------------------------------------------ */
 
 loop  : for_loop                                                  { $$=$1; }
@@ -649,7 +611,7 @@ loop  : for_loop                                                  { $$=$1; }
       | do_while_loop                                             { $$=$1; }
       ;
 
-// Memory leak tuple expression_list
+// Memory leak expression_list
 do_while_loop : DO compound_statement WHILE LBRACKET expression_list RBRACKET SEMI_COLON
                 { int last = $5->size()-1; $$ = new WhileLoop(((*($5))[last]), $2, ST_dowhile_loop); } 
               | DO statement WHILE LBRACKET expression_list RBRACKET SEMI_COLON     
@@ -670,7 +632,7 @@ for_loop_decl_statement : expression_list SEMI_COLON expression_list SEMI_COLON 
                         | SEMI_COLON SEMI_COLON                                           { $$ = new ForLoopTuple(NULL, NULL, NULL); }
                         ;
 
-// Memory leak tuple expression_list
+// Memory leak expression_list
 while_loop  : WHILE LBRACKET expression_list RBRACKET compound_statement              
             { int last = $3->size()-1; $$ = new WhileLoop(((*($3))[last]), $5, ST_while_loop); }
             | WHILE LBRACKET expression_list RBRACKET statement 
@@ -685,8 +647,7 @@ while_loop  : WHILE LBRACKET expression_list RBRACKET compound_statement
                     | IF LBRACKET EXPRESSION RBRACKET STATEMENT ELSE STATEMENT
                     | SWITCH LBRACKET EXPRESSION RBRACKET STATEMENT
                     ;
-/* ---------------------------------------------- 3.6.1 LABELED STATEMENTS -------------------------------------------- */
-/*
+
 LABELED_STATEMENT : IDENTIFIER COLON STATEMENT
                   | CASE CONSTANT_EXPRESSION COLON STATEMENT
                   | DEFAULT COLON STATEMENT
@@ -726,7 +687,7 @@ else_statement  : ELSE compound_statement
 
 /* ---------------------------------------------- 3.6.2 COMPOUND STATEMENTS -------------------------------------------- */
 
-// This represents a block of code - e.g. body of a function, body of a loop, or body of a an if statement
+// A {} block of code - e.g. body of a function, body of a loop, or body of a an if statement
 compound_statement  : LCURLY declaration_list statement_list RCURLY   { $$=new CompoundStatement($2, $3);}
                     | LCURLY statement_list RCURLY                    { $$=new CompoundStatement(NULL,$2);}
                     | LCURLY declaration_list RCURLY                  { $$=new CompoundStatement($2,NULL);}
@@ -742,8 +703,6 @@ statement_list  : statement                                         { $$ = new v
                 | statement_list statement                          { $$->push_back($2);}
                 ;
 
-// For the purposes of the milestone restricted to for, while, if statements and arithmetic expressions
-// Add return statements as well
 statement : loop                                                    { $$=$1; }
           | if_block_statement                                      { $$=$1; }
           | expression_statement                                    { $$=$1; }
@@ -784,27 +743,6 @@ int yyerror(const char* s){
   cerr<<"========================================= Parser ERROR ========================================="<<endl;
   return -1;
 }
-
-/*
-int main(){
-
-  yydebug=1;
-
-  cerr<<"========================================= Parsing starts ========================================="<<endl;
-  yyparse();
-  cerr<<"========================================= Parsing successful ========================================="<<endl;
-
-  if(root==NULL) return 0;
-
-  cerr<<"========================================= Printing starts ========================================="<<endl;
-
-  root->pretty_print(0);
-
-  cerr<<"========================================= Printing successful ========================================="<<endl;
-
-  return 0;
-}
-*/
 
 
 

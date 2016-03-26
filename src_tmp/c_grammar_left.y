@@ -1,12 +1,6 @@
 
 /* ============================================== 3.5 DECLARATIONS ============================================== */
 
-
-declaration : declaration_type init_declarator_list
-            // Allowed but not sensible. Simply ignore
-            | declaration_type     { cerr<<"Warning: Useless definition in file "<<source_file<<", Line: "<<input_file_line<<endl;}
-            ;
-
 // Any combination of type specifier(int, struct, etc), storage specifier(register, auto, etc) and type qualifier (const, volatile)
 declaration_type  : TYPE_SPECIFIER
                         | TYPE_SPECIFIER declaration_type
@@ -18,46 +12,6 @@ declaration_type  : TYPE_SPECIFIER
                         //| STORAGE_SPECIFIER declaration_type
                         ;
 
-// Initialization list
-init_declarator_list  : init_declarator
-                      | init_declarator_list COMMA init_declarator 
-                      ;
-                      
-// Variable name and initialization/value (if provided) at declaration
-init_declarator   : declarator
-                  | declarator EQUALS initializer
-                  ;
-
-// LHS of variable initialization
-declarator  : direct_declarator
-            | pointer direct_declarator
-            ;
-
-// Variable name, Array cell or function
-direct_declarator : IDENTIFIER
-                  | LBRACKET declarator RBRACKET
-                  // Array cell
-                  | direct_declarator LSQUARE constant_expression RSQUARE
-                  | direct_declarator LSQUARE RSQUARE
-                  // Function declaration: name and arguments
-                  //| direct_declarator LBRACKET parameter_type_list RBRACKET
-                  //| direct_declarator LBRACKET identifier_list RBRACKET
-                  //| direct_declarator LBRACKET RBRACKET
-                  ;
-
-// RHS of variable initialization
-initializer // Expression value for a variable
-            : assignment_expression
-            // Array initialization
-            | LCURLY initializer_list RCURLY
-            | LCURLY initializer_list COMMA RCURLY
-            ;
-
-// List for array elements initialization
-initializer_list  : initializer
-                  | initializer_list COMMA initializer
-                  ;
-
 POINTER : MULT TYPE_QUALIFIER_LIST
         | MULT 
         | MULT TYPE_QUALIFIER_LIST POINTER
@@ -67,8 +21,6 @@ POINTER : MULT TYPE_QUALIFIER_LIST
 TYPE_QUALIFIER_LIST : TYPE_QUALIFIER
                     | TYPE_QUALIFIER_LIST TYPE_QUALIFIER
                     ;
-
-/* -------------------------------------------- TYPE AND STORAGE SPECIFIERS -------------------------------------------- */
 
 // void not allowed for variables 
 TYPE_SPECIFIER  : VOID 

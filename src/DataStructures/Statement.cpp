@@ -23,7 +23,6 @@ ASMhandle::ASMhandle(ASMhandle& orig){
 		}
 	}
 
-
 	global_vars = new map<string, Variable*>;
 	if(orig.global_vars!=NULL){
 		map<string, Variable*>::iterator it;

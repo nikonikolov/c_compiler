@@ -13,3 +13,4 @@ test_asm
 mips-iv.pdf
 .DataStructures.backups
 backups/*
+src_tmp

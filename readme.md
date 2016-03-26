@@ -1,48 +1,24 @@
-Overview
+C compiler
 ========
 
-The main repository is at:
-[https://github.com/LangProc/langproc_2015_cw](https://github.com/LangProc/langproc_2015_cw).
+An implementation of a C compiler that takes C90 source code as input 
+and produces MIPS assembly as output. The output can be linked and 
+assembled to binary using tools such as gcc. The binary is then ready to 
+be run on any MIPS CPU or MIPS emulator and should produce the same results as 
+a binary purely compiled with gcc. 
 
-The language processors coursework is to build a C compiler
-from the C90 language to MIPS assembly. It should be possible
-to assemble and link the output using existing tools and
-execute it on a MIPS CPU.
+Flex 2.6.0 and Bison 3.0.4 are used for implementing lexer and parser 
+respectively. Older versions might work as well. The actual code generation
+is performed using C++11.
 
-There are three intermediate milestones, which are assessed
-at a low weight and designed to encourage familiarity with
-aspects of language processors and implementation. There
-is a more detailed discussion of the [rationale here](rationale.md).
-
-The marks break-down is:
-
-1 - [Tokeniser](1-tokeniser.md) : 10%, Due 12th Feb
-
-2 - [Parser](2-parser.md) : 20%, Due 26th Feb
-
-3 - [Code Generation](3-code-generator.md) : 20%, Due Thu 17th March (Updated again)
-
-4 - [Compiler](4-compiler.md) : 50%, Due Friday 25th March
-
-The overall timeline is shown below:
-
-![Timeline](timeline.png)
-
-It is not a good idea to assume that the final two weeks
-are sufficient time to complete a compiler.
-
-Environment
------------
-
-The target environment is the lab Ubuntu setup. You can
-make use of any tools available there-in.
-
-Build and filenames
+Build
 -------------------
 
-Your submission should contain a top-level makefile that
-can build the various components, including your compiler.
-All outputs will be built into the `bin/` directory. Apart
-from that, you have complete freedom to do whatever you
-want with directories and files.
+Run `make bin/c_compiler`
+
+Running 
+-------------------
+
+The `bin/c_compiler` executable takes C90 preprocessed source 
+code on `stdin` and produces MIPS assembly on `stdout`
 
